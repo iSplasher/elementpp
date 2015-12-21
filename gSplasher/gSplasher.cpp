@@ -15,7 +15,7 @@ int main() {
 	const sf::Color windowColor{ sf::Color(255, 0, 0, 192) };
 	const sf::Color windowColorGrabbed{ sf::Color(255, 255, 0, 64) };
 
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!", sf::Style::None);
+	sf::RenderWindow window(sf::VideoMode(200, 200), "gSplasher", sf::Style::None);
 	makeWindowTransparent(window);
 	window.setVerticalSyncEnabled(true);
 	sf::CircleShape shape(100.f);
@@ -54,8 +54,6 @@ int main() {
 			}
 		setWindowAlpha(window, 100);
 		window.clear(clearColor);
-		//window.draw(shape);
-		//window.setPosition(sf::Vector2i(winPosX, 0));
 		window.display();
 	}
 
