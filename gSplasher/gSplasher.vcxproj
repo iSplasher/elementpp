@@ -83,9 +83,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="gSplasher.h" />
+    <ClInclude Include="base.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="base.cpp" />
     <ClCompile Include="gSplasher.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
