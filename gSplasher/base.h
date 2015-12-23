@@ -27,7 +27,7 @@ public:
 private:
 	bool process_events();
 
-	std::shared_ptr<std::vector<BaseWindow>> windows;
+	std::shared_ptr<std::vector<BaseWindow*>> windows;
 	static std::shared_ptr<WindowManager> base_manager;
 };
 
