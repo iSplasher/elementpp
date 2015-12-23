@@ -18,33 +18,33 @@ inline void setWindowAlpha(sf::RenderWindow &window, sf::Uint8 alpha = 255) {
 namespace gspl
 {
 
-class WindowManager {
-	friend class BaseWindow;
+class BaseManager {
+	friend class BaseWidget;
 public:
-	WindowManager();
-	WindowManager(BaseWindow&);
-	bool run();
+	BaseManager();
+	BaseManager(BaseWidget&);
+	bool run() const;
 private:
-	bool process_events();
+	bool process_events() const;
 
-	std::shared_ptr<std::vector<BaseWindow*>> windows;
-	static std::shared_ptr<WindowManager> base_manager;
+	std::shared_ptr<std::vector<BaseWidget*>> widgets;
+	static std::shared_ptr<BaseManager> first_manager;
 };
 
-class BaseWindow {
-	friend class WindowManager;
+class BaseWidget {
+	friend class BaseManager;
 public:
-	BaseWindow();
-	BaseWindow(const BaseWindow&);
+	BaseWidget();
+	BaseWidget(const BaseWidget&);
 
 	sf::Vector2i grabOffset;
 	bool is_grabbed = false;
 private:
-	WindowManager const *manager = nullptr;
+	BaseManager const *manager = nullptr;
 	std::unique_ptr<sf::RenderWindow> sfwindow;
 
-	sf::Color base_window_color{ sf::Color(255, 0, 0, 192) };
-	sf::Color base_window_color_grabbed{ sf::Color(255, 255, 0, 64) };
+	sf::Color base_widget_color{ sf::Color(255, 0, 0, 192) };
+	sf::Color base_widget_color_grabbed{ sf::Color(255, 255, 0, 64) };
 };
 }
 

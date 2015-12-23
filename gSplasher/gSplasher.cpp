@@ -2,8 +2,8 @@
 
 int main() {
 
-	gspl::BaseWindow window;
-	gspl::WindowManager app(window);
+	gspl::BaseWidget window;
+	gspl::BaseManager app(window);
 
 	while (app.run()) {
 	}
