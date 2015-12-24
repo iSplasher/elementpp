@@ -17,9 +17,15 @@
     <ClCompile Include="base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

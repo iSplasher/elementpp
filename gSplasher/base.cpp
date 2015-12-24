@@ -1,6 +1,8 @@
+#include <SFML/Graphics.hpp>
 #include <memory>
 #include <iostream>
 #include "base.h"
+#include "wrapper.h"
 
 using namespace gspl;
 
@@ -49,13 +51,7 @@ bool BaseManager::process_events() const {
 				}
 			}
 
-			sf::Color clear_color{ widget->base_widget_color };
-			if (widget->is_grabbed) {
-				clear_color = widget->base_widget_color_grabbed;
-			}
-			setWindowAlpha(*widget->sfwindow, 100);
-			widget->sfwindow->clear(clear_color);
-			widget->sfwindow->display();
+			widget->update();
 		}
 
 	}
@@ -71,6 +67,27 @@ BaseWidget::BaseWidget() : sfwindow(new sf::RenderWindow(sf::VideoMode(200, 200)
 	sfwindow->setVerticalSyncEnabled(true);
 };
 
-BaseWidget::BaseWidget(const BaseWidget &other) {
+BaseWidget::BaseWidget(const BaseWidget &other) : BaseWidget() {
+}
 
+void BaseWidget::paint() const {
+	sf::Font font;
+	font.loadFromFile("Quicksand-Regular.otf");
+	sf::Text test{"Hello gSplasher!", font};
+	sfwindow->draw(test);
+}
+
+void BaseWidget::paint(Painter&) const {
+	
+}
+
+void BaseWidget::update() const {
+	Color clear_color{ style.base_color };
+	if (is_grabbed) {
+		clear_color = style.grabbed_color;
+	}
+	setWindowAlpha(*sfwindow, 190);
+	sfwindow->clear(clear_color);
+	paint();
+	sfwindow->display();
 }
