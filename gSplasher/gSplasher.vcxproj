@@ -10,6 +10,17 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Base.h" />
+    <ClInclude Include="include\Widgets\WidgetUtils.h" />
+    <ClInclude Include="include\Wrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Base.cpp" />
+    <ClCompile Include="gSplasher.cpp" />
+    <ClCompile Include="WidgetUtils.cpp" />
+    <ClCompile Include="Wrapper.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9925E070-B0A1-417D-8C49-E3CE89EBDE48}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -82,15 +93,6 @@
       <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;sfml-network-s.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;gdi32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="base.h" />
-    <ClInclude Include="wrapper.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="base.cpp" />
-    <ClCompile Include="gSplasher.cpp" />
-    <ClCompile Include="wrapper.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

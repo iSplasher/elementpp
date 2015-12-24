@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "wrapper.h"
+#include "Wrapper.h"
 
 inline void makeWindowTransparent(sf::RenderWindow &window) {
 	HWND hwnd = window.getSystemHandle();

@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <iostream>
-#include "base.h"
-#include "wrapper.h"
+#include "include/Base.h"
+#include "include/Wrapper.h"
 
 using namespace gspl;
 
