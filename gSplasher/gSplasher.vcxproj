@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Base.h" />
+    <ClInclude Include="include\Global.h" />
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\Wrapper.h" />
   </ItemGroup>

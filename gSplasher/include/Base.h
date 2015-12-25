@@ -8,15 +8,6 @@
 
 #include "Wrapper.h"
 
-inline void makeWindowTransparent(sf::RenderWindow &window) {
-	HWND hwnd = window.getSystemHandle();
-	SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-}
-
-inline void setWindowAlpha(sf::RenderWindow &window, sf::Uint8 alpha = 255) {
-	SetLayeredWindowAttributes(window.getSystemHandle(), 0, alpha, LWA_ALPHA);
-}
-
 namespace gspl
 {
 
@@ -34,7 +25,62 @@ private:
 	static std::shared_ptr<BaseManager> first_manager;
 };
 
-// Styles
+
+struct Region final {
+	using Point = sf::Vector2f;
+	using iterator = std::vector<Point>::iterator;
+
+	Region() : path() {
+	}
+	Region(const Region &other);
+	~Region() = default;
+
+	// starting  and ending points
+	Point startPoint() const;
+	Point endPoint() const;
+	const iterator begin();
+	const iterator end();
+	// will return false or true wether point was made (point won't be added if it makes an irregular shape)
+	bool addPoint(std::initializer_list<Point> p);
+	bool addPoint(Point p);
+	Region &operator<<(const Point &p);
+	Region &operator+=(const Region &other);
+	Region &operator-=(const Region &other);
+	bool insertPoint(std::initializer_list<Point> p);
+	bool insertPoint(Point p);
+	// if region is inside this region
+	bool contains(Region &r);
+
+private:
+	// removes points inside.. leaves outer points
+	void cleanInside();
+	// joins two region while cleaning the insides
+	Region *concatenate(Region &r1, Region&r2);
+
+	std::vector<Point> path;
+};
+
+Region operator+(const Region &lhs, const Region &rhs);
+Region operator-(const Region &lhs, const Region &rhs);
+
+struct BaseType {
+	BaseType() = default;
+	~BaseType() = default;
+};
+
+// Widget shape and other things
+struct WidgetType {
+	enum Shape {
+
+	};
+
+	WidgetType() = default;
+	~WidgetType() = default;
+
+	Region getRegion();
+
+};
+
 struct BaseStyle {
 	BaseStyle() : base_color() {
 	}
@@ -43,15 +89,18 @@ struct BaseStyle {
 	gspl::Color base_color;
 };
 
+// Look, height and shape of widget
 struct WidgetStyle : BaseStyle {
-	WidgetStyle() : BaseStyle() {
-	}
+	WidgetStyle();
 	WidgetStyle(Color bg_color, Color fg_color, Color grab_color) : BaseStyle(bg_color),
-		foreground_color(fg_color), grabbed_color(grab_color) {
+		foreground_color(fg_color), grabbed_color(grab_color), height(0), width(0) {
 	}
 
 	Color foreground_color;
 	Color grabbed_color;
+	int height;
+	int width;
+	WidgetType type;
 };
 
 // Widgets
@@ -61,7 +110,8 @@ class BaseWidget {
 public:
 	BaseWidget();
 	BaseWidget(const BaseWidget&);
-	explicit BaseWidget(const WidgetStyle s) : style(s){}
+	explicit BaseWidget(const WidgetStyle s) : style(s) {
+	}
 	virtual ~BaseWidget() = default;
 
 	// member methods
@@ -79,9 +129,15 @@ protected:
 	virtual void paint() const;
 	virtual void paint(Painter&) const;
 
+	static bool setShape(HWND hWnd, const sf::Image& image);
+	static bool setTransparency(HWND hWnd, unsigned char alpha);
+
 	// data members
 	BaseManager const *manager = nullptr;
 	std::unique_ptr<sf::RenderWindow> sfwindow;
+	sf::Image bg_img;
+	const float alpha_multiplier = 2.55; // multiply the desired transparency in percents. Lower = more transparent
+	const float base_alpha = alpha_multiplier * 60; // 40% transparency
 };
 }
 
