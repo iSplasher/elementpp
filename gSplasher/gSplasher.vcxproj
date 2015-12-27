@@ -11,14 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Base.h" />
+    <ClInclude Include="include\Core.h" />
+    <ClInclude Include="include\Event.h" />
     <ClInclude Include="include\Global.h" />
+    <ClInclude Include="include\Utils\Region.h" />
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\Wrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Base.cpp" />
+    <ClCompile Include="Core.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="gSplasher.cpp" />
+    <ClCompile Include="Region.cpp" />
     <ClCompile Include="WidgetUtils.cpp" />
     <ClCompile Include="Wrapper.cpp" />
   </ItemGroup>

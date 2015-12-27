@@ -12,11 +12,11 @@
     <Filter Include="include\Widgets">
       <UniqueIdentifier>{ab646a0b-bfd4-46a7-ac5a-3529a9becc20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Utils">
+      <UniqueIdentifier>{6d51581a-1214-45b0-8b99-ee129392ec4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Base.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Wrapper.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -26,11 +26,17 @@
     <ClInclude Include="include\Global.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\Region.h">
+      <Filter>include\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Base.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gSplasher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,6 +44,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Region.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

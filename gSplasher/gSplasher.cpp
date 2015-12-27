@@ -1,9 +1,9 @@
-#include "include/Base.h"
+#include "include/Core.h"
 
 int main() {
 
 	gspl::BaseWidget window;
-	gspl::BaseManager app(window);
+	gspl::BaseFrame app(window);
 
 	while (app.run()) {
 	}
