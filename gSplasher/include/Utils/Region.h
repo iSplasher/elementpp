@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "Primitives.h"
 
 namespace gspl
 {
 class Region final {
-	using Point = sf::Vector2f;
 	using iterator = std::vector<Point>::iterator;
 
 public:

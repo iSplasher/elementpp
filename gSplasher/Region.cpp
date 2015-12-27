@@ -7,11 +7,11 @@ Region::Region(const Region& other) {
 
 }
 
-Region::Point Region::startPoint() const {
+Point Region::startPoint() const {
 	return path.empty() ? Point(0, 0) : path[0];
 }
 
-Region::Point Region::endPoint() const {
+Point Region::endPoint() const {
 	return path.empty() ? Point(0, 0) : path[path.size() - 1];
 }
 

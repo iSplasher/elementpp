@@ -39,33 +39,38 @@ bool BaseFrame::run() const {
 	return process_events();
 }
 
-BaseStyle::BaseStyle() {
+BaseProperties::BaseProperties() {
 	base_font.loadFromFile("Quicksand-Regular.otf");
 }
 
-BaseStyle::BaseStyle(Color c): BaseStyle() {
+BaseProperties::BaseProperties(Color c) : BaseProperties() {
 	base_color = c;
 }
 
-WidgetStyle::WidgetStyle() : BaseStyle() {
-	height = 500;
-	width = 500;
+WidgetProperties::WidgetProperties() : BaseProperties() {
+	size.setWidth(500);
+	size.setHeight(500);
 }
 
-WidgetStyle::WidgetStyle(Color bg_color, Color fg_color, Color grab_color): WidgetStyle() {
+WidgetProperties::WidgetProperties(Color bg_color, Color fg_color, Color grab_color): WidgetProperties() {
 	base_color = bg_color;
 	foreground_color = fg_color;
 	grabbed_color = grab_color;
 }
 
+void Layout::update() {
+	for (auto m : *layout_members) {
+		m->update();
+	}
+}
+
 BaseWidget::BaseWidget(BaseWidget *_parent) : 
-sfwindow(new sf::RenderWindow(sf::VideoMode(style.width, style.height), "gSplasher", sf::Style::None)) {
+sfwindow(new sf::RenderWindow(sf::VideoMode(style.size.width(), style.size.height()), "gSplasher", sf::Style::None)) {
 	parent = _parent;
 	sfwindow->setVerticalSyncEnabled(true);
-	sf::Image bg_img;
-	setTransparency(sfwindow->getSystemHandle(), base_alpha);
-	is_widget = _parent == nullptr ? false : true;
-	is_window = _parent == nullptr ? true : false;
+	setTransparency(sfwindow->getSystemHandle(), style.base_alpha);
+	style.is_widget = _parent == nullptr ? false : true;
+	style.is_window = _parent == nullptr ? true : false;
 	setShape();
 }
 
@@ -73,17 +78,8 @@ BaseWidget::BaseWidget(const BaseWidget &other) : BaseWidget() {
 }
 
 // TODO: this
-BaseWidget::BaseWidget(const WidgetStyle s, BaseWidget *_parent) : BaseWidget(_parent) {
+BaseWidget::BaseWidget(const WidgetProperties s, BaseWidget *_parent) : BaseWidget(_parent) {
 	style = s;
-}
-
-void BaseWidget::paint() const {
-	sf::Text test{"Hello gSplasher!", style.base_font};
-	sfwindow->draw(test);
-}
-
-void BaseWidget::paint(Painter&) const {
-	
 }
 
 void BaseWidget::update() {
@@ -108,9 +104,8 @@ void BaseWidget::event(sf::Event ev) {
 				if (ev.mouseButton.button == sf::Mouse::Left) {
 					grabOffset = sfwindow->getPosition() - sf::Mouse::getPosition();
 					is_grabbed = true;
-					style.width += 10;
-					style.height += 10;
-					sfwindow->setSize(sf::Vector2u(style.width, style.height));
+					style.size += 10;
+					sfwindow->setSize(sf::Vector2u(style.size.width(), style.size.height()));
 				}
 			}
 			else if (ev.type == sf::Event::MouseButtonReleased) {
@@ -127,15 +122,23 @@ void BaseWidget::event(sf::Event ev) {
 	}
 }
 
+void BaseWidget::paint() {
+	paint(painter, style);
+}
+
+void BaseWidget::paint(Painter& p, WidgetProperties _style) {
+	
+}
+
 // Windows only implementation for now
 bool BaseWidget::setShape() {
-	if (sfwindow != nullptr) {
-	HRGN hRegion = CreateRoundRectRgn(0, 0, style.width, style.height, 25, 25);
+	//if (sfwindow != nullptr) {
+	//HRGN hRegion = CreateRoundRectRgn(0, 0, style.width, style.height, 25, 25);
 
-	SetWindowRgn(sfwindow->getSystemHandle(), hRegion, true);
-	DeleteObject(hRegion);
-	return true;
-	}
+	//SetWindowRgn(sfwindow->getSystemHandle(), hRegion, true);
+	//DeleteObject(hRegion);
+	//return true;
+	//}
 	return false;
 }
 

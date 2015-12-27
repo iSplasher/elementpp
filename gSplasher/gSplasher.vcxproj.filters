@@ -35,6 +35,9 @@
     <ClInclude Include="include\Core.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\Primitives.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gSplasher.cpp">
