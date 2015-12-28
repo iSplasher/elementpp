@@ -14,8 +14,10 @@
     <ClInclude Include="include\Core.h" />
     <ClInclude Include="include\Event.h" />
     <ClInclude Include="include\Global.h" />
+    <ClInclude Include="include\Layout.h" />
     <ClInclude Include="include\Utils\Primitives.h" />
     <ClInclude Include="include\Utils\Region.h" />
+    <ClInclude Include="include\Widget.h" />
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\Wrapper.h" />
   </ItemGroup>
@@ -23,7 +25,9 @@
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="gSplasher.cpp" />
+    <ClCompile Include="Layout.cpp" />
     <ClCompile Include="Region.cpp" />
+    <ClCompile Include="Widget.cpp" />
     <ClCompile Include="WidgetUtils.cpp" />
     <ClCompile Include="Wrapper.cpp" />
   </ItemGroup>

@@ -38,6 +38,12 @@
     <ClInclude Include="include\Utils\Primitives.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Layout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Widget.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gSplasher.cpp">
@@ -56,6 +62,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
