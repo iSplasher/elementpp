@@ -71,6 +71,12 @@ void BaseWidget::event(sf::Event ev) {
 	}
 }
 
+void BaseWidget::setLayout(Layout &layout) {
+	layout.setContentsRect(contentsRect());
+	layout.changeLayoutableParent(this);
+	layout.update();
+}
+
 void BaseWidget::paint() {
 	paint(painter, style);
 }

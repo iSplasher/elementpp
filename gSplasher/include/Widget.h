@@ -43,7 +43,7 @@ public:
 	// member methods
 	virtual void update() override;
 	virtual void event(sf::Event ev = sf::Event());
-	void setLayout(const Layout&);
+	void setLayout(Layout&);
 
 	// data members
 	BaseWidget *parent;
