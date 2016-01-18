@@ -77,7 +77,7 @@ public:
 
 	virtual Layoutable* parent();
 
-	virtual void add(Layoutable &item);
+	virtual void add(Layoutable &item) = 0;
 
 	//BaseWidget& takeWidget();
 	//Layout& takeLayout();

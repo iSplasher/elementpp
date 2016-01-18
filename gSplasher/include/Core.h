@@ -11,6 +11,13 @@
 
 NAMESPACE_BEGIN
 
+class gCore {
+public:
+	gCore(gCore *parent=nullptr);
+	virtual ~gCore() = default;
+	gCore* m_parent;
+};
+
 class BaseWidget;
 
 class BaseFrame {

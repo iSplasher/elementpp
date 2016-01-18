@@ -10,10 +10,6 @@ Layout::Layout(BaseWidget *p) {
 	p->setLayout(*this);
 }
 
-void Layout::add(Layoutable &item) {
-	
-}
-
 void Layout::update() {
 	// TODO: do the calculations here
 	for (auto m : *layout_members) {

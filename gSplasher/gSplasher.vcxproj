@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\Core.h" />
     <ClInclude Include="include\Event.h" />
     <ClInclude Include="include\Global.h" />
@@ -22,14 +23,12 @@
     <ClInclude Include="include\Wrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core.cpp" />
-    <ClCompile Include="Event.cpp" />
-    <ClCompile Include="gSplasher.cpp" />
-    <ClCompile Include="Layout.cpp" />
-    <ClCompile Include="Region.cpp" />
-    <ClCompile Include="Widget.cpp" />
-    <ClCompile Include="WidgetUtils.cpp" />
-    <ClCompile Include="Wrapper.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Core.cpp" />
+    <ClCompile Include="src\Event.cpp" />
+    <ClCompile Include="src\Layout.cpp" />
+    <ClCompile Include="src\Region.cpp" />
+    <ClCompile Include="src\Widget.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9925E070-B0A1-417D-8C49-E3CE89EBDE48}</ProjectGuid>
@@ -41,13 +40,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

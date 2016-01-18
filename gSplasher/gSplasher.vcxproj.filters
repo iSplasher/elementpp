@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -14,6 +10,13 @@
     </Filter>
     <Filter Include="include\Utils">
       <UniqueIdentifier>{6d51581a-1214-45b0-8b99-ee129392ec4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include\Layouts">
+      <UniqueIdentifier>{8f2ccef2-cf57-4ed0-9498-6ddfb4825c81}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,40 +38,35 @@
     <ClInclude Include="include\Core.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utils\Primitives.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Layout.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Widget.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\Primitives.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Animation.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="gSplasher.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Core.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="WidgetUtils.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Event.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Wrapper.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Layout.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Region.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Region.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Event.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Widget.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Layout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
 </Project>
