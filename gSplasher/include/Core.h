@@ -1,8 +1,6 @@
-// Contains base types
 #pragma once
 
 #include "Global.h"
-#include "Wrapper.h"
 #include "Utils/Primitives.h"
 
 #include <SFML\Graphics.hpp>
@@ -11,45 +9,42 @@
 
 NAMESPACE_BEGIN
 
+class gCoreWidget;
+
+/// <summary>
+/// Core object of the whole library. 
+/// </summary>
 class gCore {
 public:
-	gCore(gCore *parent=nullptr);
+	gCore(gCore *parent = nullptr) : core_parent(parent) {}
 	virtual ~gCore() = default;
-	gCore* m_parent;
+
+protected:
+	gCore* core_parent;
 };
 
-class BaseWidget;
-
-class BaseFrame {
-	friend class BaseWidget;
+/// <summary>
+/// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
+/// </summary>
+class gApplication final : public gCore {
 public:
-	BaseFrame();
-	BaseFrame(BaseWidget&);
-	bool run() const;
-	virtual ~BaseFrame() = default;
+	// *structers
+	gApplication() : gCore(){}
+	~gApplication() = default;
+
+	// member methods
+	int run() const;
+
+	// data members
+	static std::unique_ptr<gApplication> gApp;
 private:
-	bool process_events() const;
+	// member methods
+	bool process_ev() const;
 
-	std::shared_ptr<std::vector<BaseWidget*>> widgets;
-	static std::shared_ptr<BaseFrame> first_manager;
+	// data members
+	std::unique_ptr<std::vector<gCoreWidget*>> widgets;
 };
 
-struct BaseType {
-	BaseType() = default;
-	~BaseType() = default;
-};
-
-
-struct BaseProperties {
-	using Font = sf::Font;
-	BaseProperties();
-
-	BaseProperties(Color c);
-	Color base_color;
-	Font base_font;
-	Size size;
-	Point pos;
-};
 
 NAMESPACE_END
 

@@ -20,9 +20,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Wrapper.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Widgets\WidgetUtils.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
@@ -44,27 +41,18 @@
     <ClInclude Include="include\Widget.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utils\Primitives.h">
+    <ClInclude Include="include\Animation.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Animation.h">
+    <ClInclude Include="include\Utils\Primitives.h">
+      <Filter>include\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\CoreUtils.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Event.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Layout.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Region.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Widget.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />

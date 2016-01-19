@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Global.h"
+#include "Core.h"
 #include "Utils/Primitives.h"
 
 #include <SFML/Graphics.hpp>
@@ -8,14 +9,19 @@
 
 NAMESPACE_BEGIN
 
-class BaseWidget;
+class gCoreWidget;
 
-class Layoutable {
-	friend class Layout;
+/// <summary>
+/// Derived class can be managed by a layout
+/// </summary>
+class gLayoutable : public gCore {
+	friend class gLayout;
 public:
-	Layoutable();
-	virtual ~Layoutable() = default;
+	// *structers
+	gLayoutable();
+	virtual ~gLayoutable() = default;
 
+	// member methods
 	virtual void update() = 0;
 	virtual Rect boundingBox() const = 0;
 	virtual Rect contentsRect();
@@ -29,30 +35,34 @@ public:
 		update();
 	}
 
-	BaseWidget* widget() const {
+	gCoreWidget* widget() const {
 		return m_widget;
 	}
 
-	Layout* layout() const {
+	gLayout* layout() const {
 		return m_layout;
 	}
 
 private:
+	// data members
 	bool in_layout;
 	Rect available_space;
 
 protected:
-	BaseWidget* m_widget;
-	Layout* m_layout;
+	// members methods
+	virtual Rect setContentsRect(Rect r);
+
+	// data members
+	gCoreWidget* m_widget;
+	gLayout* m_layout;
 
 	Size m_size;
 	Size requested_size;
 	Point requested_pos;
 
-	virtual Rect setContentsRect(Rect r);
 };
 
-//class SpaceFill : public Layoutable {
+//class SpaceFill : public gLayoutable {
 //public:
 //	SpaceFill(Size& s) : size(s) {}
 //	~SpaceFill();
@@ -68,20 +78,25 @@ protected:
 //	Rect rect;
 //};
 
-class Layout : public Layoutable {
-	friend class BaseWidget;
+/// <summary>
+/// Abstract layout class. Derive this class to make a custom layout. 
+/// </summary>
+class gLayout : public gLayoutable {
+	friend class gCoreWidget;
 public:
-	Layout();
-	Layout(BaseWidget *p);
-	virtual ~Layout() = 0;
+	// * structers
+	gLayout();
+	gLayout(gCoreWidget *p);
+	virtual ~gLayout() = 0;
 
-	virtual Layoutable* parent();
+	// member methods
+	virtual gLayoutable* parent();
 
-	virtual void add(Layoutable &item) = 0;
+	virtual void add(gLayoutable &item) = 0;
 
-	//BaseWidget& takeWidget();
-	//Layout& takeLayout();
-	//void remove(Layoutable&);
+	//gCoreWidget& takeWidget();
+	//gLayout& takeLayout();
+	//void remove(gLayoutable&);
 
 	//int margin();
 	//int spacing();
@@ -97,13 +112,15 @@ public:
 	Rect contentsRect() const;
 
 protected:
-	std::shared_ptr<std::vector<Layoutable*>> layout_members;
+	// data members
+	std::shared_ptr<std::vector<gLayoutable*>> layout_members;
 
 	unsigned m_margin;
-	const Layoutable *m_parent;
+	const gLayoutable *m_parent;
 private:
+	// member methods
 	void update() override;
-	void changeLayoutableParent(const Layoutable*);
+	void changeLayoutableParent(const gLayoutable*);
 };
 
 NAMESPACE_END

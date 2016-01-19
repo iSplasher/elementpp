@@ -1,11 +1,14 @@
 #pragma once
-#include "include/Global.h"
+
+#include "../Global.h"
 
 #include <SFML/Graphics.hpp>
 
 NAMESPACE_BEGIN
 
 using Point = sf::Vector2i;
+using Color = sf::Color;
+
 struct Size final : sf::Vector2u {
 	Size() : sf::Vector2u() {
 	}
@@ -40,6 +43,7 @@ struct Size final : sf::Vector2u {
 		return *this;
 		}
 };
+
 
 struct Rect final : sf::IntRect {
 	Rect() : sf::IntRect(){}
