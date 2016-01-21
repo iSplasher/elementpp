@@ -41,7 +41,7 @@ struct gWidgetProperties : gCoreProperties {
 /// <summary>
 /// A painter used to paint on a gCoreWidget
 /// </summary>
-class Painter : public sf::Drawable {
+class GSPLASHER_API Painter : public sf::Drawable {
 
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };

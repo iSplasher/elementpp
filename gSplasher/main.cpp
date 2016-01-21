@@ -9,9 +9,6 @@ USING_NAMESPACE
 int main() {
 	gApplication app{};
 
-	while (app.run()) {
-	}
-
-	return 0;
+	return app.run();
 }
 

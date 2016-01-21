@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Global.h"
-#include "Utils/Primitives.h"
 
-#include <SFML\Graphics.hpp>
 #include <memory>
 #include <vector>
 
@@ -14,7 +12,7 @@ class gCoreWidget;
 /// <summary>
 /// Core object of the whole library. 
 /// </summary>
-class gCore {
+class GSPLASHER_API gCore {
 public:
 	gCore(gCore *parent = nullptr) : core_parent(parent) {}
 	virtual ~gCore() = default;
@@ -26,23 +24,24 @@ protected:
 /// <summary>
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
-class gApplication final : public gCore {
+class GSPLASHER_API gApplication final : public gCore {
+	using CoreWidgetList = std::vector<gCoreWidget*>;
+	using CoreWidgetListPtr = std::unique_ptr<CoreWidgetList>;
 public:
 	// *structers
-	gApplication() : gCore(){}
+	gApplication();
 	~gApplication() = default;
 
 	// member methods
 	int run() const;
 
 	// data members
-	static std::unique_ptr<gApplication> gApp;
 private:
 	// member methods
 	bool process_ev() const;
 
 	// data members
-	std::unique_ptr<std::vector<gCoreWidget*>> widgets;
+	CoreWidgetListPtr widgets;
 };
 
 
