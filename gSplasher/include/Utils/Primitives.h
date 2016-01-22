@@ -10,38 +10,25 @@ using Point = sf::Vector2i;
 using Color = sf::Color;
 
 struct Size final : sf::Vector2u {
-	Size() : sf::Vector2u() {
-	}
-	Size(const Size &other) : sf::Vector2u(other) {}
-	Size(const unsigned w, const unsigned h) : sf::Vector2u(w, h) {
-	}
+	Size(const unsigned w, const unsigned h) : sf::Vector2u(w, h), width(x), height(y) {}
+	Size() : Size(0, 0) {}
+	Size(const Size &other) : Size(other.width, other.height) {}
 	~Size() = default;
 
-	void setWidth(const unsigned w) {
-		x = w;
-	}
-	void setHeight(const unsigned h) {
-		y = h;
-	}
-
-	unsigned width() const {
-		return x;
-	}
-
-	unsigned height() const {
-		return y;
-	}
-
 	Size &operator+=(const int& i){
-		x += i;
-		y += i;
+		width += i;
+		height += i;
 		return *this;
 		}
 	Size &operator+=(const Size& s){
-		x += s.x;
-		y += s.y;
+		width += s.width;
+		height += s.height;
 		return *this;
 		}
+
+	// date members
+	unsigned &width;
+	unsigned &height;
 };
 
 

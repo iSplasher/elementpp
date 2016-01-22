@@ -20,14 +20,14 @@ class GSPLASHER_API gCoreWidget { //: public gLayoutable {
 public:
 	// *structers
 	explicit gCoreWidget(gCoreWidget *parent = nullptr);
-	gCoreWidget(const gCoreWidget&);
-	explicit gCoreWidget(const gWidgetProperties s, gCoreWidget *parent = nullptr);
+	//gCoreWidget(const gCoreWidget&);
+	//explicit gCoreWidget(const gWidgetProperties s, gCoreWidget *parent = nullptr);
 	virtual ~gCoreWidget() = default;
 
 	// member methods
-	virtual void paint(Painter &painter, gWidgetProperties &widget_style);
+	//virtual void paint(Painter &painter, gWidgetProperties &widget_style) {}
 	virtual void update();// override;
-	virtual void event(sf::Event ev = sf::Event());
+	//virtual void event(sf::Event ev = sf::Event());
 	//void setLayout(gLayout&);
 
 	// data members
@@ -35,13 +35,13 @@ public:
 
 protected:
 	// member methods
-	static bool setTransparency(HWND hWnd, unsigned char alpha);
+	bool setTransparency(unsigned char alpha) const;
 
 	// data members
-	std::shared_ptr<gApplication> const app;
+	WidgetPtr parent_widget;
 	std::unique_ptr<sf::RenderWindow> r_window;
 	//gLayout &m_layout;
-	WidgetPtr parent_widget;
+
 };
 
 NAMESPACE_END

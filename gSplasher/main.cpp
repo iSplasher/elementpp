@@ -2,13 +2,15 @@
 /// Here is where stuff is tested!
 /// </summary>
 #include "include/Core.h"
-#include "include/Global.h"
+#include "include/Widget.h"
 
 USING_NAMESPACE
 
 int main() {
-	gApplication app{};
+	gApplication* app = gApplication::instance();
 
-	return app.run();
+	gCoreWidget widget{};
+
+	return app->run();
 }
 

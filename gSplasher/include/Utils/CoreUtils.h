@@ -27,7 +27,7 @@ struct gCoreProperties {
 struct gWidgetProperties : gCoreProperties {
 	// *structers
 	gWidgetProperties() : gCoreProperties(){}
-	gWidgetProperties(Size s, Point p) : gCoreProperties(s, p) {}
+	gWidgetProperties(Size s = Size(), Point p = Point()) : gCoreProperties(s, p) {}
 
 	// data members
 	Color fg_color;

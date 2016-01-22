@@ -13,9 +13,9 @@
 
 
 // TODO: define GSPLASHER_API to nothing when not on windows
-#ifdef GSPLASHER_EXPORTS
-	#define GSPLASHER_API __declspec(dllexport)
-#else
-	#define GSPLASHER_API __declspec(dllimport)
-#endif
-
+//#ifdef GSPLASHER_EXPORTS
+//	#define GSPLASHER_API __declspec(dllexport)
+//#else
+//	#define GSPLASHER_API __declspec(dllimport)
+//#endif
+#define GSPLASHER_API
