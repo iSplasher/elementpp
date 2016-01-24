@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <vector>
+#include <atomic>
 
 NAMESPACE_BEGIN
 
@@ -15,7 +16,9 @@ class gCoreWidget;
 /// </summary>
 class GSPLASHER_API gCore {
 public:
-	gCore(gCore *parent = nullptr) : core_parent(parent) {}
+	gCore(gCore *parent = nullptr) :
+		core_parent(parent),
+		core_id(++id_counter) {}
 	virtual ~gCore() = default;
 
 	//logD(std::string);
@@ -32,13 +35,20 @@ public:
 	/// A gCore object.
 	/// </param>
 	/// <param name="ev">A gEvent object.</param>
-	virtual void event(gCore&, gEvent);
+	virtual void event(gCore*, EventPtr);
+
 
 protected:
+	// data members
 	gCore* core_parent;
 
 private:
+	// methods
 	//log(LogLevel, std::string);
+
+	// data members
+	unsigned core_id;
+	static std::atomic<unsigned> id_counter;
 
 };
 
@@ -59,6 +69,7 @@ public:
 
 	// member methods
 	int run();
+	void event(gCore*, EventPtr) override;
 	static gApplication *instance();
 	// data members
 private:

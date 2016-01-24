@@ -3,9 +3,9 @@
 #include "Global.h"
 #include "Layout.h"
 #include "Core.h"
+#include "Event.h"
 #include "Utils/CoreUtils.h"
 
-#include <Windows.h>
 #include <SFML/Graphics.hpp>
 
 
@@ -27,7 +27,7 @@ public:
 	// member methods
 	//virtual void paint(Painter &painter, gWidgetProperties &widget_style) {}
 	virtual void update();// override;
-	//virtual void event(sf::Event ev = sf::Event());
+	virtual void event(gCore *sender, EventPtr ev); // override
 	//void setLayout(gLayout&);
 
 	// data members

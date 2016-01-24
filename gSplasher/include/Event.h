@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Global.h"
+#include "Utils/Primitives.h"
 
 #include <vector>
 #include <SFML/Window/Event.hpp>
@@ -12,12 +13,75 @@ NAMESPACE_BEGIN
 /// </summary>
 class GSPLASHER_API gEvent {
 public:
-	gEvent(){}
-	gEvent(sf::Event ev) : sfevent(ev){}
+	enum Type {
+		None = 0,
+		MouseMove = 1,
+		MouseButtonPress = 2,
+		MouseButtonRelease = 3,
+		KeyPress = 4,
+		KeyRelease = 5,
+
+		// suitable for widgets
+		Enter = 6,
+		Leave = 7,
+		Paint = 8,
+		Move = 9,
+		Resize = 10,
+		Show = 11,
+		Hide = 12,
+		Close = 13,
+		Quit = 14
+	};
+
+	explicit gEvent(Type t) : m_type(t) {}
+	gEvent(sf::Event ev) : gEvent(None){}
+	gEvent(const gEvent&);
 	virtual ~gEvent() = default;
 
-private:
-	sf::Event sfevent;
+	// methods
+	Type type() const { return static_cast<Type>(m_type); };
+
+protected:
+	unsigned short m_type;
+};
+
+using EventPtr = std::shared_ptr<gEvent>;
+
+struct gInputEvent : public gEvent {
+	gInputEvent(
+		Type t,
+		bool _alt=false,
+		bool _control=false,
+		bool _shift=false,
+		bool _system=false) :
+		gEvent(t),
+		alt(_alt),
+		control(_control),
+		shift(_shift),
+		system(_system){}
+
+	bool alt;
+	bool control;
+	bool shift;
+	bool system;
+};
+
+struct gMouseEvent : public gInputEvent {
+	gMouseEvent(Type t, Point pos);
+	explicit gMouseEvent(sf::Event);
+	// data members
+	// pos
+	int x, y;
+	Point pos() const { return Point(x, y); }
+};
+
+struct gKeyEvent : public gInputEvent {
+	gKeyEvent(Type t, int k, std::string txt = std::string());
+	gKeyEvent(sf::Event);
+
+	// data members
+	int key;
+	std::string text;
 };
 
 
@@ -25,7 +89,7 @@ private:
 /// Manages events
 /// </summary>
 class GSPLASHER_API gEventManager {
-	using EventQueue = std::vector<gEvent*>;
+	using EventQueue = std::vector<EventPtr>;
 
 
 public:
@@ -42,7 +106,7 @@ public:
 	/// Dispatch event to the event loop
 	/// </summary>
 	/// <param name="event">A gEvent or its deratives</param>
-	void dispatchEvent(gEvent&);
+	void dispatchEvent(EventPtr);
 	/// <summary>
 	/// Processes events in the event queue
 	/// </summary>

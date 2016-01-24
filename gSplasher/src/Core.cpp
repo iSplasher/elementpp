@@ -3,9 +3,10 @@
 
 USING_NAMESPACE
 
+std::atomic<unsigned> gCore::id_counter;
 gApplication* gApplication::self = nullptr;
 
-void gCore::event(gCore&, gEvent) {}
+void gCore::event(gCore*, EventPtr) {}
 
 gApplication::gApplication() :
 	gCore(), widgets(std::make_unique<CoreWidgetList>()),
@@ -20,6 +21,14 @@ int gApplication::run() {
 		event_manager.processEv();
 	}
 	return 0;
+}
+
+void gApplication::event(gCore* sender, EventPtr ev) {
+	for (auto widget : *widgets) {
+		if (widget->r_window->isOpen()) {
+			widget->event(this, ev);
+		}
+	}
 }
 
 gApplication* gApplication::instance() {
