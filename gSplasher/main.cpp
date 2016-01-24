@@ -7,10 +7,10 @@
 USING_NAMESPACE
 
 int main() {
-	gApplication* app = gApplication::instance();
+	gApplication app{};
 
 	gCoreWidget widget{};
 
-	return app->run();
+	return app.run();
 }
 

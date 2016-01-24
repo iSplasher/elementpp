@@ -55,12 +55,15 @@
     <ClCompile Include="src\Event.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Core.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Widget.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\CoreUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
 </Project>

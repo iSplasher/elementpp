@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <cassert>
 
 // macros
 
@@ -18,4 +19,4 @@
 //#else
 //	#define GSPLASHER_API __declspec(dllimport)
 //#endif
-#define GSPLASHER_API
+#define GSPLASHER_API 

@@ -1,24 +1,32 @@
 #include "../include/Core.h"
 #include "../include/Widget.h"
 
-gsp::gApplication* gsp::gApplication::singleton = nullptr;
+USING_NAMESPACE
 
-int gsp::gApplication::run() const {
+gApplication* gApplication::self = nullptr;
+
+void gCore::event(gCore&, gEvent) {}
+
+gApplication::gApplication() :
+	gCore(), widgets(std::make_unique<CoreWidgetList>()),
+	event_manager() {
+	assert(self == nullptr);
+	self = this;
+	event_manager.init();
+}
+
+int gApplication::run() {
 	while (processEv()) {
-
+		event_manager.processEv();
 	}
 	return 0;
 }
 
-gsp::gApplication* gsp::gApplication::instance() {
-	if (singleton == nullptr) {
-		singleton = new gApplication();
-	}
-
-	return singleton;
+gApplication* gApplication::instance() {
+	return self;
 }
 
-bool gsp::gApplication::processEv() const {
+bool gApplication::processEv() const {
 	auto widgets_open = 0;
 	for (auto widget : *widgets) {
 
@@ -30,6 +38,6 @@ bool gsp::gApplication::processEv() const {
 	return widgets_open ? true : false;
 }
 
-void gsp::gApplication::addWidget(gCoreWidget* widget) const {
+void gApplication::addWidget(gCoreWidget* widget) const {
 	widgets->push_back(widget);
 }

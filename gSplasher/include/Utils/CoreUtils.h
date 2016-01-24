@@ -10,10 +10,11 @@ NAMESPACE_BEGIN
 /// <summary>
 /// Defines size and position.
 /// </summary>
-struct gCoreProperties {
+struct GSPLASHER_API gCoreProperties {
 	// *structers
-	gCoreProperties();
-	gCoreProperties(Size s, Point p): size(s), pos(p) {}
+	gCoreProperties() : gCoreProperties(0, 0, 0, 0){}
+	gCoreProperties(Point p, Size s): size(s), pos(p) {}
+	gCoreProperties(int x, int y, int w, int h): size(w, h), pos(x, y) {}
 
 	// data members
 	Size size;
@@ -24,10 +25,12 @@ struct gCoreProperties {
 /// <summary>
 /// Defines widget colors and font and position
 /// </summary>
-struct gWidgetProperties : gCoreProperties {
+struct GSPLASHER_API gWidgetProperties : gCoreProperties {
 	// *structers
-	gWidgetProperties() : gCoreProperties(){}
-	gWidgetProperties(Size s = Size(), Point p = Point()) : gCoreProperties(s, p) {}
+	gWidgetProperties(int x, int y, int w, int h) :
+		gCoreProperties(x, y, w, h) {}
+	gWidgetProperties(Point p = Point(), Size s = Size()) :
+		gWidgetProperties(p.x, p.y, s.width, s.height) {}
 
 	// data members
 	Color fg_color;
@@ -41,9 +44,6 @@ struct gWidgetProperties : gCoreProperties {
 /// <summary>
 /// A painter used to paint on a gCoreWidget
 /// </summary>
-class GSPLASHER_API Painter : public sf::Drawable {
-
-	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-};
+using Painter = sf::Drawable;
 
 NAMESPACE_END
