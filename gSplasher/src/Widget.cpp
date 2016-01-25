@@ -6,18 +6,14 @@
 USING_NAMESPACE
 
 gCoreWidget::gCoreWidget(gCoreWidget* parent) :
+	gCore(parent),
 	style(0, 0, 200, 200),
 	r_window(new sf::RenderWindow(sf::VideoMode(style.size.width, style.size.height), "gSplasher", sf::Style::None)) {
+	is_widget = true;
 	r_window->setVerticalSyncEnabled(true);
 	setTransparency(style.base_alpha);
 	if (parent) {	
-		parent_widget = std::make_shared<gCoreWidget>(parent);
-	}
-
-	if (parent == nullptr) {
-		if (gApp != nullptr) {
-			gApp->addWidget(this);
-		}
+		parent_widget = parent;
 	}
 }
 
@@ -25,7 +21,7 @@ void gCoreWidget::update() {
 	using SE = sf::Event;
 	SE sfev;
 	while (r_window->pollEvent(sfev)) {
-		std::shared_ptr<gEvent> ev(nullptr);
+		EventPtr ev(nullptr);
 		switch(sfev.type) {
 		case SE::MouseMoved:
 		case SE::MouseButtonPressed:
@@ -47,10 +43,12 @@ void gCoreWidget::update() {
 	r_window->display();
 }
 
-void gCoreWidget::event(gCore* sender, EventPtr ev) {
+void gCoreWidget::event(EventPtr ev) {
 	// TODO: send events to children here
-	if (ev->type() == gEvent::MouseMove) {
-		printf("Mouse moved");
+	switch (ev->type()) {
+	case gEvent::MouseMove:
+		mouseMoveEvent(std::static_pointer_cast<gMouseEvent>(ev));
+		break;
 	}
 }
 
@@ -59,4 +57,14 @@ bool gCoreWidget::setTransparency(unsigned char alpha) const {
 	SetWindowLongPtr(hWnd, GWL_EXSTYLE, GetWindowLongPtr(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 	SetLayeredWindowAttributes(hWnd, 0, alpha, LWA_ALPHA);
 	return true;
+}
+
+void gCoreWidget::mousePressEvent(MouseEventPtr ev){
+}
+
+void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
+	printf("x=%d y=%d\n", ev->x, ev->y);
+}
+
+void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 }

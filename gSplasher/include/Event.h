@@ -34,7 +34,8 @@ public:
 	};
 
 	explicit gEvent(Type t) : m_type(t) {}
-	gEvent(sf::Event ev) : gEvent(None){}
+
+	explicit gEvent(sf::Event ev) : gEvent(None){}
 	gEvent(const gEvent&);
 	virtual ~gEvent() = default;
 
@@ -48,7 +49,7 @@ protected:
 using EventPtr = std::shared_ptr<gEvent>;
 
 struct gInputEvent : public gEvent {
-	gInputEvent(
+	explicit gInputEvent(
 		Type t,
 		bool _alt=false,
 		bool _control=false,
@@ -60,20 +61,27 @@ struct gInputEvent : public gEvent {
 		shift(_shift),
 		system(_system){}
 
+	gInputEvent(const gInputEvent&);
+
 	bool alt;
 	bool control;
 	bool shift;
 	bool system;
 };
 
+using InputEventPtr = std::shared_ptr<gInputEvent>;
+
 struct gMouseEvent : public gInputEvent {
 	gMouseEvent(Type t, Point pos);
 	explicit gMouseEvent(sf::Event);
+	gMouseEvent(const gMouseEvent&);
 	// data members
 	// pos
 	int x, y;
 	Point pos() const { return Point(x, y); }
 };
+
+using MouseEventPtr = std::shared_ptr<gMouseEvent>;
 
 struct gKeyEvent : public gInputEvent {
 	gKeyEvent(Type t, int k, std::string txt = std::string());
@@ -84,6 +92,7 @@ struct gKeyEvent : public gInputEvent {
 	std::string text;
 };
 
+using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
 /// <summary>
 /// Manages events

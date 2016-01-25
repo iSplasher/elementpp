@@ -14,8 +14,7 @@ NAMESPACE_BEGIN
 /// <summary>
 /// Core widget. Can be used as a window or embedded in another widget. 
 /// </summary>
-class GSPLASHER_API gCoreWidget { //: public gLayoutable {
-	using WidgetPtr = std::shared_ptr<gCoreWidget>;
+class GSPLASHER_API gCoreWidget : gCore { //: public gLayoutable {
 	friend class gApplication;
 public:
 	// *structers
@@ -27,7 +26,7 @@ public:
 	// member methods
 	//virtual void paint(Painter &painter, gWidgetProperties &widget_style) {}
 	virtual void update();// override;
-	virtual void event(gCore *sender, EventPtr ev); // override
+	virtual void event(EventPtr ev);
 	//void setLayout(gLayout&);
 
 	// data members
@@ -36,9 +35,12 @@ public:
 protected:
 	// member methods
 	bool setTransparency(unsigned char alpha) const;
+	virtual void mousePressEvent(MouseEventPtr ev);
+	virtual void mouseMoveEvent(MouseEventPtr ev);
+	virtual void mouseReleaseEvent(MouseEventPtr ev);
 
 	// data members
-	WidgetPtr parent_widget;
+	gCoreWidget *parent_widget;
 	std::unique_ptr<sf::RenderWindow> r_window;
 	//gLayout &m_layout;
 

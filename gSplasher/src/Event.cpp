@@ -10,6 +10,13 @@ gEvent::gEvent(const gEvent& other) {
 	m_type = other.type();
 }
 
+gInputEvent::gInputEvent(const gInputEvent &other) : gEvent(other.type()) {
+	alt = other.alt;
+	control = other.control;
+	shift = other.shift;
+	system = other.system;
+}
+
 gMouseEvent::gMouseEvent(Type t, Point p) : gInputEvent(t), x(p.x), y(p.y) {}
 
 gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None), x(), y() {
@@ -33,6 +40,12 @@ gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None), x(), y() {
 		m_type = None;
 		break;
 	}
+}
+
+gMouseEvent::gMouseEvent(const gMouseEvent &other) :
+	gInputEvent(other.type(), other.alt, other.control, other.shift, other.system) {
+	x = other.x;
+	y = other.y;
 }
 
 gKeyEvent::gKeyEvent(Type t, int k, std::string txt) : gInputEvent(t), key(k), text(txt) {}
@@ -75,7 +88,7 @@ void gEventManager::processEv() {
 	while (!eventqueue.empty()) {
 		EventPtr ev = eventqueue.front();
 		if (gApp) {
-			gApp->event(gApp, ev);
+			gApp->event(ev);
 		}
 		eventqueue.erase(eventqueue.begin());
 	}

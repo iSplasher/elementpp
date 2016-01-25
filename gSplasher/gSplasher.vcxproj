@@ -21,6 +21,7 @@
     <ClInclude Include="include\Utils\Region.h" />
     <ClInclude Include="include\Widget.h" />
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
+    <ClInclude Include="include\Utils\tree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -50,6 +50,9 @@
     <ClInclude Include="include\Utils\CoreUtils.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\tree.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event.cpp">
