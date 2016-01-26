@@ -10,6 +10,7 @@
 NAMESPACE_BEGIN
 
 class gCoreWidget;
+class gApplication;
 
 /// <summary>
 /// Core object of the whole library. 
@@ -17,7 +18,7 @@ class gCoreWidget;
 class GSPLASHER_API gCore {
 public:
 	gCore(gCore *parent = nullptr);
-	virtual ~gCore() = default;
+	virtual ~gCore();
 
 	//logD(std::string);
 	//logE(std::string);
@@ -39,21 +40,31 @@ public:
 	/// </summary>
 	/// <returns>gCore*</returns>
 	gCore* parentCore() const { return core_parent; }
+	/// <summary>
+	/// Change parent of gCore object
+	/// </summary>
+	/// <param name="new_parent">The new parent object</param>
+	void changeParent(gCore*);
 
 	// data members
-	bool is_widget;
-
-protected:
-	// data members
-	gCore* core_parent;
+	bool is_widget = false;
 
 private:
 	// methods
 	//log(LogLevel, std::string);
 
 	// data members
+	gCore* core_parent;
 	unsigned core_id;
 	static std::atomic<unsigned> id_counter;
+	tree<gCore*>::iterator internal_tree;
+	/// <summary>
+	/// Used by parent to let us know if we should remove ourselves
+	/// from the internal tree container
+	/// </summary>
+	bool parent_is_deleting = false;
+
+	friend class gApplication;
 
 };
 
@@ -63,11 +74,7 @@ private:
 /// <summary>
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
-class GSPLASHER_API gApplication final : public gCore {
-
-friend class gCoreWidget;
-friend class gCore;
-
+class GSPLASHER_API gApplication final : private gCore{
 public:
 	using CoreList = tree<gCore*>;
 	using CoreListPtr = std::unique_ptr<CoreList>;
@@ -96,22 +103,25 @@ private:
 	gApplication(const gApplication&) {}
 
 	// member methods
-	bool processEv() const;
 	/// <summary>
-	/// Inserts gCore pointers to keep list in sync
+	/// Processes the next events in the loop
+	/// </summary>
+	/// <returns>false if application should quit else true</returns>
+	bool processEv() const;
+
+	/// <summary>
+	/// Inserts gCore pointer to keep list in sync
 	/// </summary>
 	/// <param name="gCore*">a pointer to the gCore object</param>
 	void insertCore(gCore*) const;
-	/// <summary>
-	/// Removes gCore pointers from the list
-	/// </summary>
-	/// <param name="gCore*">a pointer to the gCore object</param>
-	void removeCore(gCore*) const;
 
 	// data members
 	static gApplication *self;
 	gEventManager event_manager;
-	bool should_quit;
+	bool should_quit = false;
+
+	friend class gCoreWidget;
+	friend class gCore;
 };
 
 

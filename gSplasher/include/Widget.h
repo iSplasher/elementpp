@@ -14,7 +14,7 @@ NAMESPACE_BEGIN
 /// <summary>
 /// Core widget. Can be used as a window or embedded in another widget. 
 /// </summary>
-class GSPLASHER_API gCoreWidget : gCore { //: public gLayoutable {
+class GSPLASHER_API gCoreWidget : public gCore { //: public gLayoutable {
 	friend class gApplication;
 public:
 	// *structers

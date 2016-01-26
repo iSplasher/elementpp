@@ -7,7 +7,6 @@ std::atomic<unsigned> gCore::id_counter;
 gApplication* gApplication::self = nullptr;
 
 gCore::gCore(gCore* parent) :
-	is_widget(false),
 	core_parent(parent),
 	core_id(++id_counter) {
 	if (gApp != nullptr) {
@@ -16,12 +15,42 @@ gCore::gCore(gCore* parent) :
 
 }
 
+gCore::~gCore() {
+	// first we traverse the tree to tell our children that
+	// they shouldn't touch their internal tree.
+	// we also delete the cildrens
+
+	if (!parent_is_deleting) {
+		for (auto iter = internal_tree.begin(); iter != internal_tree.end(); ++iter)
+		{
+			(*iter)->parent_is_deleting = true;
+
+			for (auto inner = iter.begin(); inner != iter.end(); ++inner)
+			{
+				(*inner)->parent_is_deleting = true;
+				delete *inner;
+			}
+			delete *iter;
+		}
+
+		// then we clear our branch
+
+		internal_tree.clear_tree();
+	}
+}
+
 void gCore::event(EventPtr) {}
+
+void gCore::changeParent(gCore* new_parent) {
+	if (gApp != nullptr) {
+		internal_tree = new_parent->internal_tree.reinsert(internal_tree);
+		core_parent = new_parent;
+	}
+}
 
 gApplication::gApplication() :
 	gCore(), core_objects(std::make_unique<CoreList>()),
-	event_manager(),
-	should_quit(false) {
+	event_manager() {
 	assert(self == nullptr);
 	self = this;
 	event_manager.init();
@@ -56,27 +85,17 @@ bool gApplication::processEv() const {
 	return should_quit ? false : true;
 }
 
+
+
 void gApplication::insertCore(gCore* core) const {
 	CoreList::iterator iter;
 
 	// if there is a parent
 	if (core->parentCore()) {
-		// using breadth first search
-		auto main_t = core_objects->tree_find_breadth(core->parentCore());
-		assert(main_t != core_objects->end());
-		
 		// insert in the parent branch
-		 main_t.push_back(core);
+		core->internal_tree = core->parentCore()->internal_tree.push_back(core);
 	} else {
 		// else just insert it at root
-		iter = core_objects->push_back(core);
+		core->internal_tree = core_objects->push_back(core);
 	}
-}
-
-void gApplication::removeCore(gCore *core) const {
-	
-	auto main_t = core_objects->find(core);
-	assert(main_t != core_objects->end());
-
-	main_t.clear_tree();
 }
