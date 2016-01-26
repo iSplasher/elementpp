@@ -57,18 +57,19 @@ bool gApplication::processEv() const {
 }
 
 void gApplication::insertCore(gCore* core) const {
+	CoreList::iterator iter;
 
 	// if there is a parent
 	if (core->parentCore()) {
-		auto main_t = core_objects->find(core->parentCore());
+		// using breadth first search
+		auto main_t = core_objects->tree_find_breadth(core->parentCore());
 		assert(main_t != core_objects->end());
 		
 		// insert in the parent branch
-		main_t = main_t.insert(core);
-
+		 main_t.push_back(core);
 	} else {
 		// else just insert it at root
-		core_objects->insert(core);
+		iter = core_objects->push_back(core);
 	}
 }
 

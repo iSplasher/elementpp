@@ -88,7 +88,6 @@ public:
 
 			print_tree(i);
 		}
-		//printf("%d", core_objects->tree_size());
 	}
 
 	// data members
