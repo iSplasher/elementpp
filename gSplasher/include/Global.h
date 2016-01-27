@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <cassert>
+#include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 // macros
 
@@ -20,3 +22,10 @@
 //	#define GSPLASHER_API __declspec(dllimport)
 //#endif
 #define GSPLASHER_API 
+
+NAMESPACE_BEGIN
+
+using Mouse = sf::Mouse;
+using Keyboard = sf::Keyboard;
+
+NAMESPACE_END

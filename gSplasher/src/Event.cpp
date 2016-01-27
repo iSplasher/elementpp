@@ -29,12 +29,17 @@ gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None), x(), y() {
 		y = ev.mouseMove.y;
 		break;
 	case SE::MouseButtonPressed:
+	case SE::MouseButtonReleased:
+		if (ev.type == SE::MouseButtonPressed) {
 		m_type = MouseButtonPress;
+		}
+		else {
+		m_type = MouseButtonRelease;
+		}
+
+		button = ev.mouseButton.button;
 		x = ev.mouseButton.x;
 		y = ev.mouseButton.y;
-		break;
-	case SE::MouseButtonReleased:
-		m_type = MouseButtonRelease;
 		break;
 	default:
 		m_type = None;
@@ -44,6 +49,7 @@ gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None), x(), y() {
 
 gMouseEvent::gMouseEvent(const gMouseEvent &other) :
 	gInputEvent(other.type(), other.alt, other.control, other.shift, other.system) {
+	button = other.button;
 	x = other.x;
 	y = other.y;
 }
@@ -80,15 +86,15 @@ void gEventManager::init() {
 	tail = 0;
 }
 
-void gEventManager::dispatchEvent(EventPtr ev) {
-	eventqueue.push_back(ev);
+void gEventManager::dispatchEvent(gCore* receiver, EventPtr ev) {
+	eventqueue.push_back(std::make_pair(receiver, ev));
 }
 
 void gEventManager::processEv() {
 	while (!eventqueue.empty()) {
-		EventPtr ev = eventqueue.front();
+		EventPair &ev = eventqueue.front();
 		if (gApp) {
-			gApp->event(ev);
+			gApp->sendEvent(ev.first, ev.second);
 		}
 		eventqueue.erase(eventqueue.begin());
 	}

@@ -9,7 +9,7 @@
 
 NAMESPACE_BEGIN
 
-class gCoreWidget;
+class gWindow;
 class gApplication;
 
 /// <summary>
@@ -28,18 +28,15 @@ public:
 	/// <summary>
 	/// Events are received here
 	/// </summary>
-	/// <param name="sender">
-	/// The one responsible for sending the event.
-	/// Most of the time, this will be the parent.
-	/// A gCore object.
-	/// </param>
 	/// <param name="ev">A gEvent object.</param>
 	virtual void event(EventPtr);
+
 	/// <summary>
-	/// Retrieve a pointer to parent <gCore>
+	/// Retrieve a pointer to parent gCore
 	/// </summary>
 	/// <returns>gCore*</returns>
 	gCore* parentCore() const { return core_parent; }
+
 	/// <summary>
 	/// Change parent of gCore object
 	/// </summary>
@@ -48,6 +45,7 @@ public:
 
 	// data members
 	bool is_widget = false;
+	bool is_window = false;
 
 private:
 	// methods
@@ -120,7 +118,7 @@ private:
 	gEventManager event_manager;
 	bool should_quit = false;
 
-	friend class gCoreWidget;
+	friend class gWindow;
 	friend class gCore;
 };
 

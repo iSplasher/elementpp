@@ -67,8 +67,13 @@ void gApplication::event(EventPtr ev) {
 	// TODO: handle quit event here
 }
 
-void gApplication::sendEvent(gCore* reciever, EventPtr) {
-	// TODO: send events here
+void gApplication::sendEvent(gCore* reciever, EventPtr ev) {
+	if (reciever == parentCore()) {
+		event(ev);
+	}
+	else {
+		reciever->internal_tree.data()->event(ev);
+	}
 }
 
 gApplication* gApplication::instance() {
@@ -78,10 +83,11 @@ gApplication* gApplication::instance() {
 bool gApplication::processEv() const {
 	for (auto core : *core_objects) {
 
-		if (core->is_widget) {
+		if (core->is_window) {
 			static_cast<gCoreWidget*>(core)->update();
 		}
 	}
+
 	return should_quit ? false : true;
 }
 

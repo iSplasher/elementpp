@@ -34,7 +34,7 @@ struct GSPLASHER_API gWidgetProperties : gCoreProperties {
 
 	// data members
 	Color fg_color;
-	Color bg_color;
+	Color bg_color = Color::Transparent;
 	Color active_color;
 
 	const float alpha_multiplier = 2.55; // multiply the desired transparency in percents. Lower = more transparent

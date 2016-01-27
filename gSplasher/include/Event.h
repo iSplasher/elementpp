@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <SFML/Window/Event.hpp>
+#include <utility>
 
 NAMESPACE_BEGIN
 
@@ -78,6 +79,7 @@ struct gMouseEvent : public gInputEvent {
 	// data members
 	// pos
 	int x, y;
+	Mouse::Button button;
 	Point pos() const { return Point(x, y); }
 };
 
@@ -94,11 +96,27 @@ struct gKeyEvent : public gInputEvent {
 
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
+struct gMoveEvent : public gEvent {
+	gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
+		gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
+	gMoveEvent(Type t, Point new_p, Point old_p) :
+		gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
+
+	// data members
+	Point new_point;
+	Point old_point;
+};
+
+using MoveEventPtr = std::shared_ptr<gMoveEvent>;
+
+class gCore;
+
 /// <summary>
 /// Manages events
 /// </summary>
 class GSPLASHER_API gEventManager {
-	using EventQueue = std::vector<EventPtr>;
+	using EventPair = std::pair<gCore*, EventPtr>;
+	using EventQueue = std::vector<EventPair>;
 
 
 public:
@@ -111,11 +129,14 @@ public:
 	/// Resets head and tail for our ring buffer
 	/// </summary>
 	static void init();
+
 	/// <summary>
 	/// Dispatch event to the event loop
 	/// </summary>
-	/// <param name="event">A gEvent or its deratives</param>
-	void dispatchEvent(EventPtr);
+	/// <param name="receiver">a pointer to a gCore object</param>
+	/// <param name="event">a shared pointer to an gEvent or its deratives</param>
+	void dispatchEvent(gCore*, EventPtr);
+
 	/// <summary>
 	/// Processes events in the event queue
 	/// </summary>
