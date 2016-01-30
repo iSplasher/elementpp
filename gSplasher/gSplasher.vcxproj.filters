@@ -53,6 +53,9 @@
     <ClInclude Include="include\Utils\tree.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="src\platform\WinImpl.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event.cpp">
@@ -68,5 +71,8 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\platform\WinImpl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

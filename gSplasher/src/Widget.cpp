@@ -1,7 +1,7 @@
 #include "../include/Widget.h"
 #include "../include/Event.h"
+#include "platform/WinImpl.h"
 
-#include <Windows.h>
 #include <iostream>
 
 USING_NAMESPACE
@@ -52,6 +52,7 @@ void gCoreWidget::mousePressEvent(MouseEventPtr ev){
 	printf("A button was pressed!");
 	move_state = MoveState::Moving;
 	move_offset = ev->pos();
+	resize(style.size.width+5, style.size.height+5);
 }
 
 void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
@@ -78,107 +79,33 @@ void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 	move_state = MoveState::Normal;
 }
 
-unsigned window_count = 0;
-
-LRESULT CALLBACK globalCallback(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// Associate handle and Window instance when the creation message is received
-	if (message == WM_CREATE)
-	{
-		// Get Gwindow instance (it was passed as the last argument of CreateWindow)
-		LONG_PTR window = (LONG_PTR)reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams;
-
-		// Set as the "user data" parameter of the window
-		SetWindowLongPtrW(handle, GWLP_USERDATA, window);
-	}
-
-	//// Get the WindowImpl instance corresponding to the window handle
-	//gWindow* window = handle ? reinterpret_cast<gWindow*>(GetWindowLongPtr(handle, GWLP_USERDATA)) : NULL;
-
-	//// Forward the event to the appropriate function
-	//if (window)
-	//{
-	//	window->processEvent(message, wParam, lParam);
-
-	//	if (window->m_callback)
-	//		return CallWindowProcW(reinterpret_cast<WNDPROC>(window->m_callback), handle, message, wParam, lParam);
-	//}
-
-	// We don't forward the WM_CLOSE message to prevent the OS from automatically destroying the window
-	if (message == WM_CLOSE)
-		return 0;
-
-	// Don't forward the menu system command, so that pressing ALT or F10 doesn't steal the focus
-	if ((message == WM_SYSCOMMAND) && (wParam == SC_KEYMENU))
-		return 0;
-
-	return DefWindowProcW(handle, message, wParam, lParam);
-}
-
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
-	
-	// TODO: move this windows specific code elsewhere
-	if (window_count == 0) {
-		WNDCLASSW window_class;
-		window_class.style = CS_DROPSHADOW;
-		window_class.lpfnWndProc = &globalCallback;
-		window_class.cbClsExtra = 0;
-		window_class.cbWndExtra = 0;
-		window_class.hInstance = GetModuleHandleW(NULL);
-		window_class.hIcon = NULL;
-		window_class.hCursor = 0;
-		window_class.hbrBackground = 0;
-		window_class.lpszMenuName = NULL;
-		window_class.lpszClassName = L"gSplasher_Window";
-		RegisterClassW(&window_class);
-	}
-
-	DWORD win_style = WS_EX_LAYERED | WS_POPUP;
-
-	RECT rect = { 0, 0, style.size.width, style.size.height };
-	AdjustWindowRect(&rect, win_style, false);
-	auto width = rect.right - rect.left;
-	auto height = rect.bottom - rect.top;
-
-	HWND w_hwnd = CreateWindowExW(
-		WS_EX_LAYERED | WS_EX_TOOLWINDOW,
-		L"gSplasher_Window",
-		nullptr,
-		WS_POPUP | WS_VISIBLE,
+	WinImpl win_impl;
+	gWindowHandle handle = win_impl.createHandle(
 		style.pos.x,
 		style.pos.y,
-		width,
-		height,
-		nullptr,
-		nullptr,
-		GetModuleHandle(nullptr),
-		this
-		);
+		style.size.width,
+		style.size.height);
 
-	if (w_hwnd != nullptr) {
-		printf("OK");
-	} else {
-		printf("%u", GetLastError());
-	}
-
-	r_window.reset(new sf::RenderWindow(w_hwnd));
+	r_window.reset(new sf::RenderWindow(handle));
 	r_window->setVerticalSyncEnabled(true);
-	setTransparency(style.base_alpha);
-	redraw();
+	win_impl.setTransparency(handle, style.base_alpha);
+	win_impl.redraw(
+		handle,
+		style.pos.x,
+		style.pos.y,
+		style.size.width,
+		style.size.height);
 	is_widget = false;
 	is_window = true;
-	++window_count;
+}
+
+gWindow::~gWindow() {
 }
 
 void gWindow::update() {
-	MSG message;
-	while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
-	{
-		TranslateMessage(&message);
-		DispatchMessageW(&message);
-	}
-
+	WinImpl::processEvents();
 	using SE = sf::Event;
 	SE sfev;
 	while (r_window->pollEvent(sfev)) {
@@ -219,52 +146,6 @@ void gWindow::move(Point new_p) {
 void gWindow::resize(Size new_s) {
 	r_window->setSize(new_s);
 	style.size = new_s;
-}
-
-bool gWindow::setTransparency(unsigned char alpha) const {
-	auto hWnd = r_window->getSystemHandle();
-	SetLayeredWindowAttributes(hWnd, 0, alpha, LWA_ALPHA);
-	return true;
-}
-
-void gWindow::redraw() {
-
-	int m = 20;
-	int btm_x = style.pos.x + style.size.width - (m+3);
-	int btm_y = style.pos.y + style.size.height;
-	int c_offset_x = style.pos.x + style.size.width - m;
-	int c_offset_y = style.pos.y;
-
-	HRGN window_shape = CreateRoundRectRgn(
-		style.pos.x,
-		style.pos.y,
-		btm_x,
-		btm_y,
-		5,
-		5);
-
-	HRGN exit_shape = CreateEllipticRgn(
-		c_offset_x,
-		c_offset_y,
-		c_offset_x + m,
-		c_offset_y + m
-		);
-
-	c_offset_y += 10;
-	HRGN minimize_shape = CreateEllipticRgn(
-		c_offset_x,
-		c_offset_y,
-		c_offset_x + m,
-		c_offset_y + m
-		);
-
-	CombineRgn(window_shape, exit_shape, window_shape, RGN_OR);
-
-
-	SetWindowRgn(r_window->getSystemHandle(), window_shape, true);
-	DeleteObject(window_shape);
-	DeleteObject(exit_shape);
-	DeleteObject(minimize_shape);
 }
 
 void gWindow::generateMouseMove() {

@@ -56,6 +56,7 @@ protected:
 	virtual void mousePressEvent(MouseEventPtr ev);
 	virtual void mouseMoveEvent(MouseEventPtr ev);
 	virtual void mouseReleaseEvent(MouseEventPtr ev);
+	virtual void redraw() {}
 
 	// data members
 	gCoreWidget *parent_widget;
@@ -75,7 +76,7 @@ friend class gApplication;
 class GSPLASHER_API gWindow : public gCoreWidget {
 public:
 	explicit gWindow(gWindow* parent = nullptr);
-	virtual ~gWindow() = default;
+	virtual ~gWindow();
 
 	// methods
 	void update() override;
@@ -85,16 +86,6 @@ public:
 
 protected:
 	// methods
-	/// <summary>
-	/// Set transparency on window
-	/// </summary>
-	/// <param name="alpha">gWidgetProperties.style should be passed here.</param>
-	/// <returns>Bool for indicating success</returns>
-	bool setTransparency(unsigned char alpha) const;
-	/// <summary>
-	/// Redraws the window shape
-	/// </summary>
-	void redraw();
 
 	std::unique_ptr<sf::RenderWindow> r_window;
 

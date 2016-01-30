@@ -22,6 +22,7 @@
     <ClInclude Include="include\Widget.h" />
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\Utils\tree.h" />
+    <ClInclude Include="src\platform\WinImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="src\Event.cpp" />
     <ClCompile Include="src\CoreUtils.cpp" />
     <ClCompile Include="src\Widget.cpp" />
+    <ClCompile Include="src\platform\WinImpl.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9925E070-B0A1-417D-8C49-E3CE89EBDE48}</ProjectGuid>
