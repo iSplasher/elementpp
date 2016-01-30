@@ -17,17 +17,13 @@ gInputEvent::gInputEvent(const gInputEvent &other) : gEvent(other.type()) {
 	system = other.system;
 }
 
-gMouseEvent::gMouseEvent(Type t, Point p) : gInputEvent(t), x(p.x), y(p.y) {}
+gMouseEvent::gMouseEvent(Type t, Point p) : gInputEvent(t), x(p.x), y(p.y){}
 
-gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None), x(), y() {
+gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None) {
 	using SE = sf::Event;
+
 	// TODO: finish implementing these event types
 	switch(ev.type) {
-	case SE::MouseMoved:
-		m_type = MouseMove;
-		x = ev.mouseMove.x;
-		y = ev.mouseMove.y;
-		break;
 	case SE::MouseButtonPressed:
 	case SE::MouseButtonReleased:
 		if (ev.type == SE::MouseButtonPressed) {

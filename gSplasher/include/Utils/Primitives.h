@@ -27,8 +27,8 @@ struct Size final : sf::Vector2u {
 		}
 
 	// date members
-	unsigned &width;
-	unsigned &height;
+	unsigned width;
+	unsigned height;
 };
 
 

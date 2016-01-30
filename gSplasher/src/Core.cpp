@@ -76,11 +76,17 @@ void gApplication::sendEvent(gCore* reciever, EventPtr ev) {
 	}
 }
 
+void gApplication::dispatchEvent(gCore* reciever, EventPtr ev) {
+	event_manager.dispatchEvent(reciever, ev);
+}
+
 gApplication* gApplication::instance() {
 	return self;
 }
 
 bool gApplication::processEv() const {
+
+	// TODO: optimize this so it doesn't check all
 	for (auto core : *core_objects) {
 
 		if (core->is_window) {

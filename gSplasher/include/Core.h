@@ -2,7 +2,7 @@
 
 #include "Global.h"
 #include "Event.h"
-#include "Utils/Tree.h"
+#include "Utils/Tree.h" // TODO: move this to cpp and forward declare tree class
 
 #include <memory>
 #include <atomic>
@@ -82,6 +82,7 @@ public:
 	int run();
 	void event(EventPtr);
 	void sendEvent(gCore* reciever, EventPtr);
+	void dispatchEvent(gCore* reciever, EventPtr);
 	static gApplication *instance();
 	void print_tree(CoreList::const_iterator &t) {
 		for (CoreList::const_iterator i = t.begin();

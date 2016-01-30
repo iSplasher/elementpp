@@ -45,5 +45,6 @@ struct GSPLASHER_API gWidgetProperties : gCoreProperties {
 /// A painter used to paint on a gCoreWidget
 /// </summary>
 using Painter = sf::Drawable;
+using Mouse = sf::Mouse;
 
 NAMESPACE_END

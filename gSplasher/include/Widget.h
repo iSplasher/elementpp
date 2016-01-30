@@ -43,6 +43,9 @@ public:
 	virtual void resize(int width, int height) { resize(Size(width, height)); }
 	Point mapToGlobal(Point p);
 	//void setLayout(gLayout&);
+	bool underMouse() const { return under_mouse; }
+	unsigned width() const { return style.size.width; }
+	unsigned height() const { return style.size.height; }
 
 
 	// data members
@@ -61,6 +64,7 @@ protected:
 
 private:
 	Point move_offset;
+	bool under_mouse;
 
 friend class gApplication;
 };
@@ -87,8 +91,22 @@ protected:
 	/// <param name="alpha">gWidgetProperties.style should be passed here.</param>
 	/// <returns>Bool for indicating success</returns>
 	bool setTransparency(unsigned char alpha) const;
+	/// <summary>
+	/// Redraws the window shape
+	/// </summary>
+	void redraw();
 
 	std::unique_ptr<sf::RenderWindow> r_window;
+
+private:
+	//methods
+	void generateMouseMove();
+
+	//abitrary data members
+	int _old_mouse_x = 0;
+	int _old_mouse_y = 0;
+
+
 };
 
 NAMESPACE_END

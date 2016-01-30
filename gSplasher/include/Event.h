@@ -2,6 +2,7 @@
 
 #include "Global.h"
 #include "Utils/Primitives.h"
+#include "Utils/CoreUtils.h"
 
 #include <vector>
 #include <SFML/Window/Event.hpp>
@@ -78,9 +79,10 @@ struct gMouseEvent : public gInputEvent {
 	gMouseEvent(const gMouseEvent&);
 	// data members
 	// pos
-	int x, y;
+	int x, y, global_x = Mouse::getPosition().x, global_y = Mouse::getPosition().y;
 	Mouse::Button button;
 	Point pos() const { return Point(x, y); }
+	Point globalPos() const { return Point(global_x, global_y); }
 };
 
 using MouseEventPtr = std::shared_ptr<gMouseEvent>;
