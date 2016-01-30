@@ -5,7 +5,6 @@
 #include "Utils/CoreUtils.h"
 
 #include <vector>
-#include <SFML/Window/Event.hpp>
 #include <utility>
 
 NAMESPACE_BEGIN
@@ -36,8 +35,7 @@ public:
 	};
 
 	explicit gEvent(Type t) : m_type(t) {}
-
-	explicit gEvent(sf::Event ev) : gEvent(None){}
+	gEvent() = default;
 	gEvent(const gEvent&);
 	virtual ~gEvent() = default;
 
@@ -74,39 +72,39 @@ struct gInputEvent : public gEvent {
 using InputEventPtr = std::shared_ptr<gInputEvent>;
 
 struct gMouseEvent : public gInputEvent {
-	gMouseEvent(Type t, Point pos);
-	explicit gMouseEvent(sf::Event);
-	gMouseEvent(const gMouseEvent&);
-	// data members
-	// pos
-	int x, y, global_x = Mouse::getPosition().x, global_y = Mouse::getPosition().y;
-	Mouse::Button button;
-	Point pos() const { return Point(x, y); }
-	Point globalPos() const { return Point(global_x, global_y); }
+	//gMouseEvent(Type t, Point pos);
+	//explicit gMouseEvent(sf::Event);
+	//gMouseEvent(const gMouseEvent&);
+	//// data members
+	//// pos
+	//int x, y, global_x = Mouse::getPosition().x, global_y = Mouse::getPosition().y;
+	//Mouse::Button button;
+	//Point pos() const { return Point(x, y); }
+	//Point globalPos() const { return Point(global_x, global_y); }
 };
 
 using MouseEventPtr = std::shared_ptr<gMouseEvent>;
 
 struct gKeyEvent : public gInputEvent {
-	gKeyEvent(Type t, int k, std::string txt = std::string());
-	gKeyEvent(sf::Event);
+	//gKeyEvent(Type t, int k, std::string txt = std::string());
+	//gKeyEvent(sf::Event);
 
-	// data members
-	int key;
-	std::string text;
+	//// data members
+	//int key;
+	//std::string text;
 };
 
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
 struct gMoveEvent : public gEvent {
-	gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
-		gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
-	gMoveEvent(Type t, Point new_p, Point old_p) :
-		gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
+	//gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
+	//	gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
+	//gMoveEvent(Type t, Point new_p, Point old_p) :
+	//	gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
 
-	// data members
-	Point new_point;
-	Point old_point;
+	//// data members
+	//Point new_point;
+	//Point old_point;
 };
 
 using MoveEventPtr = std::shared_ptr<gMoveEvent>;

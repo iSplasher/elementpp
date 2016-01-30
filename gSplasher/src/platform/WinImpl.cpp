@@ -1,6 +1,5 @@
 #include "WinImpl.h"
 #include <string>
-#include <SFML/Graphics/Image.hpp>
 
 #ifdef SFML_SYSTEM_WINDOWS
 #include <Windows.h>

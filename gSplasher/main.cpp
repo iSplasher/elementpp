@@ -1,8 +1,7 @@
 /// <summary>
 /// Here is where stuff is tested!
 /// </summary>
-#include "include/Core.h"
-#include "include/Widget.h"
+#include "include/Window.h"
 
 USING_NAMESPACE
 
@@ -16,8 +15,6 @@ int main() {
 	gApplication app;
 	gCoreWidget *window =  new gWindow{};
 	MyWidget* c_widget = new MyWidget(window);
-	c_widget->resize(100,100);
-	c_widget->style.bg_color = Color::Green;
 
 	//gCoreWidget *widget2 = new gCoreWidget(widget);
 	//gCoreWidget *widget3 = new gCoreWidget(widget);

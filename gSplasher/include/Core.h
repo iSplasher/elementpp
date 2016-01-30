@@ -4,7 +4,6 @@
 #include "Event.h"
 #include "Utils/Tree.h" // TODO: move this to cpp and forward declare tree class
 
-#include <memory>
 #include <atomic>
 
 NAMESPACE_BEGIN
@@ -77,6 +76,7 @@ public:
 	using CoreList = tree<gCore*>;
 	using CoreListPtr = std::unique_ptr<CoreList>;
 	gApplication();
+	~gApplication();
 
 	// member methods
 	int run();

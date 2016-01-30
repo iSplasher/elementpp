@@ -1,6 +1,8 @@
 #include "../include/Core.h"
 #include "../include/Widget.h"
 
+#include <GLFW/glfw3.h>
+
 USING_NAMESPACE
 
 std::atomic<unsigned> gCore::id_counter;
@@ -48,12 +50,33 @@ void gCore::changeParent(gCore* new_parent) {
 	}
 }
 
+void errorCallback(int err, const char *descr) {
+	//LOG_E << descr;
+}
+
+void closeWindowCallback(GLFWwindow *r_window) {
+	// TODO: delete gWindow object
+	glfwDestroyWindow(r_window);
+}
+
 gApplication::gApplication() :
 	gCore(), core_objects(std::make_unique<CoreList>()),
 	event_manager() {
 	assert(self == nullptr);
+	// initialize GLFW library
+	//LOG_I << "initializing gSplasher application";
+	//LOG_D << "initializing GLFW library";
+	glfwSetErrorCallback(errorCallback);
+	if (!glfwInit()) {
+		exit(EXIT_FAILURE);
+	}
 	self = this;
+	//LOG_D << "initializing event manager";
 	event_manager.init();
+}
+
+gApplication::~gApplication() {
+	glfwTerminate();
 }
 
 int gApplication::run() {
