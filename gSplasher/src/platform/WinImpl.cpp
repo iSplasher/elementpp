@@ -1,4 +1,6 @@
 #include "WinImpl.h"
+#include <string>
+#include <SFML/Graphics/Image.hpp>
 
 #ifdef SFML_SYSTEM_WINDOWS
 #include <Windows.h>
@@ -110,8 +112,36 @@ void WinImpl::setTransparency(gWindowHandle handle, unsigned char alpha) {
 	SetLayeredWindowAttributes(handle, 0, alpha, LWA_ALPHA);
 }
 
+HRGN createShape(std::string path_to_file, int x, int y) {
+	sf::Image image;
+	image.loadFromFile(path_to_file) ? printf("true") : printf("false");
+
+	int offset_x = x + image.getSize().x;
+	int offset_y = y + image.getSize().y;
+
+	const sf::Uint8* pixelData = image.getPixelsPtr();
+	HRGN hRegion = CreateRectRgn(x, y, offset_x, offset_y);
+
+	// Determine the visible region
+	for (unsigned y2 = 0; y2 < image.getSize().y; y2++)
+	{
+		for (unsigned x2 = 0; x2 < image.getSize().x; x2++)
+		{
+			if (pixelData[y2 * image.getSize().x * 4 + x2 * 4 + 3] == 0)
+			{
+				HRGN hRegionPixel = CreateRectRgn(x+x2, y+y2, x+x2 + 1, y+y2 + 1);
+				CombineRgn(hRegion, hRegion, hRegionPixel, RGN_XOR);
+				DeleteObject(hRegionPixel);
+			}
+		}
+	}
+
+	// WARNING: remember to delete object!!!
+	return hRegion;
+}
+
 void WinImpl::redraw(gWindowHandle handle, int x, int y, int width, int height) {
-	int m = 20;
+	int m = 30;
 	int btm_x = x + width - (m + 3);
 	int btm_y = y + height;
 	int c_offset_x = x + width - m;
@@ -125,12 +155,9 @@ void WinImpl::redraw(gWindowHandle handle, int x, int y, int width, int height) 
 		3,
 		3);
 
-	HRGN exit_shape = CreateEllipticRgn(
-		c_offset_x,
-		c_offset_y,
-		c_offset_x + m,
-		c_offset_y + m
-		);
+	HRGN exit_shape = createShape(
+		"C:/Users/Autriche/Documents/Code/gSplasher/gSplasher/Reference/icon/add_normal.png",
+		c_offset_x, c_offset_y);
 
 	c_offset_y += 10;
 	HRGN minimize_shape = CreateEllipticRgn(
@@ -148,4 +175,5 @@ void WinImpl::redraw(gWindowHandle handle, int x, int y, int width, int height) 
 	DeleteObject(exit_shape);
 	DeleteObject(minimize_shape);
 }
+
 #endif
