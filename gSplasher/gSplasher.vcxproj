@@ -23,7 +23,7 @@
     <ClInclude Include="include\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\Utils\tree.h" />
     <ClInclude Include="include\Window.h" />
-    <ClInclude Include="src\platform\WinImpl.h" />
+    <ClInclude Include="include\Platform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -31,7 +31,7 @@
     <ClCompile Include="src\Event.cpp" />
     <ClCompile Include="src\CoreUtils.cpp" />
     <ClCompile Include="src\Widget.cpp" />
-    <ClCompile Include="src\platform\WinImpl.cpp" />
+    <ClCompile Include="src\platform\Platform.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

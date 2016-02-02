@@ -53,10 +53,10 @@
     <ClInclude Include="include\Utils\tree.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\platform\WinImpl.h">
+    <ClInclude Include="include\Window.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window.h">
+    <ClInclude Include="include\Platform.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,10 +74,10 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="src\platform\WinImpl.cpp">
+    <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\platform\Platform.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
