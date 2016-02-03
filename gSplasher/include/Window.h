@@ -2,8 +2,6 @@
 
 #include "../include/Widget.h"
 
-#include <GLFW/glfw3.h>
-
 NAMESPACE_BEGIN
 
 /// <summary>
@@ -27,7 +25,7 @@ public:
 protected:
 	// methods
 
-	GLFWwindow *r_window;
+	// *r_window;
 
 private:
 	//methods

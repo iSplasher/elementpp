@@ -1,26 +1,17 @@
 #include "../include/Window.h"
 #include "../include/Event.h"
 
-#include <GLFW/glfw3.h>
 
 USING_NAMESPACE
 
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
-
-	r_window = glfwCreateWindow(300, 300, "gSplasher", nullptr, nullptr);
-	if (!r_window) {
-		//LOG_C << "Window creation failed!";
-	}
 	is_widget = false;
 	is_window = true;
 	setActive();
 }
 
 gWindow::~gWindow() {
-	if (r_window) {
-		glfwDestroyWindow(r_window);
-	}
 }
 
 void gWindow::update() {
@@ -31,7 +22,6 @@ continue_exec:
 	//r_window->clear(style.bg_color);
 	////paint();
 	//r_window->display();
-	glfwPollEvents();
 }
 
 //Point gWindow::pos() {
@@ -49,10 +39,6 @@ continue_exec:
 //}
 
 void gWindow::setActive() const {
-	if (r_window) {
-		glfwMakeContextCurrent(r_window);
-		// TODO: activate window here
-	}
 }
 
 void gWindow::generateMouseMove() {

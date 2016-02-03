@@ -48,7 +48,7 @@ protected:
 
 using EventPtr = std::shared_ptr<gEvent>;
 
-struct gInputEvent : public gEvent {
+struct GSPLASHER_API gInputEvent : public gEvent {
 	explicit gInputEvent(
 		Type t,
 		bool _alt=false,
@@ -71,7 +71,7 @@ struct gInputEvent : public gEvent {
 
 using InputEventPtr = std::shared_ptr<gInputEvent>;
 
-struct gMouseEvent : public gInputEvent {
+struct GSPLASHER_API gMouseEvent : public gInputEvent {
 	//gMouseEvent(Type t, Point pos);
 	//explicit gMouseEvent(sf::Event);
 	//gMouseEvent(const gMouseEvent&);
@@ -85,7 +85,7 @@ struct gMouseEvent : public gInputEvent {
 
 using MouseEventPtr = std::shared_ptr<gMouseEvent>;
 
-struct gKeyEvent : public gInputEvent {
+struct GSPLASHER_API gKeyEvent : public gInputEvent {
 	//gKeyEvent(Type t, int k, std::string txt = std::string());
 	//gKeyEvent(sf::Event);
 
@@ -96,7 +96,7 @@ struct gKeyEvent : public gInputEvent {
 
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
-struct gMoveEvent : public gEvent {
+struct GSPLASHER_API gMoveEvent : public gEvent {
 	//gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
 	//	gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
 	//gMoveEvent(Type t, Point new_p, Point old_p) :
@@ -114,7 +114,7 @@ class gCore;
 /// <summary>
 /// Manages events
 /// </summary>
-class GSPLASHER_API gEventManager {
+class gEventManager {
 	using EventPair = std::pair<gCore*, EventPtr>;
 	using EventQueue = std::vector<EventPair>;
 

@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gSplasher", "gSplasher\gSplasher.vcxproj", "{9925E070-B0A1-417D-8C49-E3CE89EBDE48}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gSplasherTest", "gSplasherTest\gSplasherTest.vcxproj", "{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{9925E070-B0A1-417D-8C49-E3CE89EBDE48}.Release|Win32.ActiveCfg = Debug|Win32
 		{9925E070-B0A1-417D-8C49-E3CE89EBDE48}.Release|Win32.Build.0 = Debug|Win32
 		{9925E070-B0A1-417D-8C49-E3CE89EBDE48}.Release|x64.ActiveCfg = Release|Win32
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Debug|Win32.Build.0 = Debug|Win32
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Debug|x64.ActiveCfg = Debug|x64
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Debug|x64.Build.0 = Debug|x64
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Release|Win32.ActiveCfg = Release|Win32
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Release|Win32.Build.0 = Release|Win32
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Release|x64.ActiveCfg = Release|x64
+		{BB585EAB-D4B9-4308-846E-1E5FBDAD723F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

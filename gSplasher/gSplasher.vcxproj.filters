@@ -77,7 +77,7 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\platform\Platform.cpp">
+    <ClCompile Include="src\platform\PlatformWin.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
