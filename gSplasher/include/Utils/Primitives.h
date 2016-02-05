@@ -357,11 +357,12 @@ struct GSPLASHER_API gRectT {
 	/// <returns>gSizeT/<T/></returns>
 	/// <remarks>If type of gRect is int, an unsigned type of gSize will be returned</remarks>
 	gSizeT<T> size() const {
-		if (std::is_same<T, int>::value) {
-			return gSize(width, height);
-		}
 		return gSizeT<T>(width, height);
 	}
+
+	//gSizeT<unsigned> size<int>() const {
+	//	return gSize(width, height);
+	//}
 
 	// operators for gRectT
 

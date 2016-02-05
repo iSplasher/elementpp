@@ -59,6 +59,24 @@
     <ClInclude Include="include\Platform.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="src\nanovg\fontstash.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\nanovg.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\nanovg_gl.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\nanovg_gl_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\stb_image.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\stb_truetype.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event.cpp">
@@ -73,11 +91,16 @@
     <ClCompile Include="src\CoreUtils.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\platform\PlatformWin.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nanovg\nanovg.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

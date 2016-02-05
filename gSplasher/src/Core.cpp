@@ -1,6 +1,8 @@
 #include "../include/Core.h"
 #include "../include/Widget.h"
 
+#include <GLFW/glfw3.h>
+
 USING_NAMESPACE
 
 std::atomic<unsigned> gCore::id_counter;
@@ -48,16 +50,31 @@ void gCore::changeParent(gCore* new_parent) {
 	}
 }
 
+void error_cb(int err, const char *descr) {
+	//LOG_E << descr;
+}
+
+void closeWindow_cb(GLFWwindow *r_window) {
+	// TODO: delete gWindow object
+	glfwDestroyWindow(r_window);
+}
+
 gApplication::gApplication() :
 	gCore(), core_objects(std::make_unique<CoreList>()),
 	event_manager() {
 	assert(self == nullptr);
 	self = this;
+
+	glfwSetErrorCallback(error_cb);
+	if (!glfwInit()) {
+		exit(EXIT_FAILURE);
+	}
 	//LOG_D << "initializing event manager";
 	event_manager.init();
 }
 
 gApplication::~gApplication() {
+	glfwTerminate();
 }
 
 int gApplication::run() {
@@ -91,6 +108,7 @@ gApplication* gApplication::instance() {
 bool gApplication::processEv() const {
 
 	// TODO: optimize this so it doesn't check all
+	glfwPollEvents();
 	for (auto core : *core_objects) {
 
 		if (core->is_window) {

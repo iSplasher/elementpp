@@ -13,8 +13,8 @@ USING_NAMESPACE
 //};
 
 int main() {
-	//gApplication app;
-	//gCoreWidget *window =  new gWindow{};
+	gApplication app;
+	gCoreWidget *window =  new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);
 
 	//gCoreWidget *widget2 = new gCoreWidget(widget);
@@ -32,31 +32,7 @@ int main() {
 	//printf("%d", app.core_objects->tree_size());
 
 
-	//return app.run();
-
-	gPoint a;
-	gPoint b(50, 50);
-	gSize c;
-	gSize d(100,100);
-	gRect e;
-	gRect f(10, 10, 20, 20);
-
-	c.width = 100;
-	d.height = 100;
-
-	d += 5;
-	f += d;
-
-	std::cout << a << std::endl << c << std::endl << e << std::endl << b << std::endl << d << std::endl << f << std::endl;
-
-	f = c;
-	std::cout << c << std::endl << f << std::endl;
-
-	gRect g;
-	if (e == g)
-		std::cout << "true\n";
-	else
-		std::cout << "false\n";
+	return app.run();
 
 	return 0;
 }

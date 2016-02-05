@@ -2,6 +2,8 @@
 
 #include "../include/Widget.h"
 
+typedef struct GLFWwindow _RWindow;
+
 NAMESPACE_BEGIN
 
 /// <summary>
@@ -25,7 +27,7 @@ public:
 protected:
 	// methods
 
-	// *r_window;
+	_RWindow *r_window;
 
 private:
 	//methods
