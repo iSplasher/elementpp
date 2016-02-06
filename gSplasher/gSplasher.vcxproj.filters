@@ -18,63 +18,69 @@
     <Filter Include="include\Layouts">
       <UniqueIdentifier>{8f2ccef2-cf57-4ed0-9498-6ddfb4825c81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\nanovg">
+      <UniqueIdentifier>{ea42d729-bcd7-4d57-a068-b9ebc8282322}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Widgets\WidgetUtils.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Global.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\Region.h">
-      <Filter>include\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Event.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Layout.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Widget.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Animation.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\Primitives.h">
-      <Filter>include\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\CoreUtils.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\tree.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Platform.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nanovg\fontstash.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\nanovg\nanovg.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nanovg\nanovg_gl.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nanovg\nanovg_gl_utils.h">
-      <Filter>include</Filter>
+      <Filter>src\nanovg</Filter>
     </ClInclude>
     <ClInclude Include="src\nanovg\stb_image.h">
-      <Filter>include</Filter>
+      <Filter>src\nanovg</Filter>
     </ClInclude>
     <ClInclude Include="src\nanovg\stb_truetype.h">
+      <Filter>src\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\nanovg_gl.h">
+      <Filter>src\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\nanovg_gl_utils.h">
+      <Filter>src\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nanovg\fontstash.h">
+      <Filter>src\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Utils\CoreUtils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Utils\Painter.h">
+      <Filter>include\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Utils\Primitives.h">
+      <Filter>include\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Utils\Region.h">
+      <Filter>include\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Utils\tree.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Widgets\WidgetUtils.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Animation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Core.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Event.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Global.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Layout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Platform.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Widget.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gSplasher\Window.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -97,10 +103,13 @@
     <ClCompile Include="src\platform\PlatformWin.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\nanovg\nanovg.c">
+    <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\nanovg\nanovg.c">
+      <Filter>src\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

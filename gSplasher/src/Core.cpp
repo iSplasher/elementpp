@@ -1,6 +1,7 @@
-#include "../include/Core.h"
-#include "../include/Widget.h"
+#include "gSplasher/Core.h"
+#include "gSplasher/Widget.h"
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 USING_NAMESPACE

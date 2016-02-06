@@ -1,5 +1,5 @@
-#include "../include/Window.h"
-#include "../include/Event.h"
+#include "gSplasher/Window.h"
+#include "gSplasher/Event.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,9 +9,7 @@
 #include <GLFW/glfw3native.h>
 #endif
 
-#include "nanovg/nanovg.h"
-#define NANOVG_GL3_IMPLEMENTATION
-#include "nanovg/nanovg_gl.h"
+#include "gSplasher/Utils/Painter.h"
 
 
 USING_NAMESPACE
@@ -57,21 +55,24 @@ void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
 	glfwWindowHint(GLFW_DECORATED, false);
-	r_window = glfwCreateWindow(300, 300, "gSplasher", nullptr, nullptr);
-	shapeWindow(r_window, 0, 0, 300, 300);
+	auto s = size();
+	auto p = pos();
+	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
+	shapeWindow(r_window, p.x, p.y, s.width, s.height);
+	glfwSwapInterval(0);
+
 	is_widget = false;
 	is_window = true;
-	setActive();
+	parent_window = this;
+
+	setActive(); // needed to init glew properly
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Could not init glew.\n";
 	}
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
-	auto vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-	if (!vg) {
-		std::cout << "Could not create Nano Context\n";
-	}
+	gWindow::move(gPoint(500, 300));
 }
 
 gWindow::~gWindow() {
@@ -84,7 +85,9 @@ void gWindow::update() {
 
 	generateMouseMove();
 	//r_window->clear(style.bg_color);
-	////paint();
+	gPainter p(this);
+	paint(p);
+	glfwSwapBuffers(r_window);
 	//r_window->display();
 }
 
@@ -92,11 +95,11 @@ void gWindow::update() {
 //	return r_window->getPosition();
 //}
 
-//void gWindow::move(Point new_p) {
-//	r_window->setPosition(new_p);
-//	style.pos = new_p;
-//}
-//
+void gWindow::move(gPoint new_p) {
+	p = new_p;
+	glfwSetWindowPos(r_window, p.x, p.y);
+}
+
 //void gWindow::resize(Size new_s) {
 //	r_window->setSize(new_s);
 //	style.size = new_s;

@@ -1,8 +1,8 @@
 /// <summary>
 /// Here is where stuff is tested!
 /// </summary>
-#include "include/Window.h"
-#include "include/Utils/Primitives.h"
+#include "gSplasher/Window.h"
+#include "gSplasher/Utils/Primitives.h"
 
 USING_NAMESPACE
 //

@@ -11,19 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Animation.h" />
-    <ClInclude Include="include\Core.h" />
-    <ClInclude Include="include\Event.h" />
-    <ClInclude Include="include\Global.h" />
-    <ClInclude Include="include\Layout.h" />
-    <ClInclude Include="include\Utils\CoreUtils.h" />
-    <ClInclude Include="include\Utils\Primitives.h" />
-    <ClInclude Include="include\Utils\Region.h" />
-    <ClInclude Include="include\Widget.h" />
-    <ClInclude Include="include\Widgets\WidgetUtils.h" />
-    <ClInclude Include="include\Utils\tree.h" />
-    <ClInclude Include="include\Window.h" />
-    <ClInclude Include="include\Platform.h" />
+    <ClInclude Include="include\gSplasher\Animation.h" />
+    <ClInclude Include="include\gSplasher\Core.h" />
+    <ClInclude Include="include\gSplasher\Event.h" />
+    <ClInclude Include="include\gSplasher\Global.h" />
+    <ClInclude Include="include\gSplasher\Layout.h" />
+    <ClInclude Include="include\gSplasher\Utils\CoreUtils.h" />
+    <ClInclude Include="include\gSplasher\Utils\Painter.h" />
+    <ClInclude Include="include\gSplasher\Utils\Primitives.h" />
+    <ClInclude Include="include\gSplasher\Utils\Region.h" />
+    <ClInclude Include="include\gSplasher\Widget.h" />
+    <ClInclude Include="include\gSplasher\Widgets\WidgetUtils.h" />
+    <ClInclude Include="include\gSplasher\Utils\tree.h" />
+    <ClInclude Include="include\gSplasher\Window.h" />
+    <ClInclude Include="include\gSplasher\Platform.h" />
     <ClInclude Include="src\nanovg\fontstash.h" />
     <ClInclude Include="src\nanovg\nanovg.h" />
     <ClInclude Include="src\nanovg\nanovg_gl.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\nanovg\stb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Painter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\Event.cpp" />
@@ -85,7 +87,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GSPLASHER_EXPORTS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>C:\C++ Libs\GLEW\glew-1.13.0\include;C:\C++ Libs\GLFW\GLFW\include;C:\C++ Libs\Plog\Plog-1.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Autriche\Documents\Code\gSplasher\gSplasher\include;C:\C++ Libs\GLEW\glew-1.13.0\include;C:\C++ Libs\GLFW\GLFW\include;C:\C++ Libs\Plog\Plog-1.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -104,7 +106,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;GSPLASHER_EXPORTS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\SFML\SFML-2.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Autriche\Documents\Code\gSplasher\gSplasher\include;C:\SFML\SFML-2.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

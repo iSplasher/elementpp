@@ -1,4 +1,6 @@
-#include "../include/Widget.h"
+#include "gSplasher/Widget.h"
+#include "gSplasher/Utils/Painter.h"
+
 
 USING_NAMESPACE
 
@@ -9,7 +11,18 @@ gCoreWidget::gCoreWidget(gCoreWidget* parent) :
 	parent_widget = parent;
 }
 
+gCoreWidget::~gCoreWidget() {
+	// TODO: delete paint context
+}
+
+void gCoreWidget::paint(gPainter& painter) {
+}
+
 void gCoreWidget::update() {
+	gPainter p(this);
+	p.begin();
+	paint(p);
+	p.end();
 }
 
 void gCoreWidget::event(EventPtr ev) {

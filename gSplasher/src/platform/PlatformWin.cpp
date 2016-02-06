@@ -1,5 +1,5 @@
 #include <string>
-#include "../../include/Platform.h"
+#include "gSplasher/Platform.h"
 
 #ifdef OS_WINDOWS
 #include <Windows.h>
