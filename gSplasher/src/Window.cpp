@@ -85,8 +85,7 @@ void gWindow::update() {
 
 	generateMouseMove();
 	//r_window->clear(style.bg_color);
-	gPainter p(this);
-	paint(p);
+	gCoreWidget::update();
 	glfwSwapBuffers(r_window);
 	//r_window->display();
 }
