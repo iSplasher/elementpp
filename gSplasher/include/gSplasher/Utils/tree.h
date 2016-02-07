@@ -40,7 +40,7 @@
 #pragma warning( disable : 4786 )
 #endif // WIN32
 
-#include "../Global.h"
+#include "gSplasher/Global.h"
 
 NAMESPACE_BEGIN
 

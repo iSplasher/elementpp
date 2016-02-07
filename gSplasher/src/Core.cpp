@@ -1,5 +1,5 @@
 #include "gSplasher/Core.h"
-#include "gSplasher/Widget.h"
+#include "gSplasher/Window.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -61,8 +61,8 @@ void closeWindow_cb(GLFWwindow *r_window) {
 }
 
 gApplication::gApplication() :
-	gCore(), core_objects(std::make_unique<CoreList>()),
-	event_manager() {
+	gCore(), core_objects(std::make_unique<CoreList>()), event_manager() {
+
 	assert(self == nullptr);
 	self = this;
 
@@ -70,7 +70,6 @@ gApplication::gApplication() :
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
-	//LOG_D << "initializing event manager";
 	event_manager.init();
 }
 
@@ -109,11 +108,11 @@ gApplication* gApplication::instance() {
 bool gApplication::processEv() const {
 
 	// TODO: optimize this so it doesn't check all
-	glfwPollEvents();
+	glfwWaitEvents();
 	for (auto core : *core_objects) {
 
 		if (core->is_window) {
-			static_cast<gCoreWidget*>(core)->update();
+			static_cast<gWindow*>(core)->update();
 		}
 	}
 

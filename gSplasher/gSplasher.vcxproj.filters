@@ -74,9 +74,6 @@
     <ClInclude Include="include\gSplasher\Layout.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\gSplasher\Platform.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\gSplasher\Widget.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -100,17 +97,12 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\platform\PlatformWin.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\nanovg\nanovg.c">
       <Filter>src\nanovg</Filter>
     </ClCompile>
     <ClCompile Include="src\Painter.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
 </Project>

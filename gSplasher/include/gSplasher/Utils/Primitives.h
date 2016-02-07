@@ -307,6 +307,9 @@ template <typename T>
 struct GSPLASHER_API gRectT {
 	gRectT() : gRectT(0, 0, 0, 0) {}
 	gRectT(T X, T Y, T W, T H) : x(X), y(Y), width(W), height(H) {}
+	gRectT(gPointT<T> p, gSizeT<T> s) : gRectT(p.x, p.y, s.width, s.height) {}
+	gRectT(gPointT<T> p, T W, T H) : gRectT(p.x, p.y, W, H) {}
+	gRectT(T X, T Y, gSizeT<T> s) : gRectT(X, Y, s.width, s.height) {}
 
 	template <typename O>
 	explicit gRectT(const gRectT<O>& rect) : gRectT(rect.x, rect.y, rect.width, rect.height) {}

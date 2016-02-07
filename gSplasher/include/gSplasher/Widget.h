@@ -68,7 +68,6 @@ private:
 	bool under_mouse;
 	PainterContext *this_paint = nullptr;
 
-friend class gApplication;
 friend class gPainter;
 };
 

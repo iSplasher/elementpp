@@ -54,6 +54,12 @@ void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
 
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
+#ifndef OS_WINDOWS
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 	glfwWindowHint(GLFW_DECORATED, false);
 	auto s = size();
 	auto p = pos();
@@ -82,12 +88,8 @@ gWindow::~gWindow() {
 }
 
 void gWindow::update() {
-
-	generateMouseMove();
-	//r_window->clear(style.bg_color);
 	gCoreWidget::update();
 	glfwSwapBuffers(r_window);
-	//r_window->display();
 }
 
 //Point gWindow::pos() {
@@ -108,16 +110,12 @@ void gWindow::setActive() const {
 	glfwMakeContextCurrent(r_window);
 }
 
-void gWindow::generateMouseMove() {
-	// TODO: set a class instance switch? enableMouseTracking..?
-	//if (r_window) {
-	//	Point pos = Mouse::getPosition();
-	//	if (pos.x != _old_mouse_x || pos.y != _old_mouse_y) {
-	//		_old_mouse_x = pos.x;
-	//		_old_mouse_y = pos.y;
-	//		Point r_pos = Mouse::getPosition(*r_window);
-	//		MouseEventPtr m_ev = std::make_shared<gMouseEvent>(gEvent::MouseMove, r_pos);
-	//		gApp->dispatchEvent(this, m_ev); // TODO: make this instantous? 
-	//	}
-	//}
+void gWindow::paint(gPainter& painter) {
+	gPen p;
+	gBrush b;
+	painter.setPen(p);
+	painter.setBrush(b);
+	p.setColor(100, 100, 100, 255);
+	b.setColor(50, 50, 50, 255);
+	painter.drawRect(gRect(0,0, size().width, 50));
 }

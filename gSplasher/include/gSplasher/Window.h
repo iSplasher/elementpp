@@ -15,14 +15,9 @@ public:
 	virtual ~gWindow();
 
 	// methods
-	void update() override;
 	//Point pos() override;
 	void move(gPoint new_p);
 	//void resize(Size new_s) override;
-	/// <summary>
-	/// Activates the window. Note: painting can only be done on active window.
-	/// </summary>
-	void setActive() const;
 
 protected:
 	// methods
@@ -31,13 +26,21 @@ protected:
 
 private:
 	//methods
-	void generateMouseMove();
+
+	/// <summary>
+	/// Painting can only be done on active window.
+	/// </summary>
+	void setActive() const;
+
+	void update() override;
+	void paint(gPainter &painter);
 
 	//abitrary data members
 	int _old_mouse_x = 0;
 	int _old_mouse_y = 0;
 
 	friend class gPainter;
+	friend class gApplication;
 };
 
 NAMESPACE_END

@@ -24,7 +24,6 @@
     <ClInclude Include="include\gSplasher\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\gSplasher\Utils\tree.h" />
     <ClInclude Include="include\gSplasher\Window.h" />
-    <ClInclude Include="include\gSplasher\Platform.h" />
     <ClInclude Include="src\nanovg\fontstash.h" />
     <ClInclude Include="src\nanovg\nanovg.h" />
     <ClInclude Include="src\nanovg\nanovg_gl.h" />
@@ -40,7 +39,6 @@
     <ClCompile Include="src\CoreUtils.cpp" />
     <ClCompile Include="src\nanovg\nanovg.c" />
     <ClCompile Include="src\Widget.cpp" />
-    <ClCompile Include="src\platform\PlatformWin.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
