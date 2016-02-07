@@ -50,11 +50,11 @@ gWindow::gWindow(gWindow* parent) :
 #endif
 	glfwWindowHint(GLFW_DECORATED, false);
 	glfwWindowHint(GLFW_SAMPLES, 12);
-	auto s = size();
+	auto s = gCoreWidget::size();
 	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
 	shapeWindow(r_window, p.x, p.y, s.width, s.height);
-	alphaWindow(r_window, 200);
+	alphaWindow(r_window, 225);
 	glfwSwapInterval(0);
 
 	is_widget = false;
@@ -68,6 +68,8 @@ gWindow::gWindow(gWindow* parent) :
 	}
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
+
+	top_bar = gRect(1, 1, gCoreWidget::size().width - 3, 20);
 	gWindow::move(gPoint(500, 300));
 }
 
@@ -103,13 +105,11 @@ void gWindow::setActive() const {
 }
 
 void gWindow::paint(gPainter& painter) {
-	auto s = size();
 	gPen p(painter);
-	gBrush b;
-	p.setColor(gColor(200, 40, 40, 255));
-	painter.setBrush(b);
-	b.setColor(gColor(200, 40, 40, 255));
-	painter.drawRect(gRect(1,1, 497, 50));
-	painter.drawEllipse(gPointF(s.width/2, s.height/2), gSizeF(65, 60));
-	painter.drawCircle(gPointF(s.width/2, s.height/2+100), 10);
+	gBrush b(painter);
+	p.setColor(gColor(178, 178, 178));
+	p.setWidth(3);
+	b.setColor(gColor(250, 250, 250));
+
+	painter.drawRect(top_bar);
 }

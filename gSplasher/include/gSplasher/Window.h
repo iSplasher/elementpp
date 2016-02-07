@@ -39,6 +39,10 @@ private:
 	int _old_mouse_x = 0;
 	int _old_mouse_y = 0;
 
+	// TODO: make this a widget!
+	// Top bar of Window
+	gRect top_bar;
+
 	friend class gPainter;
 	friend class gApplication;
 };

@@ -12,7 +12,7 @@ public:
 	enum class Join;
 
 	gPen() = default;
-	gPen(gPainter &painter);
+	explicit gPen(gPainter &painter);
 
 	/// <summary>
 	/// Set a new color to this pen
@@ -58,6 +58,7 @@ private:
 class GSPLASHER_API gBrush {
 public:
 	gBrush() = default;
+	explicit gBrush(gPainter &painter);
 
 	/// <summary>
 	/// Set a new color to this brush
@@ -109,6 +110,24 @@ public:
 	gPen &pen() const { return *p; }
 
 	/// <summary>
+	/// Saves the current state
+	/// </summary>
+	/// <remarks>A matching restore() call must be used</remarks>
+	void save() const;
+
+	/// <summary>
+	/// Restores saved state
+	/// </summary>
+	/// <remarks>A save() must have been called before calling this method</remarks>
+	void restore() const;
+
+	/// <summary>
+	/// Resets to default state
+	/// </summary>
+	/// <remarks>This does not affect the state stack</remarks>
+	void reset() const;
+
+	/// <summary>
 	/// Set new brush
 	/// </summary>
 	/// <param name="brush">New brush</param>
@@ -123,9 +142,17 @@ public:
 	/// <summary>
 	/// Draw a rectangle shape
 	/// </summary>
-	/// <param name="rect">A gReftF</param>
+	/// <param name="rect">Shape dimensions</param>
 	void drawRect(gRectF rect) const;
 	void drawRect(gRect rect) const { drawRect(gRectF(rect)); }
+
+	/// <summary>
+	/// Draw a rounded rectangle shape
+	/// </summary>
+	/// <param name="rect">Shape dimensions</param>
+	/// <param name="radius">Radius of the rect corners</param>
+	void drawRoundedRect(gRectF rect, float radius) const;
+	void drawRoundedRect(gRect rect, int radius) const { drawRoundedRect(gRectF(rect), radius); }
 
 	/// <summary>
 	/// Draw an ellipse shape
@@ -141,6 +168,12 @@ public:
 	/// <param name="radius">Circle radius</param>
 	void drawCircle(gPointF center, float radius) const;
 
+	/// <summary>
+	/// Draw a line
+	/// </summary>
+	/// <param name="start">Start point of line</param>
+	/// <param name="end">End point of line</param>
+	void drawLine(gPointF start, gPointF end) const;
 
 private:
 

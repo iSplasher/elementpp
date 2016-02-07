@@ -46,7 +46,7 @@ gPen::gPen(gPainter& painter) {
 	painter.setPen(*this);
 	setJoin(Join::Bevel);
 	setCap(Cap::Round);
-	setColor(gColor(255, 255, 255, 255));
+	setColor(gColor(0, 0, 0));
 	setWidth(1);
 }
 
@@ -80,6 +80,11 @@ void gPen::apply() const {
 	if (pc) {
 		nvgStroke(pc);
 	}
+}
+
+gBrush::gBrush(gPainter& painter) {
+	painter.setBrush(*this);
+	setColor(gColor(0, 0, 0));
 }
 
 void gBrush::setColor(gColor color) {
@@ -133,6 +138,18 @@ void gPainter::setPen(gPen& pen) {
 	p = &pen;
 }
 
+void gPainter::save() const {
+	nvgSave(context);
+}
+
+void gPainter::restore() const {
+	nvgRestore(context);
+}
+
+void gPainter::reset() const {
+	nvgReset(context);
+}
+
 void gPainter::setBrush(gBrush& brush) {
 	brush.pc = context;
 	b = &brush;
@@ -141,6 +158,12 @@ void gPainter::setBrush(gBrush& brush) {
 void gPainter::drawRect(gRectF rect) const {
 	beginPath();
 	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
+	applyPB();
+}
+
+void gPainter::drawRoundedRect(gRectF rect, float radius) const {
+	beginPath();
+	nvgRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
 	applyPB();
 }
 
@@ -153,6 +176,13 @@ void gPainter::drawEllipse(gPointF center, gSizeF size) const {
 void gPainter::drawCircle(gPointF center, float radius) const {
 	beginPath();
 	nvgCircle(context, center.x, center.y, radius);
+	applyPB();
+}
+
+void gPainter::drawLine(gPointF start, gPointF end) const {
+	beginPath();
+	nvgMoveTo(context, start.x, start.y);
+	nvgLineTo(context, end.x, end.y);
 	applyPB();
 }
 
