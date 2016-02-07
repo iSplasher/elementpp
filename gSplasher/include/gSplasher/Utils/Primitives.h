@@ -1,11 +1,15 @@
 #pragma once
 
-#include "../Global.h"
+#include "gSplasher/Global.h"
 
 #include <iostream>
-#include <type_traits>
+
+typedef struct NVGcolor _PColor;
 
 NAMESPACE_BEGIN
+
+class gPen;
+class gBrush;
 
 /// <summary>
 /// gPoint. Defines x and y.
@@ -671,8 +675,57 @@ using gRectF = gRectT<float>;
 using gRectD = gRectT<double>;
 using gRectU = gRectT<unsigned>;
 
+class GSPLASHER_API gColor {
+public:
+	gColor() = default;
+	gColor(int r, int g, int b) : red(r), green(g), blue(b), type(RGB) {}
+	gColor(int r, int g, int b, float a) : red(r), green(g), blue(b), alpha(a), type(RGBA) {}
+	gColor(float h, float s, float l) : hue(h), sat(s), light(l), type(HSL) {}
+	gColor(float h, float s, float l, float a) : hue(h), sat(s), light(l), alpha(a), type(HSLA) {}
+
+	// TODO: make private and return int/float array?
+	int red = 0;
+	int green = 0;
+	int blue = 0;
+	float hue = 0;
+	float sat = 0;
+	float light = 0;
+	float alpha = 0;
+
+private:
+	enum Type {
+		RGB,
+		RGBA,
+		HSL,
+		HSLA
+	};
+
+	_PColor toPColor() const;
+	
+	Type type = RGB;
+
+	friend class gPen;
+	friend class gBrush;
+	friend std::ostream &operator <<(std::ostream &out, const gColor &c);
+};
+
+inline std::ostream &operator <<(std::ostream &out, const gColor &c) {
+	switch(c.type) {
+	case gColor::RGB:
+		out << "gColor(RGB" << "(" << c.red << ", " << c.green << ", " << c.blue << "))";
+		break;
+	case gColor::RGBA:
+		out << "gColor(RGBA" << "(" << c.red << ", " << c.green << ", " << c.blue << ", " << c.alpha << "))";
+		break;
+	case gColor::HSL:
+		out << "gColor(HSL" << "(" << c.hue << ", " << c.sat << ", " << c.light << "))";
+		break;
+	case gColor::HSLA:
+		out << "gColor(HSLA" << "(" << c.hue << ", " << c.sat << ", " << c.light << ", " << c.alpha << "))";
+		break;
+	}
+	return out;
+}
+
 
 NAMESPACE_END
-
-
-

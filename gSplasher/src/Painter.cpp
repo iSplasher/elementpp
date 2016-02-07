@@ -11,6 +11,25 @@
 
 USING_NAMESPACE
 
+_PColor gColor::toPColor() const {
+	NVGcolor c;
+	switch (type) {
+	case RGB:
+		c = nvgRGB(red, green, blue);
+		break;
+	case RGBA:
+		c = nvgRGBA(red, green, blue, alpha);
+		break;
+	case HSL:
+		c = nvgHSL(hue, sat, light);
+		break;
+	case HSLA:
+		c = nvgHSLA(hue, sat, light, alpha);
+	}
+
+	return c;
+}
+
 enum class gPen::Cap {
 	Butt = NVG_BUTT,
 	Round = NVG_ROUND,
@@ -27,14 +46,14 @@ gPen::gPen(gPainter& painter) {
 	painter.setPen(*this);
 	setJoin(Join::Bevel);
 	setCap(Cap::Round);
-	setColor(255, 255, 255, 255);
+	setColor(gColor(255, 255, 255, 255));
 	setWidth(1);
 }
 
-void gPen::setColor(float r, float g, float b, float a) const {
+void gPen::setColor(gColor color) {
 	if (pc) {
-		auto c = nvgRGBA(r, g, b, a);
-		nvgStrokeColor(pc, c);
+		nvgStrokeColor(pc, color.toPColor());
+		c_color = color;
 	}
 }
 
@@ -63,9 +82,10 @@ void gPen::apply() const {
 	}
 }
 
-void gBrush::setColor(float r, float g, float b, float a) const {
+void gBrush::setColor(gColor color) {
 	if (pc) {
-		nvgFillColor(pc, nvgRGBA(r, g, b, a));
+		nvgFillColor(pc, color.toPColor());
+		c_color = color;
 	}
 }
 
@@ -99,7 +119,7 @@ void gPainter::begin() const {
 	glViewport(0, 0, fb_width, fb_height);
 
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
-	glClearColor(0, 0, 0, 50);
+	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgBeginFrame(context, s.width, s.height, px_ratio);
 }

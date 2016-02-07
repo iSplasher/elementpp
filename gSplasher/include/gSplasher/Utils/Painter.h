@@ -17,9 +17,9 @@ public:
 	/// <summary>
 	/// Set a new color to this pen
 	/// </summary>
-	void setColor(float r, float g, float b, float a) const;
+	void setColor(gColor color);
 
-	//Color color() const { return c_color; }
+	gColor color() const { return c_color; }
 
 	/// <summary>
 	/// Set a new line width to this pen
@@ -50,6 +50,7 @@ private:
 
 	PainterContext* pc = nullptr;
 	float c_width = 1;
+	gColor c_color;
 
 	friend class gPainter;
 };
@@ -61,9 +62,9 @@ public:
 	/// <summary>
 	/// Set a new color to this brush
 	/// </summary>
-	void setColor(float r, float g, float b, float a) const;
+	void setColor(gColor color);
 
-	//Color color() const { return c_color; }
+	gColor color() const { return c_color; }
 
 	//void setGradient();
 	//void setPattern();
@@ -75,6 +76,7 @@ private:
 	void apply() const;
 
 	PainterContext* pc = nullptr;
+	gColor c_color;
 
 	friend class gPainter;
 };

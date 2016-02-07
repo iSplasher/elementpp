@@ -32,6 +32,14 @@ void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
 #endif
 }
 
+void alphaWindow(_RWindow *r_w, unsigned char alpha) {
+#ifdef OS_WINDOWS
+	auto handle = glfwGetWin32Window(r_w);
+	SetWindowLong(handle, GWL_EXSTYLE, GetWindowLong(handle, GWL_EXSTYLE) | WS_EX_LAYERED);
+	SetLayeredWindowAttributes(handle, 0, alpha, LWA_ALPHA);
+#endif
+}
+
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
 #ifndef OS_WINDOWS
@@ -46,6 +54,7 @@ gWindow::gWindow(gWindow* parent) :
 	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
 	shapeWindow(r_window, p.x, p.y, s.width, s.height);
+	alphaWindow(r_window, 200);
 	glfwSwapInterval(0);
 
 	is_widget = false;
@@ -97,9 +106,9 @@ void gWindow::paint(gPainter& painter) {
 	auto s = size();
 	gPen p(painter);
 	gBrush b;
-	p.setColor(200, 40, 40, 255);
+	p.setColor(gColor(200, 40, 40, 255));
 	painter.setBrush(b);
-	b.setColor(200, 40, 40, 255);
+	b.setColor(gColor(200, 40, 40, 255));
 	painter.drawRect(gRect(1,1, 497, 50));
 	painter.drawEllipse(gPointF(s.width/2, s.height/2), gSizeF(65, 60));
 	painter.drawCircle(gPointF(s.width/2, s.height/2+100), 10);
