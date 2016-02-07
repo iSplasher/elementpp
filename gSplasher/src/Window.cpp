@@ -16,11 +16,8 @@ USING_NAMESPACE
 
 void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
 #ifdef OS_WINDOWS
-	int m = 30;
-	int btm_x = x + width - (m + 3);
+	int btm_x = x + width;
 	int btm_y = y + height;
-	int c_offset_x = x + width - m;
-	int c_offset_y = y;
 
 	HRGN window_shape = CreateRoundRectRgn(
 		x,
@@ -30,25 +27,8 @@ void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
 		3,
 		3);
 
-	//HRGN exit_shape = createShape(
-	//	"C:/Users/Autriche/Documents/Code/gSplasher/gSplasher/Reference/icon/add_normal.png",
-	//	c_offset_x, c_offset_y);
-
-	c_offset_y += 10;
-	HRGN minimize_shape = CreateEllipticRgn(
-		c_offset_x,
-		c_offset_y,
-		c_offset_x + m,
-		c_offset_y + m
-		);
-
-	//CombineRgn(window_shape, exit_shape, window_shape, RGN_OR);
-
-
 	SetWindowRgn(glfwGetWin32Window(r_w), window_shape, true);
 	DeleteObject(window_shape);
-	//DeleteObject(exit_shape);
-	DeleteObject(minimize_shape);
 #endif
 }
 
@@ -61,6 +41,7 @@ gWindow::gWindow(gWindow* parent) :
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 	glfwWindowHint(GLFW_DECORATED, false);
+	glfwWindowHint(GLFW_SAMPLES, 12);
 	auto s = size();
 	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
@@ -89,7 +70,9 @@ gWindow::~gWindow() {
 
 void gWindow::update() {
 	gCoreWidget::update();
-	glfwSwapBuffers(r_window);
+	if (r_window) {
+		glfwSwapBuffers(r_window);
+	}
 }
 
 //Point gWindow::pos() {
@@ -111,11 +94,13 @@ void gWindow::setActive() const {
 }
 
 void gWindow::paint(gPainter& painter) {
-	gPen p;
+	auto s = size();
+	gPen p(painter);
 	gBrush b;
-	painter.setPen(p);
+	p.setColor(200, 40, 40, 255);
 	painter.setBrush(b);
-	p.setColor(100, 100, 100, 255);
-	b.setColor(50, 50, 50, 255);
-	painter.drawRect(gRect(0,0, size().width, 50));
+	b.setColor(200, 40, 40, 255);
+	painter.drawRect(gRect(1,1, 497, 50));
+	painter.drawEllipse(gPointF(s.width/2, s.height/2), gSizeF(65, 60));
+	painter.drawCircle(gPointF(s.width/2, s.height/2+100), 10);
 }

@@ -12,6 +12,7 @@ public:
 	enum class Join;
 
 	gPen() = default;
+	gPen(gPainter &painter);
 
 	/// <summary>
 	/// Set a new color to this pen
@@ -128,8 +129,8 @@ public:
 	/// Draw an ellipse shape
 	/// </summary>
 	/// <param name="center">Center of ellipse</param>
-	/// <param name="radius"></param>
-	void drawEllipse(gPointF center, gPointF radius) const;
+	/// <param name="size">Width and height of ellipse</param>
+	void drawEllipse(gPointF center, gSizeF size) const;
 
 	/// <summary>
 	/// Draw a circle shape
@@ -147,9 +148,9 @@ private:
 	void applyPB() const;
 
 	gCoreWidget *w = nullptr;
+	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gBrush *b = nullptr;
-
 };
 
 NAMESPACE_END

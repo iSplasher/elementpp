@@ -47,7 +47,7 @@ public:
 	//Point mapToGlobal(Point p);
 	//void setLayout(gLayout&);
 	bool underMouse() const { return under_mouse; }
-	gSize size() const { return gSize(300, 300); }
+	virtual gSize size() const { return gSize(500, 300); }
 
 protected:
 	// member methods

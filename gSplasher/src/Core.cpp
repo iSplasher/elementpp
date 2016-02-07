@@ -70,6 +70,7 @@ gApplication::gApplication() :
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
+	glEnable(GL_MULTISAMPLE);
 	event_manager.init();
 }
 

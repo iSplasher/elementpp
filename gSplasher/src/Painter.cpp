@@ -23,9 +23,17 @@ enum class gPen::Join {
 	Bevel = NVG_BEVEL
 };
 
+gPen::gPen(gPainter& painter) {
+	painter.setPen(*this);
+	setJoin(Join::Bevel);
+	setCap(Cap::Round);
+	setColor(255, 255, 255, 255);
+	setWidth(1);
+}
+
 void gPen::setColor(float r, float g, float b, float a) const {
 	if (pc) {
-		auto c = nvgRGBAf(r, g, b, a);
+		auto c = nvgRGBA(r, g, b, a);
 		nvgStrokeColor(pc, c);
 	}
 }
@@ -57,8 +65,7 @@ void gPen::apply() const {
 
 void gBrush::setColor(float r, float g, float b, float a) const {
 	if (pc) {
-		auto c = nvgRGBAf(r, g, b, a);
-		nvgFillColor(pc, c);
+		nvgFillColor(pc, nvgRGBA(r, g, b, a));
 	}
 }
 
@@ -71,11 +78,12 @@ void gBrush::apply() const {
 gsp::gPainter::gPainter(gCoreWidget* widget) {
 	w = widget;
 	if (!w->this_paint) {
-		w->this_paint = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
 		if (!w->this_paint) {
 			std::cout << "Fatal: Could not create paint context\n";
 		}
 	}
+	context = w->this_paint;
 }
 
 gPainter::~gPainter() {
@@ -88,54 +96,55 @@ void gPainter::begin() const {
 	auto s = w->size();
 
 	glfwGetFramebufferSize(w->parent_window->r_window, &fb_width, &fb_height);
-
 	glViewport(0, 0, fb_width, fb_height);
 
-	float px_ratio = fb_width / fb_height;
+	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 	glClearColor(0, 0, 0, 50);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	nvgBeginFrame(w->this_paint, s.width, s.height, px_ratio);
+	nvgBeginFrame(context, s.width, s.height, px_ratio);
 }
 
 void gPainter::end() const {
-	nvgEndFrame(w->this_paint);
+	nvgEndFrame(context);
 }
 
 void gPainter::setPen(gPen& pen) {
-	pen.pc = w->this_paint;
+	pen.pc = context;
 	p = &pen;
 }
 
 void gPainter::setBrush(gBrush& brush) {
-	brush.pc = w->this_paint;
+	brush.pc = context;
 	b = &brush;
 }
 
 void gPainter::drawRect(gRectF rect) const {
 	beginPath();
-	nvgRect(w->this_paint, rect.x, rect.y, rect.width, rect.height);
+	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
 	applyPB();
 }
 
-void gPainter::drawEllipse(gPointF center, gPointF radius) const {
+void gPainter::drawEllipse(gPointF center, gSizeF size) const {
 	beginPath();
-	nvgEllipse(w->this_paint, center.x, center.y, radius.x, radius.y);
+	nvgEllipse(context, center.x, center.y, size.width, size.height);
 	applyPB();
 }
 
 void gPainter::drawCircle(gPointF center, float radius) const {
 	beginPath();
-	nvgCircle(w->this_paint, center.x, center.y, radius);
+	nvgCircle(context, center.x, center.y, radius);
 	applyPB();
 }
 
 void gPainter::beginPath() const {
-	nvgBeginPath(w->this_paint);
+	nvgBeginPath(context);
 }
 
 void gPainter::applyPB() const {
-	if (p && b) {
+	if (p) {
 		p->apply();
+	}
+	if (b) {
 		b->apply();
 	}
 }
