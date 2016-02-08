@@ -48,13 +48,15 @@ public:
 	//void setLayout(gLayout&);
 	bool underMouse() const { return under_mouse; }
 	virtual gSize size() const { return gSize(500, 300); }
+	
+	void setFont(gFont font) { _font = font; }
+	gFont& font() { return _font; }
 
 protected:
 	// member methods
 	virtual void mousePressEvent(MouseEventPtr ev);
 	virtual void mouseMoveEvent(MouseEventPtr ev);
 	virtual void mouseReleaseEvent(MouseEventPtr ev);
-	virtual void redraw() {}
 
 	// data members
 	gWindow *parent_window = nullptr;
@@ -62,6 +64,7 @@ protected:
 	MoveState move_state = Normal;
 	//gLayout &m_layout;
 	gPoint p;
+	gFont _font;
 
 private:
 	//Point move_offset;

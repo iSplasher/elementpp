@@ -727,5 +727,21 @@ inline std::ostream &operator <<(std::ostream &out, const gColor &c) {
 	return out;
 }
 
+class GSPLASHER_API gFont {
+public:
+	gFont();
+	gFont(std::string font_name);
+	//gFont(const gFont &other);
+
+
+
+private:
+	std::string f_name = "";
+	float f_size = 12;
+	std::string f_face = "";
+	float l_height = f_size * 2;
+	int f_align;
+	float f_spacing;
+};
 
 NAMESPACE_END
