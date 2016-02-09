@@ -15,6 +15,9 @@ USING_NAMESPACE
 int main() {
 	gApplication app;
 	gCoreWidget *window =  new gWindow{};
+	//gCoreWidget *window2 = new gWindow{};
+	//gCoreWidget *window3 = new gWindow{};
+	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);
 
 	//gCoreWidget *widget2 = new gCoreWidget(widget);
@@ -28,7 +31,7 @@ int main() {
 	//gCoreWidget *widget10 = new gCoreWidget(widget9);
 	//gCoreWidget *widget11 = new gCoreWidget(widget4);
 
-	//app.print_tree(static_cast<gApplication::CoreList::const_iterator >(*app.core_objects));
+	app.print_tree(static_cast<gApplication::CoreList::const_iterator >(*app.core_objects));
 	//printf("%d", app.core_objects->tree_size());
 
 

@@ -21,6 +21,7 @@
     <ClInclude Include="include\gSplasher\Utils\Primitives.h" />
     <ClInclude Include="include\gSplasher\Utils\Region.h" />
     <ClInclude Include="include\gSplasher\Widget.h" />
+    <ClInclude Include="include\gSplasher\Widgets\TopBar.h" />
     <ClInclude Include="include\gSplasher\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\gSplasher\Utils\tree.h" />
     <ClInclude Include="include\gSplasher\Window.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\nanovg\stb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Widgets\TopBar.cpp" />
     <ClCompile Include="src\Painter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Core.cpp" />

@@ -115,7 +115,7 @@ gPainter::~gPainter() {
 }
 
 void gPainter::begin() const {
-	w->parent_window->setActive();
+	//w->parent_window->setActive();
 	int fb_width;
 	int fb_height;
 	auto s = w->size();
@@ -124,8 +124,6 @@ void gPainter::begin() const {
 	glViewport(0, 0, fb_width, fb_height);
 
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgBeginFrame(context, s.width, s.height, px_ratio);
 }
 

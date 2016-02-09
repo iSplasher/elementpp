@@ -21,6 +21,9 @@
     <Filter Include="src\nanovg">
       <UniqueIdentifier>{ea42d729-bcd7-4d57-a068-b9ebc8282322}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Widgets">
+      <UniqueIdentifier>{7d5352b4-4c9b-4297-b2e6-87edeff4c345}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\nanovg\nanovg.h">
@@ -80,6 +83,9 @@
     <ClInclude Include="include\gSplasher\Window.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\gSplasher\Widgets\TopBar.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event.cpp">
@@ -104,5 +110,8 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Widgets\TopBar.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

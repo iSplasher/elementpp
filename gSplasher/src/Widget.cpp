@@ -4,11 +4,12 @@
 
 USING_NAMESPACE
 
-gCoreWidget::gCoreWidget(gCoreWidget* parent) :
-	gCore(parent)
-	{//style(0, 0, 200, 200) {
+gCoreWidget::gCoreWidget(gCoreWidget* parent) : gCore(parent) {
 	is_widget = true;
 	parent_widget = parent;
+	if (parent) {
+		parent_window = parent->parent_window;
+	}
 }
 
 gCoreWidget::~gCoreWidget() {
@@ -23,6 +24,7 @@ void gCoreWidget::update() {
 	p.begin();
 	paint(p);
 	p.end();
+	updateChildren();
 }
 
 void gCoreWidget::event(EventPtr ev) {
@@ -47,9 +49,9 @@ void gCoreWidget::event(EventPtr ev) {
 //void gCoreWidget::move(Point new_p) {
 //}
 //
-//void gCoreWidget::resize(Size new_s) {
-//	style.size = new_s;
-//}
+void gCoreWidget::resize(gSize new_s) {
+	_size = new_s;
+}
 
 //Point gCoreWidget::mapToGlobal(Point p) {
 //	auto c_pos = pos();
@@ -57,7 +59,7 @@ void gCoreWidget::event(EventPtr ev) {
 //	return n_pos;
 //}
 
-void gCoreWidget::mousePressEvent(MouseEventPtr ev){
+void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 	printf("A button was pressed!");
 	move_state = MoveState::Moving;
 	//move_offset = ev->pos();
@@ -80,5 +82,12 @@ void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
 void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 	printf("A button was released!");
 	move_state = MoveState::Normal;
+}
+
+void gCoreWidget::updateChildren() {
+	auto c_vec = children();
+	for (auto &c : c_vec) {
+		static_cast<gCoreWidget*>(c)->update();
+	}
 }
 

@@ -42,6 +42,8 @@ public:
 	/// <param name="new_parent">The new parent object</param>
 	void changeParent(gCore*);
 
+	std::vector<gCore*> children();
+
 	// data members
 	bool is_widget = false;
 	bool is_window = false;

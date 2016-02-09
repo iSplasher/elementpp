@@ -38,10 +38,11 @@ private:
 	//abitrary data members
 	int _old_mouse_x = 0;
 	int _old_mouse_y = 0;
+	bool _inited = false;
 
 	// TODO: make this a widget!
 	// Top bar of Window
-	gRect top_bar;
+	UniqueWidgetPtr top_bar;
 
 	friend class gPainter;
 	friend class gApplication;

@@ -51,6 +51,14 @@ void gCore::changeParent(gCore* new_parent) {
 	}
 }
 
+std::vector<gCore*> gCore::children() {
+	std::vector<gCore*> vec;
+	for (auto i = internal_tree.begin(); i != internal_tree.end(); ++i) {
+		vec.push_back(i.data());
+	}
+	return vec;
+}
+
 void error_cb(int err, const char *descr) {
 	//LOG_E << descr;
 }
@@ -108,14 +116,16 @@ gApplication* gApplication::instance() {
 
 bool gApplication::processEv() const {
 
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// TODO: optimize this so it doesn't check all
-	glfwWaitEvents();
 	for (auto core : *core_objects) {
 
 		if (core->is_window) {
 			static_cast<gWindow*>(core)->update();
 		}
 	}
+	glfwWaitEvents();
 
 	return should_quit ? false : true;
 }

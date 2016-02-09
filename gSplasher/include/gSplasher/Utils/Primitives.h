@@ -729,17 +729,18 @@ inline std::ostream &operator <<(std::ostream &out, const gColor &c) {
 
 class GSPLASHER_API gFont {
 public:
-	gFont();
-	gFont(std::string font_name);
+	gFont() = default;
+	//gFont(std::string face);
 	//gFont(const gFont &other);
 
-
+	//void setPixelSize(float pixel_size);
+	//void setPointSize(float point_size);
 
 private:
-	std::string f_name = "";
-	float f_size = 12;
 	std::string f_face = "";
-	float l_height = f_size * 2;
+	float f_pixel_size = 12;
+	float f_point_size = 12;
+	float l_height = f_pixel_size * 2;
 	int f_align;
 	float f_spacing;
 };

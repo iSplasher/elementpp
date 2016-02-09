@@ -42,8 +42,8 @@ public:
 	gPoint pos() const { return p; };
 	virtual void move(gPoint new_p) { p = new_p; }
 	void move(int x, int y) { move(gPoint(x, y)); }
-	//virtual void resize(Size new_s);
-	//virtual void resize(int width, int height) { resize(Size(width, height)); }
+	virtual void resize(gSize new_s);
+	virtual void resize(int width, int height) { resize(gSize(width, height)); }
 	//Point mapToGlobal(Point p);
 	//void setLayout(gLayout&);
 	bool underMouse() const { return under_mouse; }
@@ -67,11 +67,18 @@ protected:
 	gFont _font;
 
 private:
+	void updateChildren();
+
 	//Point move_offset;
-	bool under_mouse;
+	bool under_mouse = false;
 	PainterContext *this_paint = nullptr;
+	gSize _size = gSize(300, 300);
 
 friend class gPainter;
 };
+
+using WidgetPtr = std::shared_ptr<gCoreWidget>;
+using UniqueWidgetPtr = std::unique_ptr<gCoreWidget>;
+
 
 NAMESPACE_END

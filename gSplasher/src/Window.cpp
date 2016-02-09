@@ -1,5 +1,6 @@
 #include "gSplasher/Window.h"
 #include "gSplasher/Event.h"
+#include "gSplasher/Widgets/TopBar.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -40,8 +41,7 @@ void alphaWindow(_RWindow *r_w, unsigned char alpha) {
 #endif
 }
 
-gWindow::gWindow(gWindow* parent) :
-	gCoreWidget(parent) {
+gWindow::gWindow(gWindow* parent) : gCoreWidget(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -62,14 +62,17 @@ gWindow::gWindow(gWindow* parent) :
 	parent_window = this;
 
 	setActive(); // needed to init glew properly
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) {
-		std::cout << "Could not init glew.\n";
+	if (!_inited) {
+		glewExperimental = GL_TRUE;
+		if (glewInit() != GLEW_OK) {
+			std::cout << "Could not init glew.\n";
+		}
+		// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
+		glGetError();
+		_inited = true;
 	}
-	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
-	glGetError();
 
-	top_bar = gRect(1, 1, gCoreWidget::size().width - 3, 20);
+	//top_bar = std::make_unique<gCoreWidget>(new gTopBar(this));
 	gWindow::move(gPoint(500, 300));
 }
 
@@ -111,5 +114,5 @@ void gWindow::paint(gPainter& painter) {
 	p.setWidth(3);
 	b.setColor(gColor(250, 250, 250));
 
-	painter.drawRect(top_bar);
+	painter.drawCircle(gPointF(200, 200), 20);
 }
