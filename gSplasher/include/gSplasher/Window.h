@@ -33,19 +33,23 @@ private:
 	void setActive() const;
 
 	void update() override;
-	void paint(gPainter &painter);
+	void paint(gPainter &painter) override;
 
 	//abitrary data members
-	int _old_mouse_x = 0;
-	int _old_mouse_y = 0;
+	double _old_mouse_x = 0;
+	double _old_mouse_y = 0;
+	bool is_dragging = false;
+
 	bool _inited = false;
 
 	// TODO: make this a widget!
 	// Top bar of Window
 	UniqueWidgetPtr top_bar;
+	SharedPainter painter;
 
 	friend class gPainter;
 	friend class gApplication;
+	friend class gCoreWidget;
 };
 
 NAMESPACE_END

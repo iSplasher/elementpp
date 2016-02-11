@@ -87,6 +87,7 @@ gApplication::~gApplication() {
 }
 
 int gApplication::run() {
+	glfwSwapInterval(0);
 	while (processEv()) {
 		event_manager.processEv();
 	}
@@ -115,9 +116,6 @@ gApplication* gApplication::instance() {
 }
 
 bool gApplication::processEv() const {
-
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// TODO: optimize this so it doesn't check all
 	for (auto core : *core_objects) {
 

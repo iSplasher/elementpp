@@ -84,13 +84,13 @@ private:
 
 class GSPLASHER_API gPainter {
 public:
-	gPainter(gCoreWidget*);
+	gPainter(gWindow*);
 	~gPainter();
 
 	/// <summary>
 	/// Begin painting
 	/// </summary>
-	void begin() const;
+	void begin(float pixel_ratio=1) const;
 
 	/// <summary>
 	/// End painting
@@ -187,5 +187,8 @@ private:
 	gPen *p = nullptr;
 	gBrush *b = nullptr;
 };
+
+using UniquePainter = std::unique_ptr<gPainter>;
+using SharedPainter = std::shared_ptr<gPainter>;
 
 NAMESPACE_END

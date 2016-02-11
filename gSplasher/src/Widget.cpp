@@ -1,4 +1,5 @@
 #include "gSplasher/Widget.h"
+#include "gSplasher/Window.h"
 #include "gSplasher/Utils/Painter.h"
 
 
@@ -20,10 +21,7 @@ void gCoreWidget::paint(gPainter& painter) {
 }
 
 void gCoreWidget::update() {
-	gPainter p(this);
-	p.begin();
-	paint(p);
-	p.end();
+	paint(*parent_window->painter);
 	updateChildren();
 }
 

@@ -15,7 +15,7 @@ USING_NAMESPACE
 int main() {
 	gApplication app;
 	gCoreWidget *window =  new gWindow{};
-	//gCoreWidget *window2 = new gWindow{};
+	gCoreWidget *window2 = new gWindow{};
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);

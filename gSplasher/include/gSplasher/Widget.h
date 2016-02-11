@@ -65,13 +65,13 @@ protected:
 	//gLayout &m_layout;
 	gPoint p;
 	gFont _font;
+	PainterContext *this_paint = nullptr;
 
 private:
 	void updateChildren();
 
 	//Point move_offset;
 	bool under_mouse = false;
-	PainterContext *this_paint = nullptr;
 	gSize _size = gSize(300, 300);
 
 friend class gPainter;

@@ -100,8 +100,8 @@ void gBrush::apply() const {
 	}
 }
 
-gsp::gPainter::gPainter(gCoreWidget* widget) {
-	w = widget;
+gsp::gPainter::gPainter(gWindow* window) {
+	w = window;
 	if (!w->this_paint) {
 		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
 		if (!w->this_paint) {
@@ -109,22 +109,16 @@ gsp::gPainter::gPainter(gCoreWidget* widget) {
 		}
 	}
 	context = w->this_paint;
+
 }
 
 gPainter::~gPainter() {
 }
 
-void gPainter::begin() const {
-	//w->parent_window->setActive();
-	int fb_width;
-	int fb_height;
+void gPainter::begin(float pixel_ratio) const {
+	w->parent_window->setActive();
 	auto s = w->size();
-
-	glfwGetFramebufferSize(w->parent_window->r_window, &fb_width, &fb_height);
-	glViewport(0, 0, fb_width, fb_height);
-
-	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
-	nvgBeginFrame(context, s.width, s.height, px_ratio);
+	nvgBeginFrame(context, s.width, s.height, pixel_ratio);
 }
 
 void gPainter::end() const {

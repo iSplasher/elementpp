@@ -12,7 +12,6 @@
 
 #include "gSplasher/Utils/Painter.h"
 
-
 USING_NAMESPACE
 
 void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
@@ -55,7 +54,6 @@ gWindow::gWindow(gWindow* parent) : gCoreWidget(parent) {
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
 	shapeWindow(r_window, p.x, p.y, s.width, s.height);
 	alphaWindow(r_window, 225);
-	glfwSwapInterval(0);
 
 	is_widget = false;
 	is_window = true;
@@ -72,6 +70,8 @@ gWindow::gWindow(gWindow* parent) : gCoreWidget(parent) {
 		_inited = true;
 	}
 
+	painter = std::make_unique<gPainter>(this);
+
 	//top_bar = std::make_unique<gCoreWidget>(new gTopBar(this));
 	gWindow::move(gPoint(500, 300));
 }
@@ -83,10 +83,35 @@ gWindow::~gWindow() {
 }
 
 void gWindow::update() {
+	int fb_width;
+	int fb_height;
+	auto s = size();
+
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glfwGetFramebufferSize(r_window, &fb_width, &fb_height);
+	glViewport(0, 0, fb_width, fb_height);
+
+	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
+	painter->begin(px_ratio);
 	gCoreWidget::update();
+	painter->end();
 	if (r_window) {
 		glfwSwapBuffers(r_window);
 	}
+
+	if (is_dragging) {
+		double xpos, ypos;
+		glfwGetCursorPos(r_window, &xpos, &ypos);
+
+		if (xpos != _old_mouse_x || ypos != _old_mouse_y) {
+			move(gPoint(xpos, ypos));
+		}
+	}
+
+	int state = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_LEFT);
+	is_dragging = state == GLFW_PRESS ? true : false;
+
 }
 
 //Point gWindow::pos() {
@@ -103,10 +128,6 @@ void gWindow::move(gPoint new_p) {
 //	style.size = new_s;
 //}
 
-void gWindow::setActive() const {
-	glfwMakeContextCurrent(r_window);
-}
-
 void gWindow::paint(gPainter& painter) {
 	gPen p(painter);
 	gBrush b(painter);
@@ -116,3 +137,8 @@ void gWindow::paint(gPainter& painter) {
 
 	painter.drawCircle(gPointF(200, 200), 20);
 }
+
+void gWindow::setActive() const {
+	glfwMakeContextCurrent(r_window);
+}
+
