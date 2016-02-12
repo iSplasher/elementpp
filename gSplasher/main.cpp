@@ -5,17 +5,46 @@
 #include "gSplasher/Utils/Primitives.h"
 
 USING_NAMESPACE
-//
-//class MyWidget : public gCoreWidget {
-//public:
-//	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
-//	}
-//};
+
+class MyWidget : public gCoreWidget {
+public:
+	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
+		resize(100, 100);
+		move(20,20);
+	}
+
+	void paint(gPainter &painter) override {
+		gPen p(painter);
+		gBrush b(painter);
+		p.setColor(gColor(255, 0, 0));
+		p.setWidth(3);
+		b.setColor(gColor(255, 0, 0));
+		painter.drawRect(gRect(0, 0, 30, 30));
+	}
+};
+
+class MyWidget2 : public gCoreWidget {
+public:
+	MyWidget2(gCoreWidget* parent = nullptr) : gCoreWidget(parent) {
+		resize(50, 50);
+	}
+
+	void paint(gPainter &painter) override {
+		gPen p(painter);
+		gBrush b(painter);
+		p.setColor(gColor(0, 255, 0));
+		p.setWidth(3);
+		b.setColor(gColor(0, 255, 0));
+		painter.drawRect(gRect(0, 0, 10, 10));
+	}
+};
 
 int main() {
 	gApplication app;
-	gCoreWidget *window =  new gWindow{};
+	gWindow *window =  new gWindow{};
 	//gCoreWidget *window2 = new gWindow{};
+	MyWidget *mywidget = new MyWidget(window);
+	MyWidget2 *mywidget2 = new MyWidget2(mywidget);
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);

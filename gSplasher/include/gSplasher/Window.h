@@ -33,7 +33,7 @@ private:
 	/// </summary>
 	void setActive() const;
 
-	void update() override;
+	void update();
 	void paint(gPainter &painter) override;
 
 	//abitrary data members
@@ -43,7 +43,6 @@ private:
 
 	bool _inited = false;
 
-	// TODO: make this a widget!
 	// Top bar of Window
 	std::unique_ptr<gTopBar> top_bar;
 	UniquePainter painter;
@@ -51,6 +50,7 @@ private:
 	friend class gPainter;
 	friend class gApplication;
 	friend class gCoreWidget;
+	friend class gTopBar;
 };
 
 NAMESPACE_END

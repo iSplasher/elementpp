@@ -109,19 +109,29 @@ gsp::gPainter::gPainter(gWindow* window) {
 		}
 	}
 	context = w->this_paint;
-
 }
 
 gPainter::~gPainter() {
 }
 
-void gPainter::begin(float pixel_ratio) const {
+void gPainter::begin(float pixel_ratio) {
+	if (begun) {
+		throw std::runtime_error("Inconsistent gPainter::begin call");
+	}
+	begun = true;
 	w->parent_window->setActive();
+	if (w->parent_window->top_bar) {
+		top_margin = w->parent_window->top_bar->size().height;
+	}
 	auto s = w->size();
 	nvgBeginFrame(context, s.width, s.height, pixel_ratio);
 }
 
-void gPainter::end() const {
+void gPainter::end() {
+	if (!begun) {
+		throw std::runtime_error("Inconsistent gPainter::end call");
+	}
+	begun = false;
 	nvgEndFrame(context);
 }
 
@@ -130,16 +140,20 @@ void gPainter::setPen(gPen& pen) {
 	p = &pen;
 }
 
-void gPainter::save() const {
+void gPainter::save() {
 	nvgSave(context);
+	o_origin_widget = origin_widget;
 }
 
-void gPainter::restore() const {
+void gPainter::restore() {
 	nvgRestore(context);
+	origin_widget = o_origin_widget;
 }
 
-void gPainter::reset() const {
+void gPainter::reset() {
 	nvgReset(context);
+	o_origin_widget = nullptr;
+	origin_widget = nullptr;
 }
 
 void gPainter::setBrush(gBrush& brush) {
@@ -149,33 +163,59 @@ void gPainter::setBrush(gBrush& brush) {
 
 void gPainter::drawRect(gRectF rect) const {
 	beginPath();
+	translate(rect);
 	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
 	applyPB();
 }
 
 void gPainter::drawRoundedRect(gRectF rect, float radius) const {
 	beginPath();
+	translate(rect);
 	nvgRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
 	applyPB();
 }
 
 void gPainter::drawEllipse(gPointF center, gSizeF size) const {
 	beginPath();
+	translate(center);
 	nvgEllipse(context, center.x, center.y, size.width, size.height);
 	applyPB();
 }
 
 void gPainter::drawCircle(gPointF center, float radius) const {
 	beginPath();
+	translate(center);
 	nvgCircle(context, center.x, center.y, radius);
 	applyPB();
 }
 
 void gPainter::drawLine(gPointF start, gPointF end) const {
 	beginPath();
+	translate(start);
+	translate(end);
 	nvgMoveTo(context, start.x, start.y);
 	nvgLineTo(context, end.x, end.y);
 	applyPB();
+}
+
+void gPainter::translate(gRectF& r) const {
+	// TODO: fix this conversion from float to int
+	if (origin_widget) {
+		auto p = origin_widget->mapToParent(gPoint(r.x, r.y));
+		r = p;
+	}
+	r.y += top_margin;
+}
+
+void gPainter::translate(gPointF& p) const {
+	// TODO: fix this conversion from float to int
+	if (origin_widget) {
+		auto p2 = origin_widget->mapToParent(gPoint(p));
+		p.x = p2.x;
+		p.y = p2.y;
+	}
+
+	p.y += top_margin;
 }
 
 void gPainter::beginPath() const {

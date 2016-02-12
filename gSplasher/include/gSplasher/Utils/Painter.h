@@ -82,6 +82,8 @@ private:
 	friend class gPainter;
 };
 
+class gTopBar;
+
 class GSPLASHER_API gPainter {
 public:
 	gPainter(gWindow*);
@@ -90,12 +92,12 @@ public:
 	/// <summary>
 	/// Begin painting
 	/// </summary>
-	void begin(float pixel_ratio=1) const;
+	void begin(float pixel_ratio=1);
 
 	/// <summary>
 	/// End painting
 	/// </summary>
-	void end() const;
+	void end();
 
 	/// <summary>
 	/// Set new pen
@@ -113,19 +115,19 @@ public:
 	/// Saves the current state
 	/// </summary>
 	/// <remarks>A matching restore() call must be used</remarks>
-	void save() const;
+	void save();
 
 	/// <summary>
 	/// Restores saved state
 	/// </summary>
 	/// <remarks>A save() must have been called before calling this method</remarks>
-	void restore() const;
+	void restore();
 
 	/// <summary>
 	/// Resets to default state
 	/// </summary>
 	/// <remarks>This does not affect the state stack</remarks>
-	void reset() const;
+	void reset();
 
 	/// <summary>
 	/// Set new brush
@@ -178,14 +180,24 @@ public:
 private:
 
 	// helper methods
-
+	void translate(gRectF &r) const;
+	void translate(gPointF &p) const;
 	void beginPath() const;
 	void applyPB() const;
 
 	gCoreWidget *w = nullptr;
+	// Coordinates will be translated to this widget's parent
+	gCoreWidget *origin_widget = nullptr;
+	gCoreWidget *o_origin_widget = nullptr;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gBrush *b = nullptr;
+	bool begun = false;
+	// TODO: maybe extend this to a gMargins? and do all sides?
+	int top_margin = 0; // for window TopBar.. 
+
+	friend class gCoreWidget;
+	friend class gTopBar;
 };
 
 using UniquePainter = std::unique_ptr<gPainter>;

@@ -74,7 +74,8 @@ gWindow::gWindow(gWindow* parent) :
 
 	painter = std::make_unique<gPainter>(this);
 
-	top_bar = std::make_unique<gTopBar>(this);
+	top_bar = std::make_unique<gTopBar>();
+	top_bar->setWindow(this);
 
 	gWindow::move(gPoint(500, 300));
 }
@@ -101,6 +102,9 @@ void gWindow::update() {
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 	painter->begin(px_ratio);
 	gCoreWidget::update();
+	if (top_bar) {
+		top_bar->update();
+	}
 	painter->end();
 	if (r_window) {
 		glfwSwapBuffers(r_window);
@@ -141,7 +145,7 @@ void gWindow::paint(gPainter& painter) {
 	p.setWidth(3);
 	b.setColor(gColor(250, 250, 250));
 
-	painter.drawCircle(gPointF(200, 200), 20);
+	painter.drawCircle(gPointF(200, 3), 20);
 }
 
 void gWindow::setActive() const {

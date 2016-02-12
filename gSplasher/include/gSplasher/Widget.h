@@ -37,7 +37,7 @@ public:
 
 	// member methods
 	virtual void paint(gPainter &painter);
-	virtual void update();// override;
+	void update();// override;
 	virtual void event(EventPtr ev);
 	gPoint pos() const { return p; };
 	virtual void move(gPoint new_p) { p = new_p; }
@@ -51,6 +51,28 @@ public:
 	
 	void setFont(gFont font) { _font = font; }
 	gFont& font() { return _font; }
+
+	/// <summary>
+	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
+	/// </summary>
+	/// <param name="p">Coordinates to translate</param>
+	/// <returns>The translated coordinate in the parent widget</returns>
+	gPoint mapToParent(gPoint p) const;
+
+	/// <summary>
+	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
+	/// </summary>
+	/// <param name="p">Coordinates to translate</param>
+	/// <returns>The translated coordinate in this widget</returns>
+	gPoint mapFromParent(gPoint p) const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="p"></param>
+	/// <returns></returns>
+	gPoint mapFromGlobal(gPoint p);
+	gPoint mapToGlobal(gPoint p);
 
 protected:
 	// member methods

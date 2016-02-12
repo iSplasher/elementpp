@@ -22,10 +22,11 @@ void gCoreWidget::paint(gPainter& painter) {
 
 void gCoreWidget::update() {
 	auto &painter = *parent_window->painter;
+	updateChildren();
 	painter.save();
+	painter.origin_widget = this;
 	paint(painter);
 	painter.restore();
-	updateChildren();
 }
 
 void gCoreWidget::event(EventPtr ev) {
@@ -59,6 +60,14 @@ void gCoreWidget::resize(gSize new_s) {
 //	Point n_pos(c_pos.x + p.x, c_pos.y + p.y);
 //	return n_pos;
 //}
+
+gPoint gCoreWidget::mapToParent(gPoint p) const {
+	return parent_widget ? p + pos() : p;
+}
+
+gPoint gCoreWidget::mapFromParent(gPoint p) const {
+	return parent_widget ? p - pos() : p;
+}
 
 void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 	printf("A button was pressed!");
