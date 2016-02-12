@@ -2,8 +2,8 @@
 #include "gSplasher/Window.h"
 #include "gSplasher/Utils/Primitives.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <GL/glew.h> // required for nanovg
+#include <GLFW/glfw3.h> // required for nanovg
 
 #include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION

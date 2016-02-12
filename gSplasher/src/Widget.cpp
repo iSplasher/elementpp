@@ -21,7 +21,10 @@ void gCoreWidget::paint(gPainter& painter) {
 }
 
 void gCoreWidget::update() {
-	paint(*parent_window->painter);
+	auto &painter = *parent_window->painter;
+	painter.save();
+	paint(painter);
+	painter.restore();
 	updateChildren();
 }
 
@@ -83,9 +86,10 @@ void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 }
 
 void gCoreWidget::updateChildren() {
-	auto c_vec = children();
-	for (auto &c : c_vec) {
-		static_cast<gCoreWidget*>(c)->update();
+	for (auto &c : children()) {
+		if (c->is_widget) {
+			static_cast<gCoreWidget*>(c)->update();
+		}
 	}
 }
 

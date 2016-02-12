@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gSplasher/Widgets/TopBar.h"
 #include "Utils/Painter.h"
 
 typedef struct GLFWwindow _RWindow;
@@ -44,8 +45,8 @@ private:
 
 	// TODO: make this a widget!
 	// Top bar of Window
-	UniqueWidgetPtr top_bar;
-	SharedPainter painter;
+	std::unique_ptr<gTopBar> top_bar;
+	UniquePainter painter;
 
 	friend class gPainter;
 	friend class gApplication;

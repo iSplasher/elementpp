@@ -1,6 +1,5 @@
 #include "gSplasher/Window.h"
 #include "gSplasher/Event.h"
-#include "gSplasher/Widgets/TopBar.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -40,7 +39,8 @@ void alphaWindow(_RWindow *r_w, unsigned char alpha) {
 #endif
 }
 
-gWindow::gWindow(gWindow* parent) : gCoreWidget(parent) {
+gWindow::gWindow(gWindow* parent) :
+	gCoreWidget(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -61,18 +61,21 @@ gWindow::gWindow(gWindow* parent) : gCoreWidget(parent) {
 
 	setActive(); // needed to init glew properly
 	if (!_inited) {
+#ifdef OS_WINDOWS
 		glewExperimental = GL_TRUE;
 		if (glewInit() != GLEW_OK) {
 			std::cout << "Could not init glew.\n";
 		}
 		// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 		glGetError();
+#endif
 		_inited = true;
 	}
 
 	painter = std::make_unique<gPainter>(this);
 
-	//top_bar = std::make_unique<gCoreWidget>(new gTopBar(this));
+	top_bar = std::make_unique<gTopBar>(this);
+
 	gWindow::move(gPoint(500, 300));
 }
 
@@ -87,10 +90,13 @@ void gWindow::update() {
 	int fb_height;
 	auto s = size();
 
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glfwGetFramebufferSize(r_window, &fb_width, &fb_height);
 	glViewport(0, 0, fb_width, fb_height);
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_CULL_FACE);
 
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 	painter->begin(px_ratio);

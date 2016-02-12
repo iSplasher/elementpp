@@ -6,9 +6,10 @@ NAMESPACE_BEGIN
 
 class gTopBar : public gCoreWidget {
 public:
-	explicit gTopBar(gCoreWidget *p_window);
+	explicit gTopBar(gWindow *p_window);
+	~gTopBar();
 
-	void paint(gPainter &painter) override;
+	void paint(gPainter &painter);
 };
 
 NAMESPACE_END

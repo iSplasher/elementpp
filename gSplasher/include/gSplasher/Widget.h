@@ -47,7 +47,7 @@ public:
 	//Point mapToGlobal(Point p);
 	//void setLayout(gLayout&);
 	bool underMouse() const { return under_mouse; }
-	virtual gSize size() const { return gSize(500, 300); }
+	virtual gSize size() const { return _size; }
 	
 	void setFont(gFont font) { _font = font; }
 	gFont& font() { return _font; }
@@ -72,7 +72,7 @@ private:
 
 	//Point move_offset;
 	bool under_mouse = false;
-	gSize _size = gSize(300, 300);
+	gSize _size = gSize(500, 300);
 
 friend class gPainter;
 };

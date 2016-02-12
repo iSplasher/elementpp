@@ -117,7 +117,7 @@ gApplication* gApplication::instance() {
 
 bool gApplication::processEv() const {
 	// TODO: optimize this so it doesn't check all
-	for (auto core : *core_objects) {
+	for (auto &core : *core_objects) {
 
 		if (core->is_window) {
 			static_cast<gWindow*>(core)->update();
