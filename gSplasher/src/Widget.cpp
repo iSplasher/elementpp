@@ -10,6 +10,7 @@ gCoreWidget::gCoreWidget(gCoreWidget* parent) : gCore(parent) {
 	parent_widget = parent;
 	if (parent) {
 		parent_window = parent->parent_window;
+		gCoreWidget::move(parent->pos()+1);
 	}
 }
 
@@ -22,11 +23,11 @@ void gCoreWidget::paint(gPainter& painter) {
 
 void gCoreWidget::update() {
 	auto &painter = *parent_window->painter;
-	updateChildren();
 	painter.save();
 	painter.origin_widget = this;
 	paint(painter);
 	painter.restore();
+	updateChildren();
 }
 
 void gCoreWidget::event(EventPtr ev) {

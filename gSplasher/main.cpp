@@ -45,6 +45,8 @@ int main() {
 	//gCoreWidget *window2 = new gWindow{};
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(mywidget);
+	std::cout << mywidget->mapFromParent(gPoint(20, 20)) << std::endl;
+	std::cout << mywidget2->mapToParent(gPoint(0, 0)) << std::endl;
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);
