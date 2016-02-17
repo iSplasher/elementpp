@@ -129,7 +129,8 @@ void gWindow::update() {
 //}
 
 void gWindow::move(gPoint new_p) {
-	p = new_p;
+	gCoreWidget::move(new_p);
+	auto p = pos();
 	glfwSetWindowPos(r_window, p.x, p.y);
 }
 

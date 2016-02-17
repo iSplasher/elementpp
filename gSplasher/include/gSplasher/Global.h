@@ -41,3 +41,11 @@
 	#define GSPLASHER_API
 #endif
 
+NAMESPACE_BEGIN
+
+enum class Orientation {
+	Vertical,
+	Horizontal
+};
+
+NAMESPACE_END

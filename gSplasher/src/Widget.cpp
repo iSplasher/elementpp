@@ -5,7 +5,7 @@
 
 USING_NAMESPACE
 
-gCoreWidget::gCoreWidget(gCoreWidget* parent) : gCore(parent) {
+gCoreWidget::gCoreWidget(gCoreWidget* parent) : gLayoutable(parent) {
 	is_widget = true;
 	parent_widget = parent;
 	if (parent) {
@@ -45,6 +45,10 @@ void gCoreWidget::event(EventPtr ev) {
 	}
 }
 
+void gCoreWidget::setLayout(gLayout& new_layout) {
+	new_layout.setWigdet(this);
+}
+
 //Point gCoreWidget::pos() {
 //	return Point(0, 0);
 //}
@@ -52,23 +56,12 @@ void gCoreWidget::event(EventPtr ev) {
 //void gCoreWidget::move(Point new_p) {
 //}
 //
-void gCoreWidget::resize(gSize new_s) {
-	_size = new_s;
-}
 
 //Point gCoreWidget::mapToGlobal(Point p) {
 //	auto c_pos = pos();
 //	Point n_pos(c_pos.x + p.x, c_pos.y + p.y);
 //	return n_pos;
 //}
-
-gPoint gCoreWidget::mapToParent(gPoint p) const {
-	return parent_widget ? p + pos() : p;
-}
-
-gPoint gCoreWidget::mapFromParent(gPoint p) const {
-	return parent_widget ? p - pos() : p;
-}
 
 void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 	printf("A button was pressed!");

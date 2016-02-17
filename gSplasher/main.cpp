@@ -3,6 +3,7 @@
 /// </summary>
 #include "gSplasher/Window.h"
 #include "gSplasher/Utils/Primitives.h"
+#include "gSplasher/Layouts/BoxLayout.h"
 
 USING_NAMESPACE
 
@@ -46,7 +47,10 @@ int main() {
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(mywidget);
 	std::cout << mywidget->mapFromParent(gPoint(20, 20)) << std::endl;
-	std::cout << mywidget2->mapToParent(gPoint(0, 0)) << std::endl;
+	std::cout << mywidget2->mapToParent(gPoint(20, 20)) << std::endl;
+
+	gBoxLayout<Orientation::Horizontal> layout(window);
+
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);

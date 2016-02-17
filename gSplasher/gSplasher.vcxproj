@@ -16,6 +16,7 @@
     <ClInclude Include="include\gSplasher\Event.h" />
     <ClInclude Include="include\gSplasher\Global.h" />
     <ClInclude Include="include\gSplasher\Layout.h" />
+    <ClInclude Include="include\gSplasher\Layouts\BoxLayout.h" />
     <ClInclude Include="include\gSplasher\Utils\CoreUtils.h" />
     <ClInclude Include="include\gSplasher\Utils\Painter.h" />
     <ClInclude Include="include\gSplasher\Utils\Primitives.h" />
@@ -25,6 +26,7 @@
     <ClInclude Include="include\gSplasher\Widgets\WidgetUtils.h" />
     <ClInclude Include="include\gSplasher\Utils\tree.h" />
     <ClInclude Include="include\gSplasher\Window.h" />
+    <ClInclude Include="src\LayoutImpl.h" />
     <ClInclude Include="src\nanovg\fontstash.h" />
     <ClInclude Include="src\nanovg\nanovg.h" />
     <ClInclude Include="src\nanovg\nanovg_gl.h" />
@@ -33,6 +35,9 @@
     <ClInclude Include="src\nanovg\stb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\LayoutImpl.cpp" />
+    <ClCompile Include="src\Layouts\BoxLayout.cpp" />
+    <ClCompile Include="src\Layout.cpp" />
     <ClCompile Include="src\Widgets\TopBar.cpp" />
     <ClCompile Include="src\Painter.cpp" />
     <ClCompile Include="main.cpp" />
@@ -87,14 +92,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GSPLASHER_EXPORTS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Autriche\Documents\Code\gSplasher\gSplasher\include;C:\C++ Libs\GLEW\glew-1.13.0\include;C:\C++ Libs\GLFW\GLFW\include;C:\C++ Libs\Plog\Plog-1.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\C++ Libs\Rhea\include;C:\Users\Autriche\Documents\Code\gSplasher\gSplasher\include;C:\C++ Libs\GLEW\glew-1.13.0\include;C:\C++ Libs\GLFW\GLFW\include;C:\C++ Libs\Plog\Plog-1.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\C++ Libs\GLEW\glew-1.13.0\lib\Release\Win32;C:\C++ Libs\GLFW\GLFW\lib;C:\CppReact\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\C++ Libs\Rhea\lib;C:\C++ Libs\GLEW\glew-1.13.0\lib\Release\Win32;C:\C++ Libs\GLFW\GLFW\lib;C:\CppReact\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>rhea-s.lib;opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
