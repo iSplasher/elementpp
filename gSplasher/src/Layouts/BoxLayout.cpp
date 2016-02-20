@@ -46,7 +46,7 @@ void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item) {
 	}
 
 	// top margin
-	solver->add_constraint(c->c_y == prev_constraint->c_y + top_margin, REQUIRED);
+	solver->add_constraint(c->c_y == l_c->c_y + top_margin, REQUIRED);
 
 	// right margin
 	if (prev_constraint) {
@@ -79,6 +79,6 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 		auto &c = *item_pair.second;
 
 		item->resize(c.c_width.int_value(), c.c_height.int_value());
-		item->move(item->mapToParent(gPoint(c.c_x.int_value(), c.c_y.int_value())));
+		item->move(gPoint(c.c_x.int_value(), c.c_y.int_value()));
 	}
 }

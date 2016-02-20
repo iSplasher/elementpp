@@ -10,7 +10,6 @@ gCoreWidget::gCoreWidget(gCoreWidget* parent) : gLayoutable(parent) {
 	parent_widget = parent;
 	if (parent) {
 		parent_window = parent->parent_window;
-		gCoreWidget::move(parent->pos()+1);
 	}
 }
 

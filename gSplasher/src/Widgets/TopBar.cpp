@@ -17,7 +17,7 @@ void gTopBar::paint(gPainter &painter) {
 	p.setColor(gColor(178, 178, 178));
 	p.setWidth(3);
 	b.setColor(gColor(250, 250, 250));
-	painter.drawRect(gRect(0, 0, gSizeI(size())));
+	painter.drawRect(gRect(0, 0, size()));
 }
 
 void gTopBar::update() {

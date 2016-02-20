@@ -10,7 +10,7 @@ USING_NAMESPACE
 class MyWidget : public gCoreWidget {
 public:
 	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
-		resize(100, 100);
+		resize(100, 70);
 		move(20,20);
 	}
 
@@ -20,7 +20,7 @@ public:
 		p.setColor(gColor(255, 0, 0));
 		p.setWidth(3);
 		b.setColor(gColor(255, 0, 0));
-		painter.drawRect(gRect(0, 0, 30, 30));
+		painter.drawRect(gRect(0, 0, size()));
 	}
 };
 
@@ -36,7 +36,7 @@ public:
 		p.setColor(gColor(0, 255, 0));
 		p.setWidth(3);
 		b.setColor(gColor(0, 255, 0));
-		painter.drawRect(gRect(0, 0, 10, 10));
+		painter.drawRect(gRect(0, 0, size()));
 	}
 };
 
@@ -45,12 +45,16 @@ int main() {
 	gWindow *window =  new gWindow{};
 	//gCoreWidget *window2 = new gWindow{};
 	MyWidget *mywidget = new MyWidget(window);
-	MyWidget2 *mywidget2 = new MyWidget2(mywidget);
-	std::cout << mywidget->mapFromParent(gPoint(20, 20)) << std::endl;
-	std::cout << mywidget2->mapToParent(gPoint(20, 20)) << std::endl;
+	//MyWidget2 *mywidget2 = new MyWidget2(window);
 
-	gBoxLayout<Orientation::Horizontal> layout(window);
+	//gBoxLayout<Orientation::Horizontal> layout(window);
+	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
+	//layout.add(mywidget);
+	//layout2.add(mywidget2);
 
+	std::cout << "mywidget " << mywidget->geometry() << std::endl;
+	//std::cout << "mywidget2" << mywidget2->geometry() << std::endl;
+	//std::cout << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);

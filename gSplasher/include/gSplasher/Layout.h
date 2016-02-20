@@ -22,7 +22,7 @@ class gLayoutImpl;
 class GSPLASHER_API gLayoutable : public gCore {
 public:
 	// *structers
-	gLayoutable(gLayoutable *parent=nullptr) : gCore(parent) {}
+	gLayoutable(gLayoutable* parent = nullptr);
 	virtual ~gLayoutable() = default;
 
 	// member methods
@@ -44,6 +44,8 @@ public:
 	virtual void resize(gSize new_s);
 	virtual void resize(int width, int height) { resize(gSize(width, height)); }
 	virtual gSize size() const { return _size; }
+
+	virtual gRect geometry() const { return gRect(pos(), size()); }
 
 	gLayout* layout() const {
 		return m_layout;
@@ -78,7 +80,7 @@ private:
 	gRect available_space;
 	gPoint p;
 	gSize _size = gSize(500, 300);;
-	unsigned _margin;
+	int _margin = 2;
 
 
 	friend class gLayout;

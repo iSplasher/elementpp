@@ -14,6 +14,12 @@ gPoint gLayoutable::mapFromParent(gPoint p) const {
 	return layoutitem_parent ? p - pos() : p;
 }
 
+gLayoutable::gLayoutable(gLayoutable* parent): gCore(parent) {
+	if (parent) {
+		gLayoutable::move(pos() + 1);
+	}
+}
+
 void gLayoutable::move(gPoint new_p) {
 	//if (is_widget && parent_widget) {
 	//	p = mapToParent(new_p);
@@ -29,7 +35,9 @@ void gLayoutable::resize(gSize new_s) {
 gLayout::gLayout(gCoreWidget* parent) : gLayoutable() {
 	m_parent = parent;
 	l_impl = std::make_shared<gLayoutImpl>(this);
-	setWigdet(parent);
+	if (parent) {
+		setWigdet(parent);
+	}
 }
 
 void gLayout::setWigdet(gCoreWidget* new_parent) {

@@ -300,8 +300,7 @@ std::ostream &operator <<(std::ostream &out, const gSizeT<T> &s) {
 	return out;
 }
 
-using gSize = gSizeT<unsigned>;
-using gSizeI = gSizeT<int>;
+using gSize = gSizeT<int>;
 using gSizeF = gSizeT<float>;
 using gSizeD = gSizeT<double>;
 
