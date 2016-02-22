@@ -36,6 +36,8 @@ public:
 	virtual void paint(gPainter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);
+	gPoint pos() const override;
+	void setParent(gCoreWidget* new_parent);
 	void setLayout(gLayout& new_layout);
 	bool underMouse() const { return under_mouse; }
 
@@ -43,12 +45,30 @@ public:
 	gFont& font() { return _font; }
 
 	/// <summary>
+	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
+	/// </summary>
+	/// <param name="p">Coordinates to translate</param>
+	/// <returns>The translated coordinate in the parent widget</returns>
+	gPoint mapToParent(gPoint p) const;
+
+	/// <summary>
+	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
+	/// </summary>
+	/// <param name="p">Coordinates to translate</param>
+	/// <returns>The translated coordinate in this widget</returns>
+	gPoint mapFromParent(gPoint p) const;
+
+	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="p"></param>
 	/// <returns></returns>
-	gPoint mapFromGlobal(gPoint p);
-	gPoint mapToGlobal(gPoint p);
+	gPoint mapFromWindow(gPoint p) const;
+	gPoint mapToWindow(gPoint p) const;
+
+	gPoint mapFromGlobal(gPoint p) const;
+	gPoint mapToGlobal(gPoint p) const;
+
 
 protected:
 	// member methods

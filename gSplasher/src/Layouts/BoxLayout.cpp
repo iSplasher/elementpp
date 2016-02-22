@@ -79,6 +79,8 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 		auto &c = *item_pair.second;
 
 		item->resize(c.c_width.int_value(), c.c_height.int_value());
-		item->move(gPoint(c.c_x.int_value(), c.c_y.int_value()));
+		auto p = gPoint(c.c_x.int_value(), c.c_y.int_value());
+		std::cout << p << std::endl;
+		item->move(p);
 	}
 }

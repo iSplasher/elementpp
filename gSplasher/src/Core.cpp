@@ -44,9 +44,11 @@ gCore::~gCore() {
 
 void gCore::event(EventPtr) {}
 
-void gCore::changeParent(gCore* new_parent) {
+void gCore::setParent(gCore* new_parent) {
 	if (gApp != nullptr) {
-		internal_tree = new_parent->internal_tree.reinsert(internal_tree);
+		if (new_parent) {
+			internal_tree = new_parent->internal_tree.reinsert(internal_tree);
+		}
 		core_parent = new_parent;
 	}
 }

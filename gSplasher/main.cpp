@@ -10,7 +10,7 @@ USING_NAMESPACE
 class MyWidget : public gCoreWidget {
 public:
 	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
-		resize(100, 70);
+		resize(50, 50);
 		move(20,20);
 	}
 
@@ -28,6 +28,7 @@ class MyWidget2 : public gCoreWidget {
 public:
 	MyWidget2(gCoreWidget* parent = nullptr) : gCoreWidget(parent) {
 		resize(50, 50);
+		move(20, 20);
 	}
 
 	void paint(gPainter &painter) override {
@@ -45,16 +46,24 @@ int main() {
 	gWindow *window =  new gWindow{};
 	//gCoreWidget *window2 = new gWindow{};
 	MyWidget *mywidget = new MyWidget(window);
-	//MyWidget2 *mywidget2 = new MyWidget2(window);
+	MyWidget2 *mywidget2 = new MyWidget2(window);
+	MyWidget *mywidget3 = new MyWidget(window);
 
-	//gBoxLayout<Orientation::Horizontal> layout(window);
+	gBoxLayout<Orientation::Horizontal> layout(window);
 	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
-	//layout.add(mywidget);
-	//layout2.add(mywidget2);
+	layout.add(mywidget);
+	layout.add(mywidget2);
+	layout.add(mywidget3);
 
+	//std::cout << "mywidget " << mywidget->mapFromGlobal(gPoint(0, 0)) << std::endl;
+	//std::cout << "mywidget2 " << mywidget2->mapFromGlobal(gPoint(0, 0)) << std::endl;
+	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	std::cout << "mywidget " << mywidget->geometry() << std::endl;
-	//std::cout << "mywidget2" << mywidget2->geometry() << std::endl;
-	//std::cout << layout2.geometry() << std::endl;
+	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
+	std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
+	std::cout << "window " << window->geometry() << std::endl;
+	std::cout << "layout " << layout.geometry() << std::endl;
+	//std::cout << "layout2" << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
 	//MyWidget* c_widget = new MyWidget(window);

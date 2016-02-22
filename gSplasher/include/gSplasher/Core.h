@@ -40,7 +40,7 @@ public:
 	/// Change parent of gCore object
 	/// </summary>
 	/// <param name="new_parent">The new parent object</param>
-	void changeParent(gCore*);
+	virtual void setParent(gCore*);
 
 	std::vector<gCore*> children();
 

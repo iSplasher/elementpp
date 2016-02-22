@@ -35,7 +35,7 @@ public:
 	//virtual gSize maximumSize() const = 0;
 	//virtual bool isEmpty() const = 0;
 
-	gPoint pos() const { return p; };
+	virtual gPoint pos() const { return c_topleft; };
 
 	virtual void move(gPoint new_p);
 
@@ -51,20 +51,6 @@ public:
 		return m_layout;
 	}
 
-	/// <summary>
-	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
-	/// </summary>
-	/// <param name="p">Coordinates to translate</param>
-	/// <returns>The translated coordinate in the parent widget</returns>
-	gPoint mapToParent(gPoint p) const;
-
-	/// <summary>
-	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
-	/// </summary>
-	/// <param name="p">Coordinates to translate</param>
-	/// <returns>The translated coordinate in this widget</returns>
-	gPoint mapFromParent(gPoint p) const;
-
 protected:
 	// members methods
 	//virtual gRect setContentsRect(gRect r);
@@ -73,12 +59,13 @@ protected:
 	gLayout* m_layout = nullptr;
 
 private:
-
 	// data members
+	gLayoutable *parent_layoutable = nullptr;
 	gLayoutable *layoutitem_parent = nullptr;
 	bool in_layout = false;
 	gRect available_space;
-	gPoint p;
+	gPoint g_topleft;
+	gPoint c_topleft;
 	gSize _size = gSize(500, 300);;
 	int _margin = 2;
 
@@ -138,8 +125,6 @@ public:
 
 protected:
 	// data members
-	const gCoreWidget *m_parent;
-
 	std::shared_ptr<gLayoutImpl> l_impl;
 
 private:

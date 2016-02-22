@@ -142,18 +142,18 @@ void gPainter::setPen(gPen& pen) {
 
 void gPainter::save() {
 	nvgSave(context);
-	o_origin_widget = origin_widget;
+	o_origin = origin;
 }
 
 void gPainter::restore() {
 	nvgRestore(context);
-	origin_widget = o_origin_widget;
+	origin = o_origin;
 }
 
 void gPainter::reset() {
 	nvgReset(context);
-	o_origin_widget = nullptr;
-	origin_widget = nullptr;
+	o_origin = gPointF();
+	origin = gPointF();
 }
 
 void gPainter::setBrush(gBrush& brush) {
@@ -199,22 +199,12 @@ void gPainter::drawLine(gPointF start, gPointF end) const {
 }
 
 void gPainter::translate(gRectF& r) const {
-	// TODO: fix this conversion from float to int
-	if (origin_widget) {
-		auto p = origin_widget->mapToParent(gPoint(r.x, r.y));
-		r = p;
-	}
+	r += origin;
 	r.y += top_margin;
 }
 
 void gPainter::translate(gPointF& p) const {
-	// TODO: fix this conversion from float to int
-	if (origin_widget) {
-		auto p2 = origin_widget->mapToParent(gPoint(p));
-		p.x = p2.x;
-		p.y = p2.y;
-	}
-
+	p += origin;
 	p.y += top_margin;
 }
 

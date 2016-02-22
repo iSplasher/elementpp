@@ -8,7 +8,7 @@ gLayoutImpl::gLayoutImpl(gLayout* p_layout) {
 	simplex = std::make_unique<Simplex>();
 
 	auto s = p_layout->size();
-	auto p = p_layout->pos();
+	auto p = gPoint();
 	layout_constraints.c_x = p.x;
 	layout_constraints.c_y = p.y;
 	layout_constraints.c_width = s.width;

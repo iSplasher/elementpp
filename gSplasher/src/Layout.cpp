@@ -6,34 +6,18 @@
 
 USING_NAMESPACE
 
-gPoint gLayoutable::mapToParent(gPoint p) const {
-	return layoutitem_parent ? p + pos() : p;
-}
-
-gPoint gLayoutable::mapFromParent(gPoint p) const {
-	return layoutitem_parent ? p - pos() : p;
-}
-
 gLayoutable::gLayoutable(gLayoutable* parent): gCore(parent) {
-	if (parent) {
-		gLayoutable::move(pos() + 1);
-	}
 }
 
 void gLayoutable::move(gPoint new_p) {
-	//if (is_widget && parent_widget) {
-	//	p = mapToParent(new_p);
-	//} else {
-	p = new_p;
-	//}
+	c_topleft = new_p;
 }
 
 void gLayoutable::resize(gSize new_s) {
 	_size = new_s;
 }
 
-gLayout::gLayout(gCoreWidget* parent) : gLayoutable() {
-	m_parent = parent;
+gLayout::gLayout(gCoreWidget* parent) : gLayoutable(parent) {
 	l_impl = std::make_shared<gLayoutImpl>(this);
 	if (parent) {
 		setWigdet(parent);

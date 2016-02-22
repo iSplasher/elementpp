@@ -187,8 +187,8 @@ private:
 
 	gCoreWidget *w = nullptr;
 	// Coordinates will be translated to this widget's parent
-	gCoreWidget *origin_widget = nullptr;
-	gCoreWidget *o_origin_widget = nullptr;
+	gPointF origin;
+	gPointF o_origin;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gBrush *b = nullptr;

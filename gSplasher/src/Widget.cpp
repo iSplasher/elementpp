@@ -7,10 +7,7 @@ USING_NAMESPACE
 
 gCoreWidget::gCoreWidget(gCoreWidget* parent) : gLayoutable(parent) {
 	is_widget = true;
-	parent_widget = parent;
-	if (parent) {
-		parent_window = parent->parent_window;
-	}
+	setParent(parent);
 }
 
 gCoreWidget::~gCoreWidget() {
@@ -23,7 +20,7 @@ void gCoreWidget::paint(gPainter& painter) {
 void gCoreWidget::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
-	painter.origin_widget = this;
+	painter.origin = gPointF(mapToWindow(pos()));
 	paint(painter);
 	painter.restore();
 	updateChildren();
@@ -44,23 +41,76 @@ void gCoreWidget::event(EventPtr ev) {
 	}
 }
 
+gPoint gCoreWidget::pos() const {
+
+	if (is_widget && !parent_widget) {
+		return gPoint();
+	}
+	return gLayoutable::pos();
+}
+
+void gCoreWidget::setParent(gCoreWidget* new_parent) {
+	parent_widget = new_parent;
+	if (new_parent) {
+		parent_window = new_parent->parent_window;
+		move(0, 0);
+	} else {
+		parent_window = nullptr;
+	}
+	gLayoutable::setParent(new_parent);
+}
+
 void gCoreWidget::setLayout(gLayout& new_layout) {
 	new_layout.setWigdet(this);
 }
 
-//Point gCoreWidget::pos() {
-//	return Point(0, 0);
-//}
-//
-//void gCoreWidget::move(Point new_p) {
-//}
-//
+gPoint gCoreWidget::mapToParent(gPoint _p) const {
+	return _p + pos();
+}
 
-//Point gCoreWidget::mapToGlobal(Point p) {
-//	auto c_pos = pos();
-//	Point n_pos(c_pos.x + p.x, c_pos.y + p.y);
-//	return n_pos;
-//}
+gPoint gCoreWidget::mapFromParent(gPoint _p) const {
+	return _p - pos();
+}
+
+gPoint gCoreWidget::mapFromGlobal(gPoint p) const {
+	auto w = this;
+
+	while (w) {
+		p -= w->pos();
+		w = w->is_window ? nullptr : w->parent_widget;
+	}
+	return p;
+}
+
+gPoint gCoreWidget::mapToGlobal(gPoint p) const {
+	auto w = this;
+
+	while (w) {
+		p += w->pos();
+		w = w->is_window ? nullptr : w->parent_widget;
+	}
+	return p;
+}
+
+gPoint gCoreWidget::mapFromWindow(gPoint p) const {
+	auto w = this;
+
+	while (w) {
+		p -= w->pos();
+		w = w->parent_widget && w->parent_widget->is_window ? nullptr : w->parent_widget;
+	}
+	return p;
+}
+
+gPoint gCoreWidget::mapToWindow(gPoint p) const {
+	auto w = this;
+
+	while (w) {
+		p += w->pos();
+		w = w->parent_widget && w->parent_widget->is_window ? nullptr : w->parent_widget;
+	}
+	return p;
+}
 
 void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 	printf("A button was pressed!");
