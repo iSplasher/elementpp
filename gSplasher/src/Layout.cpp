@@ -30,7 +30,7 @@ void gLayout::setWigdet(gCoreWidget* new_parent) {
 	move(new_parent->pos());
 }
 
-void gLayout::add(gLayoutable* item) {
+void gLayout::add(gLayoutable* item, Alignment align) {
 	item->layoutitem_parent = this;
 }
 

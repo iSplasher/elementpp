@@ -48,12 +48,22 @@ int main() {
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(window);
 	MyWidget *mywidget3 = new MyWidget(window);
+	MyWidget *mywidget4 = new MyWidget(window);
+	MyWidget *mywidget5 = new MyWidget(window);
+	MyWidget *mywidget6 = new MyWidget(window);
+	MyWidget *mywidget7 = new MyWidget(window);
+	MyWidget *mywidget8 = new MyWidget(window);
 
 	gBoxLayout<Orientation::Horizontal> layout(window);
 	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
 	layout.add(mywidget);
 	layout.add(mywidget2);
 	layout.add(mywidget3);
+	layout.add(mywidget4);
+	layout.add(mywidget5);
+	layout.add(mywidget6);
+	layout.add(mywidget7);
+	layout.add(mywidget8);
 
 	//std::cout << "mywidget " << mywidget->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget2 " << mywidget2->mapFromGlobal(gPoint(0, 0)) << std::endl;

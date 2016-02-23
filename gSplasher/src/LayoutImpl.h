@@ -48,6 +48,9 @@ public:
 	/// <returns>Previous constraint item</returns>
 	ItemConstraintPtr prevConstraint() const;
 
+	LayoutItem* firstItem() { return layout_items.empty() ? nullptr : &layout_items.front(); }
+	LayoutItem* lastItem() { return layout_items.empty() ? nullptr : &layout_items.back(); }
+
 private:
 	gLayout *layout = nullptr;
 	Solver simplex;

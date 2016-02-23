@@ -9,8 +9,8 @@ void gBoxLayout<Orientation::Vertical>::add(gLayoutable *item) {
 }
 
 template<>
-void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item) {
-	gLayout::add(item);
+void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item, Alignment align) {
+	gLayout::add(item, align);
 	auto item_pair = l_impl->addItem(item);
 	auto &solver = l_impl->solver();
 	
@@ -54,13 +54,12 @@ void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item) {
 		for (auto &p_c : prev_constraint->right_constraints) {
 			solver->remove_constraint(*p_c);
 		}
-		solver->add_constraint(prev_c_width <= c->c_x + c->c_width - 1, REQUIRED);
-		solver->add_constraint(prev_c_width <= c->c_x + c->c_width - space, MEDIUM);
-	} else {
-		ContraintPtr right_c = std::make_shared<rhea::constraint>(c->c_x + c->c_width <= l_c->c_x + l_c->c_width - right_margin, REQUIRED);
-		c->right_constraints.push_back(right_c);
-		solver->add_constraint(*right_c);
+		//solver->add_constraint(prev_c_width <= c->c_x + c->c_width - 1, REQUIRED);
+		solver->add_constraint(prev_c_width <= c->c_x + c->c_width - space, STRONG);
 	}
+	ContraintPtr right_c = std::make_shared<rhea::constraint>(c->c_x + c->c_width <= l_c->c_x + l_c->c_width - right_margin, REQUIRED);
+	c->right_constraints.push_back(right_c);
+	solver->add_constraint(*right_c);
 
 	// bottom margin
 	solver->add_constraint(c->c_y + c->c_height == l_c->c_y + l_c->c_height - bottom_margin, REQUIRED);

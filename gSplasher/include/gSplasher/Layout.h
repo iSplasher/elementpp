@@ -103,7 +103,7 @@ public:
 	//virtual gLayoutable* parent();
 	void setWigdet(gCoreWidget *new_parent);
 
-	virtual void add(gLayoutable *item);
+	virtual void add(gLayoutable *item, Alignment align=Alignment::HCenter|Alignment::VCenter);
 
 	//gCoreWidget& takeWidget();
 	//gLayout& takeLayout();
@@ -126,6 +126,7 @@ public:
 protected:
 	// data members
 	std::shared_ptr<gLayoutImpl> l_impl;
+
 
 private:
 	// member methods
