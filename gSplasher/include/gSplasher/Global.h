@@ -45,27 +45,27 @@ NAMESPACE_BEGIN
 
 // enums 
 
-// for enum bitwise operators
+// to allow scoped enum bitwise operations 
 
-template<typename Enum>
-Enum operator |(Enum lhs, Enum rhs)
-{
-	static_assert(std::is_enum<Enum>::value,
-		"template parameter is not an enum type");
+#define DEFINE_ENUM_FLAGS(T) \
+enum class T;	\
+inline T	operator	&	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) & static_cast<int>(y));	}; \
+inline T	operator	|	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) | static_cast<int>(y));	}; \
+inline T	operator	^	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) ^ static_cast<int>(y));	}; \
+inline T	operator	~	(T x)			{	return static_cast<T>	(~static_cast<int>(x));							}; \
+inline T&	operator	&=	(T& x, T y)		{	x = x & y;	return x;	}; \
+inline T&	operator	|=	(T& x, T y)		{	x = x | y;	return x;	}; \
+inline T&	operator	^=	(T& x, T y)		{	x = x ^ y;	return x;	}; \
+inline bool	 flags(T x)	{	return static_cast<int>(x) != 0;};
 
-	using underlying = typename std::underlying_type<Enum>::type;
 
-	return static_cast<Enum> (
-		static_cast<underlying>(lhs) |
-		static_cast<underlying>(rhs)
-		);
-}
-
+DEFINE_ENUM_FLAGS(Orientation)
 enum class Orientation {
 	Vertical,
 	Horizontal
 };
 
+DEFINE_ENUM_FLAGS(Alignment)
 enum class Alignment {
 	Left,
 	Top,

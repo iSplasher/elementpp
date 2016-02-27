@@ -4,7 +4,7 @@
 USING_NAMESPACE
 
 template<>
-void gBoxLayout<Orientation::Vertical>::add(gLayoutable *item) {
+void gBoxLayout<Orientation::Vertical>::add(gLayoutable *item, Alignment align) {
 	
 }
 
@@ -63,6 +63,7 @@ void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item, Alignment align
 
 	// bottom margin
 	solver->add_constraint(c->c_y + c->c_height == l_c->c_y + l_c->c_height - bottom_margin, REQUIRED);
+
 	invalidate();
 }
 
