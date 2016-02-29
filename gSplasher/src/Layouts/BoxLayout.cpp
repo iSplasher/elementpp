@@ -55,7 +55,7 @@ void gBoxLayout<Orientation::Horizontal>::add(gLayoutable *item, Alignment align
 			solver->remove_constraint(*p_c);
 		}
 		//solver->add_constraint(prev_c_width <= c->c_x + c->c_width - 1, REQUIRED);
-		solver->add_constraint(prev_c_width <= c->c_x + c->c_width - space, STRONG);
+		solver->add_constraint(prev_c_width == c->c_x + c->c_width - space, STRONG);
 	}
 	ContraintPtr right_c = std::make_shared<rhea::constraint>(c->c_x + c->c_width <= l_c->c_x + l_c->c_width - right_margin, REQUIRED);
 	c->right_constraints.push_back(right_c);
