@@ -31,8 +31,8 @@ class Widget(Layoutable):
 
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
-        self.maxWidth = 50
-        self.maxHeight = 50
+        self.maxWidth = 100
+        self.maxHeight = 100
         self.minWidth = 10
         self.minHeight = 10
         self.margin = 2
@@ -45,20 +45,21 @@ class Widget(Layoutable):
         solver.add_constraint(self.height <= self.maxHeight, REQUIRED)
 
     def resize(self, w, h):
+        self._fixed_width = False
+        self._fixed_height = False
         self.width.value = w
+        solver.add_stay(self.width, MEDIUM)
         self.height.value = h
-        #with solver.edit():
-         #   solver.suggest_value(self.width, w)
-          #  solver.suggest_value(self.height, h)
+        solver.add_stay(self.height, MEDIUM)
 
     def setFixedWidth(self, w):
         self.width.value = w
-        solver.add_stay(self.width, STRONG)
+        solver.add_stay(self.width, STRONG, 2)
         self._fixed_width = True
 
     def setFixedHeight(self, h):
         self.height.value = h
-        solver.add_stay(self.height, STRONG)
+        solver.add_stay(self.height, STRONG, 2)
         self._fixed_height = True
 
 
@@ -110,9 +111,8 @@ class HLayout(Layoutable):
             else:
                 self.add_constraint(item.x+item.width < layout.x+layout.width-self.spacing, REQUIRED)
 
-            self.add_constraint(item.y >= layout.y+self.spacing, REQUIRED)
-            self.add_constraint(item.width <= self.width-self.spacing, STRONG)
-            self.add_constraint(item.height <= self.height-self.spacing, STRONG)
+            self.add_constraint(item.y > layout.y+self.spacing, REQUIRED)
+            self.add_constraint(item.y+item.height < layout.y+layout.height-self.spacing, REQUIRED)
 
             # the size can accommodate if not fixed
             if not item._fixed_width:
@@ -122,9 +122,13 @@ class HLayout(Layoutable):
 
             # if width is not fixed then width should be the same
             if prevItem and not prevItem._fixed_width and not item._fixed_width:
-                self.add_constraint(item.width == prevItem.width, MEDIUM)
+                self.add_constraint(item.width == prevItem.width, WEAK)
             if not prevItem:
-                self.add_constraint(item.width == layout.width, MEDIUM)
+                self.add_constraint(item.width == layout.width, WEAK)
+
+            # same with height
+            if not item._fixed_height:
+                self.add_constraint(item.height == layout.height - (2*self.spacing), MEDIUM)
 
             prevItem = item
 
@@ -134,21 +138,26 @@ solver.add_stay(window.x)
 # for y
 solver.add_stay(window.y)
 window.resize(20, 20)
-solver.add_stay(window.width, MEDIUM)
-solver.add_stay(window.height, MEDIUM)
 layout = HLayout(window)
 
 
 
-for x in range(3):
+for x in range(5):
     w = Widget("Widget"+str(x))
     #if x == 1:
     #    w.setFixedWidth(20)
     layout.addItem(w)
 
 layout.widgets[1].setFixedWidth(20)
+layout.widgets[1].setFixedHeight(30)
+layout.widgets[0].setFixedHeight(10)
 
-print(window)
-print(layout)
-for w in layout.widgets:
-    print("\n", w)
+def print_all():
+    print(window)
+    print(layout)
+    for w in layout.widgets:
+        print("\n", w)
+
+print_all()
+#window.resize(500, 500);
+#print_all()
