@@ -51,6 +51,17 @@ class Widget(Layoutable):
          #   solver.suggest_value(self.width, w)
           #  solver.suggest_value(self.height, h)
 
+    def setFixedWidth(self, w):
+        self.width.value = w
+        solver.add_stay(self.width, STRONG)
+        self._fixed_width = True
+
+    def setFixedHeight(self, h):
+        self.height.value = h
+        solver.add_stay(self.height, STRONG)
+        self._fixed_height = True
+
+
 class HLayout(Layoutable):
     TOP, BOTTOM, LEFT, RIGHT, CENTER = range(5)
 
@@ -123,14 +134,19 @@ solver.add_stay(window.x)
 # for y
 solver.add_stay(window.y)
 window.resize(20, 20)
-solver.add_stay(window.width, STRONG)
-solver.add_stay(window.height, STRONG)
+solver.add_stay(window.width, MEDIUM)
+solver.add_stay(window.height, MEDIUM)
 layout = HLayout(window)
 
 
 
 for x in range(3):
-    layout.addItem(Widget("Widget"+str(x)))
+    w = Widget("Widget"+str(x))
+    #if x == 1:
+    #    w.setFixedWidth(20)
+    layout.addItem(w)
+
+layout.widgets[1].setFixedWidth(20)
 
 print(window)
 print(layout)
