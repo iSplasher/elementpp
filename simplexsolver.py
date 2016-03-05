@@ -1,107 +1,138 @@
 from cassowary import SimplexSolver, Variable, WEAK, STRONG, REQUIRED, MEDIUM
+import inspect
 
 solver = SimplexSolver()
+#print(inspect.getmembers(solver, predicate=inspect.ismethod))
 
-class Widget():
-    MINIMAL, NORMAL, STRETCH = range(3)
-
-    def __init__(self, name):
+class Layoutable:
+    def __init__(self, name, parent):
+        self.parent = parent
+        self.name = name
         self.x = Variable('x'+name, 0)
         self.y = Variable('y'+name, 0)
         self.width = Variable('width'+name)
         self.height = Variable('height'+name)
-        self.realW = 20
-        self.realH = 20
-        self.maxWidth = 50
-        self.maxHeight = 50
-        self.minWidth = 10
-        self.minHeight = 10
-        self.name = name
-        self.policy = self.MINIMAL
+        self.layout = None
+
+        self._fixed_width = False
+        self._fixed_height = False
+
+        solver.add_constraint(self.x >= 0, REQUIRED)
+        solver.add_constraint(self.y >= 0, REQUIRED)
+        solver.add_constraint(self.width >= 0, REQUIRED)
+        solver.add_constraint(self.height >= 0, REQUIRED)
 
     def __repr__(self):
         return "{}(x={}, y={}, width={}, height={})".format(
                          self.name, self.x.value, self.y.value, self.width.value, self.height.value)
 
-widgets = []
-for x in range(1):
-    n = 'Widget' + str(x)
-    widgets.append(Widget(n))
+class Widget(Layoutable):
+    MINIMAL, NORMAL, STRETCH = range(3)
+
+    def __init__(self, name, parent=None):
+        super().__init__(name, parent)
+        self.maxWidth = 50
+        self.maxHeight = 50
+        self.minWidth = 10
+        self.minHeight = 10
+        self.margin = 2
+        self.policy = self.STRETCH
+        self.layout = None
+
+        solver.add_constraint(self.width >= self.minWidth, REQUIRED)
+        solver.add_constraint(self.height >= self.minHeight, REQUIRED)
+        solver.add_constraint(self.width <= self.maxWidth, REQUIRED)
+        solver.add_constraint(self.height <= self.maxHeight, REQUIRED)
+
+    def resize(self, w, h):
+        self.width.value = w
+        self.height.value = h
+        #with solver.edit():
+         #   solver.suggest_value(self.width, w)
+          #  solver.suggest_value(self.height, h)
+
+class HLayout(Layoutable):
+    TOP, BOTTOM, LEFT, RIGHT, CENTER = range(5)
+
+    def __init__(self, parent):
+        super().__init__("layout", parent)
+        self.spacing = 2
+        self.width = parent.width
+        self.height = parent.height
+        self.widgets = []
+        self._constraints = []
+
+    def addItem(self, new_w, alignment=CENTER):
+        new_w.parent = self.parent
+        new_w.layout = self
+        self.widgets.append(new_w)
+        self.invalidate()
+
+    def add_constraint(self, linear_eq, strength=REQUIRED):
+        constraint = solver.add_constraint(linear_eq, strength)
+        self._constraints.append(constraint)
+
+    def invalidate(self):
+
+        # remove all constraints
+        for c in self._constraints:
+            solver.remove_constraint(c)
+        self._constraints.clear()
+
+        prevItem = None
+        length = len(self.widgets)
+        # make sure
+
+        for n, item in enumerate(self.widgets, 1):
+            nextItem = None
+            if n < length:
+                nextItem = self.widgets[n]
+
+            # make sure item can't be out of bounds
+            if prevItem:
+                self.add_constraint(item.x > prevItem.x+prevItem.width+self.spacing, REQUIRED)
+            else:
+                self.add_constraint(item.x > layout.x+self.spacing, REQUIRED)
+
+            if nextItem:
+                self.add_constraint(item.x+item.width < nextItem.x, REQUIRED)
+            else:
+                self.add_constraint(item.x+item.width < layout.x+layout.width-self.spacing, REQUIRED)
+
+            self.add_constraint(item.y >= layout.y+self.spacing, REQUIRED)
+            self.add_constraint(item.width <= self.width-self.spacing, STRONG)
+            self.add_constraint(item.height <= self.height-self.spacing, STRONG)
+
+            # the size can accommodate if not fixed
+            if not item._fixed_width:
+                solver.add_stay(item.width, WEAK)
+            if not item._fixed_height:
+                solver.add_stay(item.height, WEAK)
+
+            # if width is not fixed then width should be the same
+            if prevItem and not prevItem._fixed_width and not item._fixed_width:
+                self.add_constraint(item.width == prevItem.width, MEDIUM)
+            if not prevItem:
+                self.add_constraint(item.width == layout.width, MEDIUM)
+
+            prevItem = item
 
 window = Widget("Window")
-window.x.value = 0
-window.y.value = 0
-window.width.value = 50
-window.height.value = 50
-margin = 2
-spacing = 2
-start_x = 0
-start_y = 0
-
 # for x
 solver.add_stay(window.x)
-solver.add_stay(window.width, STRONG)
-solver.add_constraint(window.x >= start_x, strength=REQUIRED)
-
 # for y
 solver.add_stay(window.y)
+window.resize(20, 20)
+solver.add_stay(window.width, STRONG)
 solver.add_stay(window.height, STRONG)
-solver.add_constraint(window.y >= start_y, strength=REQUIRED)
-
-for n, w in enumerate(widgets):
-    # for x
-    solver.add_constraint(w.x > window.x, strength=REQUIRED)
-    if w.policy == Widget.NORMAL:
-        w.width.value = w.realW
-        solver.add_stay(w.width, STRONG)
-        solver.add_constraint(w.width >= w.minWidth, strength=STRONG)
-    elif w.policy == Widget.MINIMAL:
-        solver.add_constraint(w.width == w.minWidth, strength=STRONG)
-    solver.add_constraint(w.width <= w.maxWidth, strength=STRONG)
-
-    # for y
-    solver.add_constraint(w.y > window.y, strength=REQUIRED)
-    if w.policy == Widget.NORMAL:
-        w.height.value = w.realH
-        solver.add_stay(w.height, MEDIUM)
-        solver.add_constraint(w.height >= w.minHeight, strength=STRONG)
-    elif w.policy == Widget.MINIMAL:
-        solver.add_constraint(w.height == w.minHeight, strength=STRONG)
-    solver.add_constraint(w.height <= w.maxHeight, strength=STRONG)
+layout = HLayout(window)
 
 
-    # left margin
-    if n == 0:
-        solver.add_constraint(w.x >= window.x+margin, strength=REQUIRED)
-        # alignment
-    else:
-        prev_widget = widgets[n-1]
-        solver.add_constraint(w.x >= prev_widget.x+prev_widget.width+1, strength=REQUIRED)
-        solver.add_constraint(w.x >= prev_widget.x+prev_widget.width+spacing/2, strength=MEDIUM)
 
-    # top margin
-    solver.add_constraint(w.y == window.y+margin, strength=REQUIRED)
-
-    # right margin
-    if n+1 == len(widgets):
-        solver.add_constraint(w.x+w.width <= window.x+window.width-margin, strength=REQUIRED)
-    else:
-        next_widget = widgets[n+1]
-        solver.add_constraint(w.x+w.width <= next_widget.x+next_widget.width-1, strength=REQUIRED)
-        solver.add_constraint(w.x+w.width <= next_widget.x+next_widget.width-spacing/2, strength=MEDIUM)
-
-    # bottom margin
-    if w.policy == Widget.MINIMAL:
-        solver.add_constraint(w.y+w.height <= window.y+window.height-margin, strength=REQUIRED)
-    else:
-        solver.add_constraint(w.y+w.height == window.y+window.height-margin, strength=REQUIRED)
-
-# alignment
-#center
-first_w = widgets[0]
-last_w = widgets[len(widgets)-1]
-solver.add_constraint(first_w.x-window.x == (window.x+window.width)-(last_w.x+last_w.width))
+for x in range(3):
+    layout.addItem(Widget("Widget"+str(x)))
 
 print(window)
-for w in widgets:
+print(layout)
+for w in layout.widgets:
     print("\n", w)
