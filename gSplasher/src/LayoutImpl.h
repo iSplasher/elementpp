@@ -7,56 +7,63 @@
 #include <vector>
 
 NAMESPACE_BEGIN
-using Simplex = rhea::simplex_solver;
+namespace priv
+{
+
+	using Simplex = rhea::simplex_solver;
 #define REQUIRED rhea::strength::required()
 #define STRONG rhea::strength::strong()
 #define MEDIUM rhea::strength::medium()
 #define WEAK rhea::strength::weak()
 
-using ContraintPtr = std::shared_ptr<rhea::constraint>;
-struct ItemConstraints {
-	rhea::variable c_x;
-	rhea::variable c_y;
-	rhea::variable c_width;
-	rhea::variable c_height;
-	int minWidth = 10;
-	int maxWidth = INT_MAX;
-	int minHeight = 10;
-	int maxHeight = INT_MAX;
-	std::vector<ContraintPtr> right_constraints = {};
+	using ContraintPtr = std::shared_ptr<rhea::constraint>;
+	struct ItemConstraints {
+		int minWidth = 10;
+		int maxWidth = INT_MAX;
+		int minHeight = 10;
+		int maxHeight = INT_MAX;
+		rhea::variable x = 0;
+		rhea::variable y = 0;
+		rhea::variable width = minWidth;
+		rhea::variable height = minHeight;
 
-};
+		bool fixed_width = false;
+		bool fixed_height = false;
+	};
 
-using ItemConstraintPtr = std::shared_ptr<ItemConstraints>;
+	class LayoutImpl {
+	public:
+		using LayoutItems = std::vector<gLayoutable*>;
+		using Solver = std::unique_ptr<Simplex>;
+		LayoutImpl(gLayout *p_layout);
 
-class gLayoutImpl {
-public:
-	using LayoutItem = std::pair<gLayoutable*, ItemConstraintPtr>;
-	using LayoutItems = std::vector<LayoutItem>;
-	using Solver = std::unique_ptr<Simplex>;
-	gLayoutImpl(gLayout *p_layout);
+		void addItem(gLayoutable* item);
 
-	LayoutItem addItem(gLayoutable* item);
+		LayoutItems& items() { return layout_items; }
+		int size() const { return layout_items.size(); }
+		Solver& solver() { return simplex; }
 
-	LayoutItems& items() { return layout_items; }
-	Solver& solver() { return simplex; }
-	ItemConstraints* constraints() { return &layout_constraints; }
+		void addConstraint(rhea::constraint constraint);
+		void addConstraint(rhea::linear_inequality exp, rhea::strength strength = REQUIRED, double weigth=1);
+		void addConstraint(rhea::linear_equation exp, rhea::strength strength = REQUIRED, double weigth=1);
+		void resetConstraints();
 
-	/// <summary>
-	/// Returns the constraint item previous to the last added item
-	/// </summary>
-	/// <returns>Previous constraint item</returns>
-	ItemConstraintPtr prevConstraint() const;
+		static ItemData getData(gLayoutable* item);
 
-	LayoutItem* firstItem() { return layout_items.empty() ? nullptr : &layout_items.front(); }
-	LayoutItem* lastItem() { return layout_items.empty() ? nullptr : &layout_items.back(); }
+		/// <summary>
+		/// Returns the constraint item previous to the last added item
+		/// </summary>
+		/// <returns>Previous constraint item</returns>
+		ItemData prevConstraint();
 
-private:
-	gLayout *layout = nullptr;
-	Solver simplex;
-	LayoutItems layout_items;
+		gLayoutable* firstItem() { return layout_items.empty() ? nullptr : layout_items.front(); }
+		gLayoutable* lastItem() { return layout_items.empty() ? nullptr : layout_items.back(); }
 
-	ItemConstraints layout_constraints;
-};
-
+	private:
+		gLayout *layout = nullptr;
+		Solver simplex;
+		LayoutItems layout_items;
+		rhea::constraint_list constraints;
+	};
+}
 NAMESPACE_END

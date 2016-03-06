@@ -17,8 +17,8 @@ public:
 
 	// methods
 	//Point pos() override;
-	void move(gPoint new_p);
-	//void resize(Size new_s) override;
+	void move(gPoint new_p) override;
+	void resize(gSize new_s) override;
 
 protected:
 	// methods

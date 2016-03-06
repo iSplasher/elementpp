@@ -1,42 +1,60 @@
 #include "LayoutImpl.h"
 
 USING_NAMESPACE
+using namespace priv;
 
-gLayoutImpl::gLayoutImpl(gLayout* p_layout) {
+LayoutImpl::LayoutImpl(gLayout* p_layout) {
 	layout = p_layout;
 
 	simplex = std::make_unique<Simplex>();
 
-	auto s = p_layout->size();
-	auto p = gPoint();
-	layout_constraints.c_x = p.x;
-	layout_constraints.c_y = p.y;
-	layout_constraints.c_width = s.width;
-	layout_constraints.c_height = s.height;
-
-	// for x
-	simplex->add_stay(layout_constraints.c_x, REQUIRED);
-	simplex->add_stay(layout_constraints.c_width, WEAK); // inital
-	// cannot be negative | set this to start x
-	simplex->add_constraint(layout_constraints.c_x >= 0, REQUIRED);
-
-	// for y
-	simplex->add_stay(layout_constraints.c_y, REQUIRED);
-	simplex->add_stay(layout_constraints.c_height, WEAK); // inital
-	// cannot be negative
-	simplex->add_constraint(layout_constraints.c_y >= 0, REQUIRED);
+	// layout cannot go out of bounds
+	simplex->add_constraint(p_layout->c_data->x >= 0, REQUIRED);
+	simplex->add_constraint(p_layout->c_data->y >= 0, REQUIRED);
+	simplex->add_constraint(p_layout->c_data->width >= 0, REQUIRED);
+	simplex->add_constraint(p_layout->c_data->height >= 0, REQUIRED);
 }
 
-gLayoutImpl::LayoutItem gLayoutImpl::addItem(gLayoutable* item) {
-	LayoutItem item_pair = std::make_pair(item, std::make_shared<ItemConstraints>());
-	layout_items.push_back(item_pair);
-	return item_pair;
+void LayoutImpl::addItem(gLayoutable* item) {
+	// item cannot go out of bounds
+	addConstraint(item->c_data->x >= 0, REQUIRED);
+	addConstraint(item->c_data->y >= 0, REQUIRED);
+	addConstraint(item->c_data->width >= 0, REQUIRED);
+	addConstraint(item->c_data->height >= 0, REQUIRED);
+	layout_items.push_back(item);
 }
 
-ItemConstraintPtr gLayoutImpl::prevConstraint() const {
-	ItemConstraintPtr prev = nullptr;
-	if (!layout_items.empty() && layout_items.size() > 1) {
-		prev = ((layout_items.end() - 2)->second);
+void LayoutImpl::addConstraint(rhea::constraint constraint) {
+	simplex->add_constraint(constraint);
+	constraints.push_back(constraint);
+}
+
+void LayoutImpl::addConstraint(rhea::linear_inequality exp, rhea::strength strength, double weigth) {
+	addConstraint(rhea::constraint(exp, strength, weigth));
+}
+
+void LayoutImpl::addConstraint(rhea::linear_equation exp, rhea::strength strength, double weigth) {
+	addConstraint(rhea::constraint(exp, strength, weigth));
+	
+}
+
+void LayoutImpl::resetConstraints() {
+	for (auto &c : constraints) {
+		simplex->remove_constraint(c);
 	}
-	return prev;
+	constraints.clear();
+}
+
+ItemData LayoutImpl::getData(gLayoutable* item) {
+	return item ? item->c_data : nullptr;
+}
+
+ItemData LayoutImpl::prevConstraint() {
+	ItemData item_data = nullptr;
+	if (!layout_items.empty() && layout_items.size() > 1) {
+		auto item_iter = layout_items.end()-2;
+		item_data = (*item_iter)->c_data;
+	}
+
+	return item_data;
 }

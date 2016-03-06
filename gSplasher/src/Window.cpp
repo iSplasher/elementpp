@@ -78,6 +78,7 @@ gWindow::gWindow(gWindow* parent) :
 	top_bar->setWindow(this);
 
 	gWindow::move(gPoint(500, 300));
+	gLayoutable::resize(500, 300);
 }
 
 gWindow::~gWindow() {
@@ -102,7 +103,7 @@ void gWindow::update() {
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 	painter->begin(px_ratio);
 	gCoreWidget::update();
-	if (top_bar) {
+	if (!top_bar) {
 		top_bar->update();
 	}
 	painter->end();
@@ -134,10 +135,11 @@ void gWindow::move(gPoint new_p) {
 	glfwSetWindowPos(r_window, p.x, p.y);
 }
 
-//void gWindow::resize(Size new_s) {
-//	r_window->setSize(new_s);
-//	style.size = new_s;
-//}
+void gWindow::resize(gSize new_s) {
+	gLayoutable::resize(new_s);
+	auto s = size();
+	glfwSetWindowSize(r_window, s.width, s.height);
+}
 
 void gWindow::paint(gPainter& painter) {
 	gPen p(painter);

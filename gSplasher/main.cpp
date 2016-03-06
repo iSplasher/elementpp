@@ -56,9 +56,9 @@ int main() {
 
 	gBoxLayout<Orientation::Horizontal> layout(window);
 	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
-	layout.add(mywidget);
-	layout.add(mywidget2);
-	layout.add(mywidget3);
+	//layout.add(mywidget);
+	//layout.add(mywidget2);
+	//layout.add(mywidget3);
 	//layout.add(mywidget4);
 	//layout.add(mywidget5);
 	//layout.add(mywidget6);
@@ -68,9 +68,9 @@ int main() {
 	//std::cout << "mywidget " << mywidget->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget2 " << mywidget2->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(gPoint(0, 0)) << std::endl;
-	std::cout << "mywidget " << mywidget->geometry() << std::endl;
-	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
-	std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
+	//std::cout << "mywidget " << mywidget->geometry() << std::endl;
+	//std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
+	//std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
 	std::cout << "window " << window->geometry() << std::endl;
 	std::cout << "layout " << layout.geometry() << std::endl;
 	//std::cout << "layout2" << layout2.geometry() << std::endl;

@@ -4,17 +4,17 @@
 #include "Core.h"
 #include "Utils/Primitives.h"
 
-namespace rhea
-{
-using Simplex = class simplex_solver;
-}
-
 NAMESPACE_BEGIN
 
-using Simplex = rhea::Simplex;
 class gCoreWidget;
 class gLayout;
-class gLayoutImpl;
+
+namespace priv {
+class LayoutImpl;
+struct ItemConstraints;
+using ItemData = std::shared_ptr<ItemConstraints>;
+using Layouter = std::shared_ptr<LayoutImpl>;
+}
 
 /// <summary>
 /// Derived class can be managed by a layout
@@ -23,7 +23,7 @@ class GSPLASHER_API gLayoutable : public gCore {
 public:
 	// *structers
 	gLayoutable(gLayoutable* parent = nullptr);
-	virtual ~gLayoutable() = default;
+	virtual ~gLayoutable();
 
 	// member methods
 	virtual void update() = 0;
@@ -35,7 +35,7 @@ public:
 	//virtual gSize maximumSize() const = 0;
 	//virtual bool isEmpty() const = 0;
 
-	virtual gPoint pos() const { return c_topleft; };
+	virtual gPoint pos() const;
 
 	virtual void move(gPoint new_p);
 
@@ -43,7 +43,7 @@ public:
 
 	virtual void resize(gSize new_s);
 	virtual void resize(int width, int height) { resize(gSize(width, height)); }
-	virtual gSize size() const { return _size; }
+	virtual gSize size() const;
 
 	virtual gRect geometry() const { return gRect(pos(), size()); }
 
@@ -63,14 +63,12 @@ private:
 	gLayoutable *parent_layoutable = nullptr;
 	gLayoutable *layoutitem_parent = nullptr;
 	bool in_layout = false;
-	gRect available_space;
-	gPoint g_topleft;
-	gPoint c_topleft;
-	gSize _size = gSize(500, 300);;
+	priv::ItemData c_data;
 	int _margin = 2;
 
 
 	friend class gLayout;
+	friend class priv::LayoutImpl;
 };
 
 //class SpaceFill : public gLayoutable {
@@ -109,9 +107,9 @@ public:
 	//gLayout& takeLayout();
 	//void remove(gLayoutable&);
 
-	//int spacing();
+	int spacing() const { return _spacing; }
 	//void setMargin();
-	//void setSpacing();
+	void setSpacing(int s) { _spacing = s; invalidate(); }
 
 	//virtual int count() const;
 	//bool isEmpty() const;
@@ -125,13 +123,16 @@ public:
 
 protected:
 	// data members
-	std::shared_ptr<gLayoutImpl> l_impl;
+	priv::Layouter layouter;
 
 
 private:
 	// member methods
 	void update() override {};
 	//void changeLayoutableParent(const gLayoutable*);
+
+	// data
+	int _spacing = 2;
 };
 
 NAMESPACE_END
