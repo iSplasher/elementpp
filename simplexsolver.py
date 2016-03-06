@@ -38,6 +38,7 @@ class Widget(Layoutable):
         self.margin = 2
         self.policy = self.STRETCH
         self.layout = None
+        self._policies = []
 
         solver.add_constraint(self.width >= self.minWidth, REQUIRED)
         solver.add_constraint(self.height >= self.minHeight, REQUIRED)
@@ -62,6 +63,16 @@ class Widget(Layoutable):
         solver.add_stay(self.height, STRONG, 2)
         self._fixed_height = True
 
+    def setSizePolicy(self, n_p):
+        self.policy = n_p
+        for p in self._policies:
+            solver.remove_constraint(n_p)
+        if n_p == self.MINIMAL:
+            self._policies.append(solver.add_constraint(self.width == self.minWidth, STRONG))
+            self._policies.append(solver.add_constraint(self.height == self.minHeight, STRONG))
+        elif n_p == self.STRETCH:
+            self._policies.append(solver.add_constraint(self.width == self.maxWidth, STRONG))
+            self._policies.append(solver.add_constraint(self.height == self.maxHeight, STRONG))
 
 class HLayout(Layoutable):
     TOP, BOTTOM, LEFT, RIGHT, CENTER = range(5)
@@ -151,6 +162,7 @@ for x in range(5):
 layout.widgets[1].setFixedWidth(20)
 layout.widgets[1].setFixedHeight(30)
 layout.widgets[0].setFixedHeight(10)
+layout.widgets[2].setSizePolicy(Widget.STRETCH)
 
 def print_all():
     print(window)
