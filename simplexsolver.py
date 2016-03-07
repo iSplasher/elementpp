@@ -74,11 +74,12 @@ class Widget(Layoutable):
             self._policies.append(solver.add_constraint(self.width == self.maxWidth, STRONG))
             self._policies.append(solver.add_constraint(self.height == self.maxHeight, STRONG))
 
-class HLayout(Layoutable):
+class Layout(Layoutable):
+
     TOP, BOTTOM, LEFT, RIGHT, CENTER = range(5)
 
-    def __init__(self, parent):
-        super().__init__("layout", parent)
+    def __init__(self, name, parent):
+        super().__init__(name, parent)
         self.spacing = 2
         self.width = parent.width
         self.height = parent.height
@@ -94,6 +95,14 @@ class HLayout(Layoutable):
     def add_constraint(self, linear_eq, strength=REQUIRED):
         constraint = solver.add_constraint(linear_eq, strength)
         self._constraints.append(constraint)
+
+    def invalidate(self):
+        pass
+
+class HLayout(Layout):
+
+    def __init__(self, parent):
+        super().__init__("HLayout", parent)
 
     def invalidate(self):
 
@@ -142,6 +151,16 @@ class HLayout(Layoutable):
                 self.add_constraint(item.height == layout.height - (2*self.spacing), MEDIUM)
 
             prevItem = item
+
+
+class VLayout(Layout):
+    TOP, BOTTOM, LEFT, RIGHT, CENTER = range(5)
+
+    def __init__(self, parent):
+        super().__init__("VLayout", parent)
+
+    def invalidate(self):
+        pass
 
 window = Widget("Window")
 # for x
