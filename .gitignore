@@ -191,3 +191,7 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /Documentation/html
+/Doc/html
+*.db
+*.opendb
+/signals-cpp-master

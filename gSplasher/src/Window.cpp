@@ -13,23 +13,23 @@
 
 USING_NAMESPACE
 
-void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
-#ifdef OS_WINDOWS
-	int btm_x = x + width;
-	int btm_y = y + height;
-
-	HRGN window_shape = CreateRoundRectRgn(
-		x,
-		y,
-		btm_x,
-		btm_y,
-		3,
-		3);
-
-	SetWindowRgn(glfwGetWin32Window(r_w), window_shape, true);
-	DeleteObject(window_shape);
-#endif
-}
+//void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
+//#ifdef OS_WINDOWS
+//	int btm_x = x + width;
+//	int btm_y = y + height;
+//
+//	HRGN window_shape = CreateRoundRectRgn(
+//		x,
+//		y,
+//		btm_x,
+//		btm_y,
+//		3,
+//		3);
+//
+//	SetWindowRgn(glfwGetWin32Window(r_w), window_shape, true);
+//	DeleteObject(window_shape);
+//#endif
+//}
 
 void alphaWindow(_RWindow *r_w, unsigned char alpha) {
 #ifdef OS_WINDOWS
@@ -52,7 +52,6 @@ gWindow::gWindow(gWindow* parent) :
 	auto s = gCoreWidget::size();
 	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
-	shapeWindow(r_window, p.x, p.y, s.width, s.height);
 	alphaWindow(r_window, 225);
 
 	is_widget = false;
