@@ -1,4 +1,5 @@
 #include "LayoutImpl.h"
+#include "gSplasher/Widget.h"
 
 USING_NAMESPACE
 using namespace priv;
@@ -17,11 +18,10 @@ LayoutImpl::LayoutImpl(gLayout* p_layout) {
 
 void LayoutImpl::addItem(gLayoutable* item) {
 	// item cannot go out of bounds
-	addConstraint(item->c_data->x >= 0, REQUIRED);
-	addConstraint(item->c_data->y >= 0, REQUIRED);
-	addConstraint(item->c_data->width >= 0, REQUIRED);
-	addConstraint(item->c_data->height >= 0, REQUIRED);
-	layout_items.push_back(item);
+	simplex->add_constraint(item->c_data->x >= 0, REQUIRED);
+	simplex->add_constraint(item->c_data->y >= 0, REQUIRED);
+	simplex->add_constraint(item->c_data->width >= 0, REQUIRED);
+	simplex->add_constraint(item->c_data->height >= 0, REQUIRED);
 }
 
 void LayoutImpl::addConstraint(rhea::constraint constraint) {
@@ -43,6 +43,31 @@ void LayoutImpl::resetConstraints() {
 		simplex->remove_constraint(c);
 	}
 	constraints.clear();
+}
+
+void LayoutImpl::setWidget(gCoreWidget* new_widget) {
+	for (auto &c : parent_constraints) {
+		simplex->remove_constraint(c);
+	}
+	constraints.clear();
+
+	simplex->add_stay(new_widget->c_data->width, STRONG);
+	simplex->add_stay(new_widget->c_data->height, STRONG);
+
+	// TODO: consider widget margin here!!
+	rhea::constraint x_c{ layout->c_data->x == 0, REQUIRED };
+	simplex->add_constraint(x_c);
+	parent_constraints.push_back(x_c);
+	rhea::constraint y_c{ layout->c_data->y == 0, REQUIRED };
+	simplex->add_constraint(y_c);
+	parent_constraints.push_back(y_c);
+	rhea::constraint width_c{ layout->c_data->width == new_widget->c_data->width, REQUIRED };
+	simplex->add_constraint(width_c);
+	parent_constraints.push_back(width_c);
+	rhea::constraint height_c{ layout->c_data->height == new_widget->c_data->height, REQUIRED };
+	simplex->add_constraint(height_c);
+	parent_constraints.push_back(height_c);
+
 }
 
 ItemData LayoutImpl::getData(gLayoutable* item) {

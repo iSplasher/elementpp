@@ -39,8 +39,7 @@ gLayout::gLayout(gCoreWidget* parent) : gLayoutable(parent) {
 
 void gLayout::setWigdet(gCoreWidget* new_parent) {
 	layoutitem_parent = new_parent;
-	resize(new_parent->size());
-	move(new_parent->pos());
+	layouter->setWidget(new_parent);
 }
 
 void gLayout::add(gLayoutable* item, Alignment align) {

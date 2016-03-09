@@ -48,6 +48,8 @@ namespace priv
 		void addConstraint(rhea::linear_equation exp, rhea::strength strength = REQUIRED, double weigth=1);
 		void resetConstraints();
 
+		void setWidget(gCoreWidget* new_widget);
+
 		static ItemData getData(gLayoutable* item);
 
 		/// <summary>
@@ -64,6 +66,7 @@ namespace priv
 		Solver simplex;
 		LayoutItems layout_items;
 		rhea::constraint_list constraints;
+		rhea::constraint_list parent_constraints;
 	};
 }
 NAMESPACE_END
