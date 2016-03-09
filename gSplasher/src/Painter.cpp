@@ -109,6 +109,7 @@ gsp::gPainter::gPainter(gWindow* window) {
 		}
 	}
 	context = w->this_paint;
+	current_widget = window;
 }
 
 gPainter::~gPainter() {
@@ -199,13 +200,17 @@ void gPainter::drawLine(gPointF start, gPointF end) const {
 }
 
 void gPainter::translate(gRectF& r) const {
-	r += origin;
-	r.y += top_margin;
+	if (!current_widget->is_window) {
+		r += origin;
+		r.y += top_margin;
+	}
 }
 
 void gPainter::translate(gPointF& p) const {
-	p += origin;
-	p.y += top_margin;
+	if (!current_widget->is_window) {
+		p += origin;
+		p.y += top_margin;
+	}
 }
 
 void gPainter::beginPath() const {

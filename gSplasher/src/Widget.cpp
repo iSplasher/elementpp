@@ -21,6 +21,7 @@ void gCoreWidget::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
 	painter.origin = gPointF(mapToWindow(pos()));
+	painter.current_widget = this;
 	paint(painter);
 	painter.restore();
 	updateChildren();

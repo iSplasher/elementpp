@@ -46,8 +46,8 @@ int main() {
 	gWindow *window =  new gWindow{};
 	//gCoreWidget *window2 = new gWindow{};
 	MyWidget *mywidget = new MyWidget(window);
-	MyWidget2 *mywidget2 = new MyWidget2(window);
-	MyWidget *mywidget3 = new MyWidget(window);
+	//MyWidget2 *mywidget2 = new MyWidget2(window);
+	//MyWidget *mywidget3 = new MyWidget(window);
 	//MyWidget *mywidget4 = new MyWidget(window);
 	//MyWidget *mywidget5 = new MyWidget(window);
 	//MyWidget *mywidget6 = new MyWidget(window);
@@ -72,6 +72,7 @@ int main() {
 	//std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
 	std::cout << "window " << window->geometry() << std::endl;
+	std::cout << "topbar " << window->top_bar->geometry() << std::endl;
 	std::cout << "layout " << layout.geometry() << std::endl;
 	//std::cout << "layout2" << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};

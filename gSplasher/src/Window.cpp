@@ -74,10 +74,10 @@ gWindow::gWindow(gWindow* parent) :
 	painter = std::make_unique<gPainter>(this);
 
 	top_bar = std::make_unique<gTopBar>();
-	top_bar->setWindow(this);
 
 	gWindow::move(gPoint(500, 300));
 	gLayoutable::resize(500, 300);
+	top_bar->setWindow(this);
 }
 
 gWindow::~gWindow() {

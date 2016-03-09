@@ -189,6 +189,7 @@ private:
 	// Coordinates will be translated to this widget's parent
 	gPointF origin;
 	gPointF o_origin;
+	gCoreWidget *current_widget = nullptr;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gBrush *b = nullptr;

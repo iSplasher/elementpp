@@ -20,6 +20,8 @@ public:
 	void move(gPoint new_p) override;
 	void resize(gSize new_s) override;
 
+	// Top bar of Window
+	std::unique_ptr<gTopBar> top_bar;
 protected:
 	// methods
 
@@ -43,8 +45,6 @@ private:
 
 	bool _inited = false;
 
-	// Top bar of Window
-	std::unique_ptr<gTopBar> top_bar;
 	UniquePainter painter;
 
 	friend class gPainter;
