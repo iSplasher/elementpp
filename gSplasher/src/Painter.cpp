@@ -144,17 +144,29 @@ void gPainter::setPen(gPen& pen) {
 void gPainter::save() {
 	nvgSave(context);
 	o_origin = origin;
+	o_p = p;
+	o_b = b;
 }
 
 void gPainter::restore() {
 	nvgRestore(context);
 	origin = o_origin;
+	p = o_p;
+	b = o_b;
 }
 
 void gPainter::reset() {
 	nvgReset(context);
 	o_origin = gPointF();
 	origin = gPointF();
+	o_b = nullptr;
+	b = nullptr;
+	o_p = nullptr;
+	p = nullptr;
+}
+
+void gPainter::setGlobalAlpha(float alpha) const {
+	nvgGlobalAlpha(context, alpha);
 }
 
 void gPainter::setBrush(gBrush& brush) {

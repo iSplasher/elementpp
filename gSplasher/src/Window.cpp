@@ -3,41 +3,15 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#ifdef OS_WINDOWS
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
-#endif
+//#ifdef OS_WINDOWS
+//#define GLFW_EXPOSE_NATIVE_WIN32
+//#define GLFW_EXPOSE_NATIVE_WGL
+//#include <GLFW/glfw3native.h>
+//#endif
 
 #include "gSplasher/Utils/Painter.h"
 
 USING_NAMESPACE
-
-//void shapeWindow(_RWindow *r_w, int x, int y, int width, int height) {
-//#ifdef OS_WINDOWS
-//	int btm_x = x + width;
-//	int btm_y = y + height;
-//
-//	HRGN window_shape = CreateRoundRectRgn(
-//		x,
-//		y,
-//		btm_x,
-//		btm_y,
-//		3,
-//		3);
-//
-//	SetWindowRgn(glfwGetWin32Window(r_w), window_shape, true);
-//	DeleteObject(window_shape);
-//#endif
-//}
-
-void alphaWindow(_RWindow *r_w, unsigned char alpha) {
-#ifdef OS_WINDOWS
-	auto handle = glfwGetWin32Window(r_w);
-	SetWindowLong(handle, GWL_EXSTYLE, GetWindowLong(handle, GWL_EXSTYLE) | WS_EX_LAYERED);
-	SetLayeredWindowAttributes(handle, 0, alpha, LWA_ALPHA);
-#endif
-}
 
 gWindow::gWindow(gWindow* parent) :
 	gCoreWidget(parent) {
@@ -47,12 +21,14 @@ gWindow::gWindow(gWindow* parent) :
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
+	glfwWindowHint(GLFW_DEPTH_BITS, 16);
+	glfwWindowHint(GLFW_ALPHA_BITS, 8);
+	glfwWindowHint(GLFW_TRANSPARENT, true);
 	glfwWindowHint(GLFW_DECORATED, false);
 	glfwWindowHint(GLFW_SAMPLES, 12);
 	auto s = gCoreWidget::size();
 	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
-	alphaWindow(r_window, 225);
 
 	is_widget = false;
 	is_window = true;
@@ -93,7 +69,7 @@ void gWindow::update() {
 
 	glfwGetFramebufferSize(r_window, &fb_width, &fb_height);
 	glViewport(0, 0, fb_width, fb_height);
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -102,7 +78,7 @@ void gWindow::update() {
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 	painter->begin(px_ratio);
 	gCoreWidget::update();
-	if (!top_bar) {
+	if (top_bar) {
 		top_bar->update();
 	}
 	painter->end();
@@ -141,13 +117,10 @@ void gWindow::resize(gSize new_s) {
 }
 
 void gWindow::paint(gPainter& painter) {
-	gPen p(painter);
 	gBrush b(painter);
-	p.setColor(gColor(178, 178, 178));
-	p.setWidth(3);
-	b.setColor(gColor(250, 250, 250));
+	b.setColor(gColor(250, 250, 250, 100));
 
-	painter.drawCircle(gPointF(200, 3), 20);
+	painter.drawRect(gRect(0, 0, size()));
 }
 
 void gWindow::setActive() const {

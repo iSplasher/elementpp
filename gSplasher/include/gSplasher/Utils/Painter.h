@@ -130,6 +130,13 @@ public:
 	void reset();
 
 	/// <summary>
+	/// Sets the transparency applied to all rendered shapes.
+	/// Already transparent paths will get proportionally more transparent as well.
+	/// </summary>
+	/// <param name="alpha">new alpha value between 0 and 1</param>
+	void setGlobalAlpha(float alpha) const;
+
+	/// <summary>
 	/// Set new brush
 	/// </summary>
 	/// <param name="brush">New brush</param>
@@ -185,6 +192,8 @@ private:
 	void beginPath() const;
 	void applyPB() const;
 
+	// TODO: Create a save-stack struct to store old objects instead!
+
 	gCoreWidget *w = nullptr;
 	// Coordinates will be translated to this widget's parent
 	gPointF origin;
@@ -192,7 +201,9 @@ private:
 	gCoreWidget *current_widget = nullptr;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
+	gPen *o_p = nullptr;
 	gBrush *b = nullptr;
+	gBrush *o_b = nullptr;
 	bool begun = false;
 	// TODO: maybe extend this to a gMargins? and do all sides?
 	int top_margin = 0; // for window TopBar.. 
