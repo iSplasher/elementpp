@@ -12,7 +12,8 @@ NAMESPACE_BEGIN
 /// </summary>
 class GSPLASHER_API gWindow : public gCoreWidget {
 public:
-	explicit gWindow(gWindow* parent = nullptr);
+	explicit gWindow(gWindow* parent = nullptr) : gWindow(gSize(500, 300), parent) {}
+	explicit gWindow(gSize size, gWindow* parent = nullptr);
 	virtual ~gWindow();
 
 	// methods

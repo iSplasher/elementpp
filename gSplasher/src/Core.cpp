@@ -78,7 +78,7 @@ gApplication::gApplication() :
 
 	glfwSetErrorCallback(error_cb);
 	if (!glfwInit()) {
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Could not init glfw");
 	}
 	glEnable(GL_MULTISAMPLE);
 	event_manager.init();

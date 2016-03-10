@@ -17,11 +17,22 @@ LayoutImpl::LayoutImpl(gLayout* p_layout) {
 }
 
 void LayoutImpl::addItem(gLayoutable* item) {
+
+	auto &c_data = item->c_data;
+
 	// item cannot go out of bounds
-	simplex->add_constraint(item->c_data->x >= 0, REQUIRED);
-	simplex->add_constraint(item->c_data->y >= 0, REQUIRED);
-	simplex->add_constraint(item->c_data->width >= 0, REQUIRED);
-	simplex->add_constraint(item->c_data->height >= 0, REQUIRED);
+	simplex->add_constraint(c_data->x >= 0, REQUIRED);
+	simplex->add_constraint(c_data->y >= 0, REQUIRED);
+	simplex->add_constraint(c_data->width >= 0, REQUIRED);
+	simplex->add_constraint(c_data->height >= 0, REQUIRED);
+
+	// minimum & maximum constraints
+	simplex->add_constraint(c_data->width >= c_data->minWidth, REQUIRED);
+	simplex->add_constraint(c_data->width <= c_data->maxWidth, REQUIRED);
+	simplex->add_constraint(c_data->height >= c_data->minHeight, REQUIRED);
+	simplex->add_constraint(c_data->height <= c_data->maxHeight, REQUIRED);
+
+	layout_items.push_back(item);
 }
 
 void LayoutImpl::addConstraint(rhea::constraint constraint) {

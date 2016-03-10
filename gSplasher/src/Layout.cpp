@@ -12,6 +12,11 @@ gLayoutable::gLayoutable(gLayoutable* parent): gCore(parent) {
 
 gLayoutable::~gLayoutable() {}
 
+gCoreWidget* gLayoutable::parentWidget() const {
+	auto core_p = parentCore();
+	return core_p ? core_p->is_widget || core_p->is_window ? static_cast<gCoreWidget*>(core_p) : nullptr : nullptr;
+}
+
 gPoint gLayoutable::pos() const {
 	return gPoint(c_data->x.int_value(), c_data->y.int_value());
 }
@@ -38,18 +43,13 @@ gLayout::gLayout(gCoreWidget* parent) : gLayoutable(parent) {
 }
 
 void gLayout::setWigdet(gCoreWidget* new_parent) {
-	layoutitem_parent = new_parent;
 	layouter->setWidget(new_parent);
 }
 
 void gLayout::add(gLayoutable* item, Alignment align) {
-	item->layoutitem_parent = this;
+	item->containing_layout = this;
+	item->setParent(parentWidget());
 	layouter->addItem(item);
 	invalidate();
 }
-
-//gSize gLayout::prefferedSize() const {
-//	// TODO: add proper margins;
-//	return m_parent->size() - 2;
-//}
 

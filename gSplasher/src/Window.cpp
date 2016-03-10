@@ -13,8 +13,7 @@
 
 USING_NAMESPACE
 
-gWindow::gWindow(gWindow* parent) :
-	gCoreWidget(parent) {
+gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -26,9 +25,11 @@ gWindow::gWindow(gWindow* parent) :
 	glfwWindowHint(GLFW_TRANSPARENT, true);
 	glfwWindowHint(GLFW_DECORATED, false);
 	glfwWindowHint(GLFW_SAMPLES, 12);
-	auto s = gCoreWidget::size();
-	auto p = pos();
 	r_window = glfwCreateWindow(s.width, s.height, "gSplasher", nullptr, nullptr);
+
+	if (!r_window) {
+		throw std::runtime_error("Could not create window");
+	}
 
 	is_widget = false;
 	is_window = true;
@@ -38,8 +39,9 @@ gWindow::gWindow(gWindow* parent) :
 	if (!_inited) {
 #ifdef OS_WINDOWS
 		glewExperimental = GL_TRUE;
-		if (glewInit() != GLEW_OK) {
-			std::cout << "Could not init glew.\n";
+		auto glew_result = glewInit();
+		if (glew_result != GLEW_OK) {
+			throw std::runtime_error("Could not init glew");
 		}
 		// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 		glGetError();
@@ -76,6 +78,8 @@ void gWindow::update() {
 	glEnable(GL_CULL_FACE);
 
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
+	std::cout << "px_ratio " << px_ratio << "\n";
+
 	painter->begin(px_ratio);
 	gCoreWidget::update();
 	if (top_bar) {
@@ -117,6 +121,8 @@ void gWindow::resize(gSize new_s) {
 }
 
 void gWindow::paint(gPainter& painter) {
+	gPen p(painter);
+	p.setWidth(0.0);
 	gBrush b(painter);
 	b.setColor(gColor(250, 250, 250, 100));
 

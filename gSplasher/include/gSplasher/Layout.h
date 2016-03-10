@@ -26,6 +26,12 @@ public:
 	virtual ~gLayoutable();
 
 	// member methods
+
+	/// <summary>
+	/// Returns pointer to parent gCoreWidget or nullptr if parent is not a widget or there is no parent.
+	/// </summary>
+	/// <returns>gCoreWidget or nullptr </returns>
+	gCoreWidget* parentWidget() const;
 	virtual void update() = 0;
 	//virtual gRect contentsRect();
 	//virtual Rect contentsMargin();
@@ -48,23 +54,19 @@ public:
 	virtual gRect geometry() const { return gRect(pos(), size()); }
 
 	gLayout* layout() const {
-		return m_layout;
+		return containing_layout;
 	}
 
 protected:
 	// members methods
 	//virtual gRect setContentsRect(gRect r);
 
-	// data members
-	gLayout* m_layout = nullptr;
-
 private:
 	// data members
-	gLayoutable *parent_layoutable = nullptr;
-	gLayoutable *layoutitem_parent = nullptr;
+	gLayout* containing_layout = nullptr;
 	bool in_layout = false;
 	priv::ItemData c_data;
-	int _margin = 2;
+	int _margin = 0;
 
 
 	friend class gLayout;
@@ -132,7 +134,7 @@ private:
 	//void changeLayoutableParent(const gLayoutable*);
 
 	// data
-	int _spacing = 2;
+	int _spacing = 0;
 };
 
 NAMESPACE_END

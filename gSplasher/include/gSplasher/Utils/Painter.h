@@ -49,7 +49,7 @@ private:
 	void apply() const;
 
 	PainterContext* pc = nullptr;
-	float c_width = 1;
+	float c_width = 0.1f;
 	gColor c_color;
 
 	friend class gPainter;
