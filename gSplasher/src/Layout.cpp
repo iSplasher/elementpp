@@ -12,6 +12,24 @@ gLayoutable::gLayoutable(gLayoutable* parent): gCore(parent) {
 
 gLayoutable::~gLayoutable() {}
 
+void gLayoutable::setFixedWidth(int width) {
+	c_data->fixed_width = true;
+	c_data->width.change_value(width);
+	auto l = layout();
+	if (l) {
+		l->invalidate();
+	}
+}
+
+void gLayoutable::setFixedHeight(int height) {
+	c_data->fixed_height = true;
+	c_data->height.change_value(height);
+	auto l = layout();
+	if (l) {
+		l->invalidate();
+	}
+}
+
 gCoreWidget* gLayoutable::parentWidget() const {
 	auto core_p = parentCore();
 	return core_p ? core_p->is_widget || core_p->is_window ? static_cast<gCoreWidget*>(core_p) : nullptr : nullptr;
@@ -27,8 +45,10 @@ void gLayoutable::move(gPoint new_p) {
 }
 
 void gLayoutable::resize(gSize new_s) {
-	c_data->width.change_value(new_s.width);
-	c_data->height.change_value(new_s.height);
+	if (!layout()) {
+		c_data->width.change_value(new_s.width);
+		c_data->height.change_value(new_s.height);
+	}
 }
 
 gSize gLayoutable::size() const {
@@ -53,3 +73,9 @@ void gLayout::add(gLayoutable* item, Alignment align) {
 	invalidate();
 }
 
+void gLayout::setItemFixedWidth(priv::ItemData& data, int new_value) {
+	data->width.change_value(new_value);
+
+	// TODO: store the fixed constraints somewhere! Maybe in Map container?
+	auto solver = layouter;
+}

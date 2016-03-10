@@ -11,10 +11,13 @@ class MyWidget : public gCoreWidget {
 public:
 	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
 		resize(50, 50);
-		move(20,20);
+		move(20, 20);
 	}
 
 	void paint(gPainter &painter) override {
+		gPen p(painter);
+		p.setColor(gColor(0, 255, 0));
+		p.setWidth(0.8);
 		gBrush b(painter);
 		b.setColor(gColor(255, 0, 0));
 		painter.drawRect(gRect(0, 0, size()));
@@ -31,8 +34,8 @@ public:
 	void paint(gPainter &painter) override {
 		gPen p(painter);
 		gBrush b(painter);
-		p.setColor(gColor(0, 255, 0));
-		p.setWidth(0.1f);
+		p.setColor(gColor(255, 0, 0));
+		p.setWidth(0.8);
 		b.setColor(gColor(0, 255, 0));
 		painter.drawRect(gRect(0, 0, size()));
 	}
@@ -43,33 +46,34 @@ int main() {
 	gWindow *window =  new gWindow{};
 	//gCoreWidget *window2 = new gWindow{};
 	MyWidget *mywidget = new MyWidget(window);
-	//MyWidget2 *mywidget2 = new MyWidget2(window);
-	//MyWidget *mywidget3 = new MyWidget(window);
-	//MyWidget *mywidget4 = new MyWidget(window);
-	//MyWidget *mywidget5 = new MyWidget(window);
+	MyWidget2 *mywidget2 = new MyWidget2(window);
+	MyWidget *mywidget3 = new MyWidget(window);
+	MyWidget2 *mywidget4 = new MyWidget2(window);
+	MyWidget *mywidget5 = new MyWidget(window);
 	//MyWidget *mywidget6 = new MyWidget(window);
 	//MyWidget *mywidget7 = new MyWidget(window);
 	//MyWidget *mywidget8 = new MyWidget(window);
 
-	gBoxLayout<Orientation::Horizontal> layout(window);
+	gBoxLayout<Orientation::Horizontal> layout{window};
 	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
 	layout.add(mywidget);
-	//layout.add(mywidget2);
-	//layout.add(mywidget3);
-	//layout.add(mywidget4);
-	//layout.add(mywidget5);
+	layout.add(mywidget2);
+	layout.add(mywidget3);
+	layout.add(mywidget4);
+	layout.add(mywidget5);
 	//layout.add(mywidget6);
 	//layout.add(mywidget7);
 	//layout.add(mywidget8);
 
-	//std::cout << "mywidget " << mywidget->mapFromGlobal(gPoint(0, 0)) << std::endl;
-	//std::cout << "mywidget2 " << mywidget2->mapFromGlobal(gPoint(0, 0)) << std::endl;
+	//std::cout << "mywidget to window " << mywidget->mapToWindow(gPoint(0, 0)) << std::endl;
+	//std::cout << "mywidget2 to window " << mywidget2->mapToWindow(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	std::cout << "mywidget " << mywidget->geometry() << std::endl;
-	//std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
+	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
 	std::cout << "window " << window->geometry() << std::endl;
-	std::cout << "layout " << layout.geometry() << std::endl;
+	mywidget->setFixedWidth(200);
+	//std::cout << "layout " << layout.geometry() << std::endl;
 	//std::cout << "layout2" << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};

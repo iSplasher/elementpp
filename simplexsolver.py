@@ -142,9 +142,9 @@ class HLayout(Layout):
 
             # if width is not fixed then width should be the same
             if prevItem and not prevItem._fixed_width and not item._fixed_width:
-                self.add_constraint(item.width == prevItem.width, WEAK, 2)
-            if not prevItem:
-                self.add_constraint(item.width == layout.width, WEAK, 2)
+                self.add_constraint(item.width == prevItem.width, MEDIUM)
+            if not prevItem and not nextItem:
+                self.add_constraint(item.width == layout.width, MEDIUM)
 
             # same with height
             if not item._fixed_height:

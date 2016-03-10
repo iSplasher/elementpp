@@ -27,6 +27,9 @@ public:
 
 	// member methods
 
+	void setFixedWidth(int width);
+	void setFixedHeight(int height);
+
 	/// <summary>
 	/// Returns pointer to parent gCoreWidget or nullptr if parent is not a widget or there is no parent.
 	/// </summary>
@@ -131,10 +134,16 @@ protected:
 private:
 	// member methods
 	void update() override {};
-	//void changeLayoutableParent(const gLayoutable*);
+	void setFixedWidth(int width) {}
+	void setFixedheight(int height) {}
+
+	void setItemFixedWidth(priv::ItemData &data, int new_value);
+	void setItemFixedHeight(priv::ItemData &data, int new_value);
 
 	// data
-	int _spacing = 0;
+	int _spacing = 5;
+
+	friend class gLayoutable;
 };
 
 NAMESPACE_END

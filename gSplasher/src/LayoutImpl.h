@@ -18,9 +18,9 @@ namespace priv
 
 	using ContraintPtr = std::shared_ptr<rhea::constraint>;
 	struct ItemConstraints {
-		int minWidth = 10;
+		int minWidth = 1;
 		int maxWidth = INT_MAX;
-		int minHeight = 10;
+		int minHeight = 1;
 		int maxHeight = INT_MAX;
 		rhea::variable x = 0;
 		rhea::variable y = 0;

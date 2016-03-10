@@ -59,14 +59,37 @@ public:
 	gPoint mapFromParent(gPoint p) const;
 
 	/// <summary>
-	/// 
+	/// Translates the coordinates p from the containing window's
 	/// </summary>
-	/// <param name="p"></param>
-	/// <returns></returns>
+	/// <remarks>
+	/// If there is no containing window, no translation will be done
+	/// </remarks>
+	/// <param name="p">Coordinate to translate</param>
+	/// <returns>The translated coordinate from containing window</returns>
 	gPoint mapFromWindow(gPoint p) const;
+
+	/// <summary>
+	/// Translates the coordinates p to the containing window's
+	/// </summary>
+	/// <remarks>
+	/// If there is no containing window, no translation will be done
+	/// </remarks>
+	/// <param name="p">Coordinate to translate</param>
+	/// <returns>The translated coordinate in containing window</returns>
 	gPoint mapToWindow(gPoint p) const;
 
+	/// <summary>
+	/// Translates the coordinates p from the desktop coordinates
+	/// </summary>
+	/// <param name="p">Coordinate to translate</param>
+	/// <returns>The translated coordine from desktop</returns>
 	gPoint mapFromGlobal(gPoint p) const;
+
+	/// <summary>
+	/// Translates the coordinates p to the desktop coordinates
+	/// </summary>
+	/// <param name="p">Coordinate to translate</param>
+	/// <returns>The translated coordine in desktop</returns>
 	gPoint mapToGlobal(gPoint p) const;
 
 

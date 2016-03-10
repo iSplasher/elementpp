@@ -1,5 +1,6 @@
 #include "LayoutImpl.h"
 #include "gSplasher/Widget.h"
+#include "gSplasher/Window.h"
 
 USING_NAMESPACE
 using namespace priv;
@@ -75,7 +76,15 @@ void LayoutImpl::setWidget(gCoreWidget* new_widget) {
 	rhea::constraint width_c{ layout->c_data->width == new_widget->c_data->width, REQUIRED };
 	simplex->add_constraint(width_c);
 	parent_constraints.push_back(width_c);
-	rhea::constraint height_c{ layout->c_data->height == new_widget->c_data->height, REQUIRED };
+	rhea::constraint height_c;
+	if (new_widget->is_window) {
+		auto n_window = static_cast<gWindow*>(new_widget);
+		simplex->add_stay(n_window->top_bar->c_data->height, REQUIRED);
+		height_c = layout->c_data->height == n_window->c_data->height - n_window->top_bar->c_data->height, REQUIRED;
+		
+	} else {
+		height_c = layout->c_data->height == new_widget->c_data->height, REQUIRED;
+	}
 	simplex->add_constraint(height_c);
 	parent_constraints.push_back(height_c);
 

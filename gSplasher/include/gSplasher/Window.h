@@ -3,7 +3,7 @@
 #include "gSplasher/Widgets/TopBar.h"
 #include "Utils/Painter.h"
 
-typedef struct GLFWwindow _RWindow;
+typedef struct GLFWwindow _privRWindow;
 
 NAMESPACE_BEGIN
 
@@ -24,7 +24,6 @@ public:
 protected:
 	// methods
 
-	_RWindow *r_window;
 
 private:
 	//methods
@@ -47,11 +46,14 @@ private:
 	UniquePainter painter;
 	// Top bar of Window
 	std::unique_ptr<gTopBar> top_bar;
+	// render window
+	_privRWindow *r_window;
 
 	friend class gPainter;
 	friend class gApplication;
 	friend class gCoreWidget;
 	friend class gTopBar;
+	friend class priv::LayoutImpl;
 };
 
 NAMESPACE_END

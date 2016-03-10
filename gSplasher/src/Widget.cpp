@@ -20,7 +20,7 @@ void gCoreWidget::paint(gPainter& painter) {
 void gCoreWidget::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
-	painter.origin = gPointF(mapToWindow(pos()));
+	painter.origin = gPointF(mapToWindow(gPoint(0, 0)));
 	painter.current_widget = this;
 	paint(painter);
 	painter.restore();
@@ -55,7 +55,8 @@ void gCoreWidget::setParent(gCoreWidget* new_parent) {
 	if (new_parent) {
 		parent_window = new_parent->parent_window;
 		move(0, 0);
-	} else {
+	}
+	else {
 		parent_window = nullptr;
 	}
 	gLayoutable::setParent(new_parent);
@@ -94,6 +95,9 @@ gPoint gCoreWidget::mapToGlobal(gPoint p) const {
 }
 
 gPoint gCoreWidget::mapFromWindow(gPoint p) const {
+	if (is_window) {
+		return p;
+	}
 	auto w = this;
 
 	while (w) {
@@ -104,6 +108,9 @@ gPoint gCoreWidget::mapFromWindow(gPoint p) const {
 }
 
 gPoint gCoreWidget::mapToWindow(gPoint p) const {
+	if (is_window) {
+		return p;
+	}
 	auto w = this;
 
 	while (w) {

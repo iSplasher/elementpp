@@ -78,7 +78,6 @@ void gWindow::update() {
 	glEnable(GL_CULL_FACE);
 
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
-	std::cout << "px_ratio " << px_ratio << "\n";
 
 	painter->begin(px_ratio);
 	gCoreWidget::update();
@@ -121,8 +120,6 @@ void gWindow::resize(gSize new_s) {
 }
 
 void gWindow::paint(gPainter& painter) {
-	gPen p(painter);
-	p.setWidth(0.0);
 	gBrush b(painter);
 	b.setColor(gColor(250, 250, 250, 100));
 
