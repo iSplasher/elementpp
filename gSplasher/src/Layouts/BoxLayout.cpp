@@ -61,19 +61,19 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 
 
 		// the size can accommodate if not fixed
-		if (!current_data->fixed_width) {
+		if (!current_data->fixed_w_constraint) {
 			solver->add_stay(current_data->width, WEAK);
 		} else {
-			solver->add_stay(current_data->width, STRONG, 2);
+			layouter->addConstraint(current_data->width == current_data->fixed_width, STRONG, 2);
 		}
-		if (!current_data->fixed_height) {
+		if (!current_data->fixed_h_constraint) {
 			solver->add_stay(current_data->height, WEAK);
 		} else {
-			solver->add_stay(current_data->height, STRONG, 2);
+			layouter->addConstraint(current_data->height == current_data->fixed_height, STRONG, 2);
 		}
 
 		// if width is not fixed then width should be the same
-		if (prev_item && !prev_data->fixed_width && !current_data->fixed_width) {
+		if (prev_item && !prev_data->fixed_w_constraint && !current_data->fixed_w_constraint) {
 			layouter->addConstraint(current_data->width == prev_data->width, MEDIUM);
 		}
 		if (!prev_item && !next_item) {
@@ -81,7 +81,7 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 		}
 
 		// same with height
-		if (!current_data->fixed_height) {
+		if (!current_data->fixed_h_constraint) {
 			layouter->addConstraint(current_data->height == this_data->height - (2 * space), MEDIUM);
 		}
 

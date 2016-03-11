@@ -35,6 +35,8 @@ public:
 	/// </summary>
 	/// <returns>gCoreWidget or nullptr </returns>
 	gCoreWidget* parentWidget() const;
+
+	virtual void event(EventPtr ev);
 	virtual void update() = 0;
 	//virtual gRect contentsRect();
 	//virtual Rect contentsMargin();
@@ -47,7 +49,6 @@ public:
 	virtual gPoint pos() const;
 
 	virtual void move(gPoint new_p);
-
 	void move(int x, int y) { move(gPoint(x, y)); }
 
 	virtual void resize(gSize new_s);
@@ -62,6 +63,7 @@ public:
 
 protected:
 	// members methods
+	virtual void resizeEvent(ResizeEventPtr ev);
 	//virtual gRect setContentsRect(gRect r);
 
 private:
@@ -104,7 +106,7 @@ public:
 
 	// member methods
 	//virtual gLayoutable* parent();
-	void setWigdet(gCoreWidget *new_parent);
+	void setWigdet(gCoreWidget *new_parent) const;
 
 	virtual void add(gLayoutable *item, Alignment align=Alignment::HCenter|Alignment::VCenter);
 
@@ -124,7 +126,7 @@ public:
 	//gSize prefferedSize() const;
 
 	//gRect contentsRect() const;
-	virtual void invalidate() = 0;
+	virtual void invalidate();
 
 protected:
 	// data members
@@ -137,13 +139,8 @@ private:
 	void setFixedWidth(int width) {}
 	void setFixedheight(int height) {}
 
-	void setItemFixedWidth(priv::ItemData &data, int new_value);
-	void setItemFixedHeight(priv::ItemData &data, int new_value);
-
 	// data
 	int _spacing = 5;
-
-	friend class gLayoutable;
 };
 
 NAMESPACE_END

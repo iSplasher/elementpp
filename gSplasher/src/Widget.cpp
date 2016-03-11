@@ -39,7 +39,12 @@ void gCoreWidget::event(EventPtr ev) {
 	case gEvent::MouseButtonRelease:
 		mouseReleaseEvent(std::static_pointer_cast<gMouseEvent>(ev));
 		break;
+	case gEvent::Resize:
+		resizeEvent(std::static_pointer_cast<gResizeEvent>(ev));
+		break;
 	}
+
+	gLayoutable::event(ev);
 }
 
 gPoint gCoreWidget::pos() const {

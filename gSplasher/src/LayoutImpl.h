@@ -27,8 +27,12 @@ namespace priv
 		rhea::variable width = minWidth;
 		rhea::variable height = minHeight;
 
-		bool fixed_width = false;
-		bool fixed_height = false;
+		rhea::constraint fixed_width_constraint;
+		rhea::constraint fixed_height_constraint;
+		bool fixed_w_constraint = false;
+		bool fixed_h_constraint = false;
+		int fixed_width = 0;
+		int fixed_height = 0;
 	};
 
 	class LayoutImpl {

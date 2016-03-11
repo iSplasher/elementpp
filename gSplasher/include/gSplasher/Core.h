@@ -82,7 +82,7 @@ public:
 
 	// member methods
 	int run();
-	void event(EventPtr);
+	void event(EventPtr) override;
 	void sendEvent(gCore* reciever, EventPtr);
 	void dispatchEvent(gCore* reciever, EventPtr);
 	static gApplication *instance();

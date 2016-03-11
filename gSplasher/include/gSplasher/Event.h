@@ -12,8 +12,7 @@ NAMESPACE_BEGIN
 /// <summary>
 /// Base event. Custom events should subclass this class.
 /// </summary>
-class GSPLASHER_API gEvent {
-public:
+struct GSPLASHER_API gEvent {
 	enum Type {
 		None = 0,
 		MouseMove = 1,
@@ -48,7 +47,9 @@ protected:
 
 using EventPtr = std::shared_ptr<gEvent>;
 
-struct GSPLASHER_API gInputEvent : public gEvent {
+// Input Events
+
+struct GSPLASHER_API gInputEvent : gEvent {
 	explicit gInputEvent(
 		Type t,
 		bool _alt=false,
@@ -71,7 +72,7 @@ struct GSPLASHER_API gInputEvent : public gEvent {
 
 using InputEventPtr = std::shared_ptr<gInputEvent>;
 
-struct GSPLASHER_API gMouseEvent : public gInputEvent {
+struct GSPLASHER_API gMouseEvent : gInputEvent {
 	//gMouseEvent(Type t, Point pos);
 	//explicit gMouseEvent(sf::Event);
 	//gMouseEvent(const gMouseEvent&);
@@ -85,7 +86,7 @@ struct GSPLASHER_API gMouseEvent : public gInputEvent {
 
 using MouseEventPtr = std::shared_ptr<gMouseEvent>;
 
-struct GSPLASHER_API gKeyEvent : public gInputEvent {
+struct GSPLASHER_API gKeyEvent : gInputEvent {
 	//gKeyEvent(Type t, int k, std::string txt = std::string());
 	//gKeyEvent(sf::Event);
 
@@ -96,7 +97,7 @@ struct GSPLASHER_API gKeyEvent : public gInputEvent {
 
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
-struct GSPLASHER_API gMoveEvent : public gEvent {
+struct GSPLASHER_API gMoveEvent : gEvent {
 	//gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
 	//	gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
 	//gMoveEvent(Type t, Point new_p, Point old_p) :
@@ -108,6 +109,17 @@ struct GSPLASHER_API gMoveEvent : public gEvent {
 };
 
 using MoveEventPtr = std::shared_ptr<gMoveEvent>;
+
+// Widget Events
+
+struct GSPLASHER_API gResizeEvent : gEvent {
+	gResizeEvent(Type t, gSize nsize, gSize osize) : gEvent(t), new_size(nsize), old_size(osize) {}
+
+	gSize new_size;
+	gSize old_size;
+};
+
+using ResizeEventPtr = std::shared_ptr<gResizeEvent>;
 
 class gCore;
 

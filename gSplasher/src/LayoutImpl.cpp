@@ -80,8 +80,10 @@ void LayoutImpl::setWidget(gCoreWidget* new_widget) {
 	if (new_widget->is_window) {
 		auto n_window = static_cast<gWindow*>(new_widget);
 		simplex->add_stay(n_window->top_bar->c_data->height, REQUIRED);
-		height_c = layout->c_data->height == n_window->c_data->height - n_window->top_bar->c_data->height, REQUIRED;
-		
+		height_c = { layout->c_data->height == n_window->c_data->height - n_window->top_bar->c_data->height, REQUIRED };
+		rhea::constraint topbar_width_c = { n_window->c_data->width == n_window->top_bar->c_data->width, REQUIRED };
+		simplex->add_constraint(topbar_width_c);
+		parent_constraints.push_back(topbar_width_c);
 	} else {
 		height_c = layout->c_data->height == new_widget->c_data->height, REQUIRED;
 	}

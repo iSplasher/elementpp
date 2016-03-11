@@ -54,7 +54,7 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 	top_bar = std::make_unique<gTopBar>();
 
 	gWindow::move(gPoint(500, 300));
-	gLayoutable::resize(500, 300);
+	gWindow::resizeEvent( std::make_shared<gResizeEvent>(gEvent::Resize, s, gLayoutable::size()));
 	top_bar->setWindow(this);
 }
 
@@ -113,9 +113,11 @@ void gWindow::move(gPoint new_p) {
 	glfwSetWindowPos(r_window, p.x, p.y);
 }
 
-void gWindow::resize(gSize new_s) {
-	gLayoutable::resize(new_s);
+void gWindow::resizeEvent(ResizeEventPtr ev) {
+	std::cout << "window resize\n";
+	gLayoutable::resizeEvent(ev);
 	auto s = size();
+	std::cout << s << "\n";
 	glfwSetWindowSize(r_window, s.width, s.height);
 }
 

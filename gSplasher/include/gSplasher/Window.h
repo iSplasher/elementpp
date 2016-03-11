@@ -19,10 +19,10 @@ public:
 	// methods
 	//Point pos() override;
 	void move(gPoint new_p) override;
-	void resize(gSize new_s) override;
 
 protected:
 	// methods
+	virtual void resizeEvent(ResizeEventPtr ev);
 
 
 private:

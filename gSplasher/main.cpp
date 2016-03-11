@@ -65,15 +65,16 @@ int main() {
 	//layout.add(mywidget7);
 	//layout.add(mywidget8);
 
+	mywidget->setFixedWidth(350);
+	mywidget2->setFixedWidth(450);
 	//std::cout << "mywidget to window " << mywidget->mapToWindow(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget2 to window " << mywidget2->mapToWindow(gPoint(0, 0)) << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(gPoint(0, 0)) << std::endl;
 	std::cout << "mywidget " << mywidget->geometry() << std::endl;
 	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
-	//std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
+	std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
 	std::cout << "window " << window->geometry() << std::endl;
-	mywidget->setFixedWidth(200);
-	//std::cout << "layout " << layout.geometry() << std::endl;
+	std::cout << "layout " << layout.geometry() << std::endl;
 	//std::cout << "layout2" << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};
 	//gCoreWidget *window4 = new gWindow{};
