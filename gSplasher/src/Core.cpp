@@ -78,7 +78,7 @@ void closeWindow_cb(GLFWwindow *r_window) {
 
 gApplication::gApplication() :
 	gCore(), core_objects(std::make_unique<CoreList>()), event_manager() {
-	internal_tree = core_objects->begin();
+	internal_tree = core_objects->tree_iterator();
 
 	assert(self == nullptr);
 	self = this;

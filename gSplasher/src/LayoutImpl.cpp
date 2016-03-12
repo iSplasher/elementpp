@@ -16,6 +16,7 @@ LayoutImpl::LayoutImpl(gLayout* p_layout) {
 	simplex->add_constraint(p_layout->c_data->y >= 0, REQUIRED);
 	simplex->add_constraint(p_layout->c_data->width >= 0, REQUIRED);
 	simplex->add_constraint(p_layout->c_data->height >= 0, REQUIRED);
+	simplex->solve();
 }
 
 void LayoutImpl::addItem(gLayoutable* item) {
@@ -33,6 +34,7 @@ void LayoutImpl::addItem(gLayoutable* item) {
 	simplex->add_constraint(c_data->width <= c_data->maxWidth, REQUIRED);
 	simplex->add_constraint(c_data->height >= c_data->minHeight, REQUIRED);
 	simplex->add_constraint(c_data->height <= c_data->maxHeight, REQUIRED);
+	simplex->solve();
 
 	layout_items.push_back(item);
 }
@@ -90,6 +92,7 @@ void LayoutImpl::setWidget(gCoreWidget* new_widget) {
 	}
 	simplex->add_constraint(height_c);
 	parent_constraints.push_back(height_c);
+	simplex->solve();
 
 }
 

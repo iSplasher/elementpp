@@ -88,7 +88,7 @@ public:
 	static gApplication *instance();
 	bool isRunning() const { return is_running; }
 
-	void print_tree(CoreList::const_iterator &t) {
+	void print_tree(CoreList::const_iterator &t) const {
 		for (CoreList::const_iterator i = t.begin();
 		i != t.end(); ++i)
 		{

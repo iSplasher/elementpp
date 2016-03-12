@@ -98,6 +98,7 @@ void gLayout::invalidate() {
 void gLayout::event(EventPtr ev) {
 	switch(ev->type()) {
 	case gEvent::Type::Layout:
+		std::cout << "invalidate event" << std::endl;
 		invalidate();
 		break;
 	}
