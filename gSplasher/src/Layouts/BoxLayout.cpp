@@ -20,6 +20,9 @@ void gBoxLayout<Orientation::Vertical>::invalidate() {
 
 template<>
 void gBoxLayout<Orientation::Horizontal>::invalidate() {
+	if (!gApp->isRunning()) {
+		return;
+	}
 	layouter->resetConstraints();
 
 	gLayoutable* prev_item = nullptr;
@@ -28,6 +31,9 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 	auto &items = layouter->items();
 	auto space = gLayout::spacing();
 	auto &solver = layouter->solver();
+
+	// save old size for resizeEvent
+	//for ()
 
 	for (auto it = items.begin(); it != items.end(); ++it) {
 		item = *it;
@@ -87,4 +93,7 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 
 		prev_item = *it;
 	}
+
+	solver->solve();
+
 }

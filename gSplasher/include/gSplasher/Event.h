@@ -9,28 +9,32 @@
 
 NAMESPACE_BEGIN
 
+class gCore;
+class gEventManager;
+
 /// <summary>
 /// Base event. Custom events should subclass this class.
 /// </summary>
 struct GSPLASHER_API gEvent {
-	enum Type {
-		None = 0,
-		MouseMove = 1,
-		MouseButtonPress = 2,
-		MouseButtonRelease = 3,
-		KeyPress = 4,
-		KeyRelease = 5,
+	enum class Type {
+		None,
+		MouseMove,
+		MouseButtonPress,
+		MouseButtonRelease,
+		KeyPress,
+		KeyRelease,
 
 		// suitable for widgets
-		Enter = 6,
-		Leave = 7,
-		Paint = 8,
-		Move = 9,
-		Resize = 10,
-		Show = 11,
-		Hide = 12,
-		Close = 13,
-		Quit = 14
+		Enter,
+		Leave,
+		Layout,
+		Paint,
+		Move,
+		Resize,
+		Show,
+		Hide,
+		Close,
+		Quit,
 	};
 
 	explicit gEvent(Type t) : m_type(t) {}
@@ -42,7 +46,11 @@ struct GSPLASHER_API gEvent {
 	Type type() const { return static_cast<Type>(m_type); };
 
 protected:
-	unsigned short m_type;
+	Type m_type;
+	gCore* receiver = nullptr;
+
+	friend class gEventManager;
+	friend class gCore;
 };
 
 using EventPtr = std::shared_ptr<gEvent>;
@@ -120,8 +128,6 @@ struct GSPLASHER_API gResizeEvent : gEvent {
 };
 
 using ResizeEventPtr = std::shared_ptr<gResizeEvent>;
-
-class gCore;
 
 /// <summary>
 /// Manages events

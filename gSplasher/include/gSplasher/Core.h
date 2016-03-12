@@ -28,7 +28,7 @@ public:
 	/// Events are received here
 	/// </summary>
 	/// <param name="ev">A gEvent object.</param>
-	virtual void event(EventPtr);
+	virtual void event(EventPtr ev);
 
 	/// <summary>
 	/// Retrieve a pointer to parent gCore
@@ -86,6 +86,8 @@ public:
 	void sendEvent(gCore* reciever, EventPtr);
 	void dispatchEvent(gCore* reciever, EventPtr);
 	static gApplication *instance();
+	bool isRunning() const { return is_running; }
+
 	void print_tree(CoreList::const_iterator &t) {
 		for (CoreList::const_iterator i = t.begin();
 		i != t.end(); ++i)
@@ -120,6 +122,7 @@ private:
 	static gApplication *self;
 	gEventManager event_manager;
 	bool should_quit = false;
+	bool is_running = false;
 
 	friend class gWindow;
 	friend class gCore;

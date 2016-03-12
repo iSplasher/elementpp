@@ -93,7 +93,7 @@
       <Filter>include\Layouts</Filter>
     </ClInclude>
     <ClInclude Include="src\LayoutImpl.h">
-      <Filter>include</Filter>
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -39,7 +39,7 @@ gCoreWidget* gLayoutable::parentWidget() const {
 
 void gLayoutable::event(EventPtr ev) {
 	switch (ev->type()) {
-	case gEvent::Resize:
+	case gEvent::Type::Resize:
 		resizeEvent(std::static_pointer_cast<gResizeEvent>(ev));
 		break;
 	}
@@ -57,7 +57,7 @@ void gLayoutable::move(gPoint new_p) {
 }
 
 void gLayoutable::resize(gSize new_s) {
-	gApp->dispatchEvent(this, std::make_shared<gResizeEvent>(gEvent::Resize, new_s, size()));
+	gApp->dispatchEvent(this, std::make_shared<gResizeEvent>(gEvent::Type::Resize, new_s, size()));
 }
 
 gSize gLayoutable::size() const {
@@ -93,4 +93,13 @@ void gLayout::add(gLayoutable* item, Alignment align) {
 
 void gLayout::invalidate() {
 	
+}
+
+void gLayout::event(EventPtr ev) {
+	switch(ev->type()) {
+	case gEvent::Type::Layout:
+		invalidate();
+		break;
+	}
+	gLayoutable::event(ev);
 }

@@ -129,6 +129,9 @@ public:
 	virtual void invalidate();
 
 protected:
+
+	void event(EventPtr ev);
+
 	// data members
 	priv::Layouter layouter;
 

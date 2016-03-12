@@ -42,7 +42,13 @@ gCore::~gCore() {
 	}
 }
 
-void gCore::event(EventPtr) {}
+void gCore::event(EventPtr ev) {
+	if (ev->receiver == nullptr || ev->receiver != this) {
+		for (auto &c : children()) {
+			c->event(ev);
+		}
+	}
+}
 
 void gCore::setParent(gCore* new_parent) {
 	if (gApp != nullptr) {
@@ -72,6 +78,7 @@ void closeWindow_cb(GLFWwindow *r_window) {
 
 gApplication::gApplication() :
 	gCore(), core_objects(std::make_unique<CoreList>()), event_manager() {
+	internal_tree = core_objects->begin();
 
 	assert(self == nullptr);
 	self = this;
@@ -86,9 +93,12 @@ gApplication::gApplication() :
 
 gApplication::~gApplication() {
 	glfwTerminate();
+	is_running = false;
 }
 
 int gApplication::run() {
+	is_running = true;
+	sendEvent(nullptr, std::make_shared<gEvent>(gEvent::Type::Layout));
 	glfwSwapInterval(0);
 	while (processEv()) {
 		event_manager.processEv();
@@ -98,14 +108,15 @@ int gApplication::run() {
 
 void gApplication::event(EventPtr ev) {
 	// TODO: handle quit event here
+	gCore::event(ev);
 }
 
 void gApplication::sendEvent(gCore* reciever, EventPtr ev) {
-	if (reciever == parentCore()) {
+	if (!reciever || reciever == parentCore()) {
 		event(ev);
 	}
 	else {
-		reciever->internal_tree.data()->event(ev);
+		reciever->event(ev);
 	}
 }
 
@@ -133,8 +144,6 @@ bool gApplication::processEv() const {
 
 
 void gApplication::insertCore(gCore* core) const {
-	CoreList::iterator iter;
-
 	// if there is a parent
 	if (core->parentCore()) {
 		// insert in the parent branch
@@ -143,4 +152,5 @@ void gApplication::insertCore(gCore* core) const {
 		// else just insert it at root
 		core->internal_tree = core_objects->push_back(core);
 	}
+
 }

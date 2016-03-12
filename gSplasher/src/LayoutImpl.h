@@ -33,6 +33,8 @@ namespace priv
 		bool fixed_h_constraint = false;
 		int fixed_width = 0;
 		int fixed_height = 0;
+
+		gSize old_size;
 	};
 
 	class LayoutImpl {

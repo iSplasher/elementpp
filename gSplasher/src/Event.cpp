@@ -83,6 +83,9 @@ void gEventManager::init() {
 }
 
 void gEventManager::dispatchEvent(gCore* receiver, EventPtr ev) {
+	ev->receiver = receiver;
+
+	// TODO: no need for pair
 	eventqueue.push_back(std::make_pair(receiver, ev));
 }
 
