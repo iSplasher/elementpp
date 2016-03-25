@@ -43,6 +43,9 @@ gCore::~gCore() {
 }
 
 void gCore::event(EventPtr ev) {
+#ifdef _DEBUG
+	ev->printEvent();
+#endif
 	if (ev->receiver == nullptr || ev->receiver != this) {
 		for (auto &c : children()) {
 			c->event(ev);

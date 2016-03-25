@@ -5,7 +5,8 @@
 USING_NAMESPACE
 
 gTopBar::gTopBar(): gCoreWidget() {
-	resize(0, 0);
+	setFixedWidth(0);
+	setFixedHeight(0);
 }
 
 gTopBar::~gTopBar() {
@@ -32,7 +33,12 @@ void gTopBar::update() {
 	}
 }
 
+void gTopBar::event(EventPtr ev) {
+	std::cout << "Topbar event received!\n";
+}
+
 void gTopBar::setWindow(gWindow* w) {
 	parent_window = w;
-	resize(w->size().width, 20);
+	setFixedWidth(w->size().width);
+	setFixedHeight(20);
 }

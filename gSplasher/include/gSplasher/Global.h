@@ -31,7 +31,7 @@
 
 #endif
 
-#ifdef OS_WINDOWS_D
+#ifndef _DEBUG
 	#ifdef GSPLASHER_EXPORTS
 		#define GSPLASHER_API __declspec(dllexport)
 	#else

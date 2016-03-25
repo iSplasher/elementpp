@@ -33,6 +33,7 @@ public:
 	virtual ~gCoreWidget();
 
 	// member methods
+	gWindow* parentWindow() const { return parent_window; }
 	virtual void paint(gPainter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);

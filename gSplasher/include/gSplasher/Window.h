@@ -12,11 +12,13 @@ NAMESPACE_BEGIN
 /// </summary>
 class GSPLASHER_API gWindow : public gCoreWidget {
 public:
+	using TopBar = std::unique_ptr<gTopBar>;
 	explicit gWindow(gWindow* parent = nullptr) : gWindow(gSize(500, 300), parent) {}
 	explicit gWindow(gSize size, gWindow* parent = nullptr);
 	virtual ~gWindow();
 
 	// methods
+	TopBar& topBar() { return top_bar; }
 	//Point pos() override;
 	void move(gPoint new_p) override;
 
@@ -27,7 +29,6 @@ protected:
 
 private:
 	//methods
-
 	/// <summary>
 	/// Painting can only be done on active window.
 	/// </summary>
@@ -45,7 +46,7 @@ private:
 
 	UniquePainter painter;
 	// Top bar of Window
-	std::unique_ptr<gTopBar> top_bar;
+	TopBar top_bar;
 	// render window
 	_privRWindow *r_window;
 

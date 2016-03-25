@@ -56,11 +56,11 @@ int main() {
 
 	gBoxLayout<Orientation::Horizontal> layout{window};
 	//gBoxLayout<Orientation::Horizontal> layout2(mywidget);
-	layout.add(mywidget);
-	layout.add(mywidget2);
-	layout.add(mywidget3);
-	layout.add(mywidget4);
-	layout.add(mywidget5);
+	//layout.add(mywidget);
+	//layout.add(mywidget2);
+	//layout.add(mywidget3);
+	//layout.add(mywidget4);
+	//layout.add(mywidget5);
 	//layout.add(mywidget6);
 	//layout.add(mywidget7);
 	//layout.add(mywidget8);
@@ -74,6 +74,7 @@ int main() {
 	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
 	std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
 	std::cout << "window " << window->geometry() << std::endl;
+	std::cout << "topbar " << window->topBar()->geometry() << std::endl;
 	std::cout << "layout " << layout.geometry() << std::endl;
 	//std::cout << "layout2" << layout2.geometry() << std::endl;
 	//gCoreWidget *window3 = new gWindow{};

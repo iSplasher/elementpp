@@ -88,7 +88,7 @@ void LayoutImpl::setWidget(gCoreWidget* new_widget) {
 		simplex->add_constraint(topbar_width_c);
 		parent_constraints.push_back(topbar_width_c);
 	} else {
-		height_c = layout->c_data->height == new_widget->c_data->height, REQUIRED;
+	height_c = layout->c_data->height == new_widget->c_data->height, REQUIRED;
 	}
 	simplex->add_constraint(height_c);
 	parent_constraints.push_back(height_c);

@@ -6,6 +6,9 @@
 
 #include <vector>
 #include <utility>
+#ifdef _DEBUG
+#include <string>
+#endif
 
 NAMESPACE_BEGIN
 
@@ -44,6 +47,67 @@ struct GSPLASHER_API gEvent {
 
 	// methods
 	Type type() const { return static_cast<Type>(m_type); };
+#ifdef _DEBUG
+	void printEvent() const {
+		std::string s_type("");
+
+		switch (m_type) {
+		case Type::None:
+			s_type = "None";
+			break;
+		case Type::MouseMove: 
+			s_type = "MouseMove";
+			break;
+		case Type::MouseButtonPress: 
+			s_type = "MouseButtonPress";
+			break;
+		case Type::MouseButtonRelease: 
+			s_type = "MouseButtonRelease";
+			break;
+		case Type::KeyPress: 
+			s_type = "KeyPress";
+			break;
+		case Type::KeyRelease: 
+			s_type = "KeyRelease";
+			break;
+		case Type::Enter: 
+			s_type = "Enter";
+			break;
+		case Type::Leave: 
+			s_type = "Leave";
+			break;
+		case Type::Layout: 
+			s_type = "Layout";
+			break;
+		case Type::Paint: 
+			s_type = "Paint";
+			break;
+		case Type::Move: 
+			s_type = "Move";
+			break;
+		case Type::Resize: 
+			s_type = "Resize";
+			break;
+		case Type::Show: 
+			s_type = "Show";
+			break;
+		case Type::Hide: 
+			s_type = "Hide";
+			break;
+		case Type::Close: 
+			s_type = "Close";
+			break;
+		case Type::Quit: 
+			s_type = "Quit";
+			break;
+		default: 
+			s_type = "Unnamed";
+			break;
+		}
+
+		std::cout << s_type << " event was generated!" << std::endl;
+	}
+#endif
 
 protected:
 	Type m_type;
@@ -60,15 +124,15 @@ using EventPtr = std::shared_ptr<gEvent>;
 struct GSPLASHER_API gInputEvent : gEvent {
 	explicit gInputEvent(
 		Type t,
-		bool _alt=false,
-		bool _control=false,
-		bool _shift=false,
-		bool _system=false) :
+		bool _alt = false,
+		bool _control = false,
+		bool _shift = false,
+		bool _system = false) :
 		gEvent(t),
 		alt(_alt),
 		control(_control),
 		shift(_shift),
-		system(_system){}
+		system(_system) {}
 
 	gInputEvent(const gInputEvent&);
 
