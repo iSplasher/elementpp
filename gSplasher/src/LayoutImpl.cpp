@@ -9,7 +9,7 @@ LayoutImpl::LayoutImpl(gLayout* p_layout) {
 	layout = p_layout;
 
 	simplex = std::make_unique<Simplex>();
-	simplex->set_autosolve(false);
+	simplex->set_autosolve(true);
 
 	// layout cannot go out of bounds
 	simplex->add_constraint(p_layout->c_data->x >= 0, REQUIRED);

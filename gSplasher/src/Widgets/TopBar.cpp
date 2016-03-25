@@ -33,10 +33,6 @@ void gTopBar::update() {
 	}
 }
 
-void gTopBar::event(EventPtr ev) {
-	std::cout << "Topbar event received!\n";
-}
-
 void gTopBar::setWindow(gWindow* w) {
 	parent_window = w;
 	setFixedWidth(w->size().width);

@@ -79,12 +79,17 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 		}
 
 		// if width is not fixed then width should be the same
-		if (prev_item && !prev_data->fixed_w_constraint && !current_data->fixed_w_constraint) {
-			layouter->addConstraint(current_data->width == prev_data->width, MEDIUM);
+		if (next_item && !next_data->fixed_w_constraint) {
+			layouter->addConstraint(current_data->width == next_data->width, MEDIUM, 2);
+		} else {
+			layouter->addConstraint(current_data->x+current_data->width == this_data->x+this_data->width-space, MEDIUM, 2);
 		}
-		if (!prev_item && !next_item) {
-			layouter->addConstraint(current_data->width == this_data->width, MEDIUM);
-		}
+
+		// make it expanding in both directions
+		layouter->addConstraint(current_data->x == this_data->x+space, MEDIUM);
+		layouter->addConstraint(current_data->x+current_data->width == this_data->x+this_data->width-space, MEDIUM);
+		layouter->addConstraint(current_data->y == this_data->y+space, MEDIUM);
+		layouter->addConstraint(current_data->y+current_data->height == this_data->y+this_data->height-space, MEDIUM);
 
 		// same with height
 		if (!current_data->fixed_h_constraint) {
