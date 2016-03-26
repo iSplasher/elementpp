@@ -92,6 +92,7 @@ gApplication::gApplication() :
 	}
 	glEnable(GL_MULTISAMPLE);
 	event_manager.init();
+	setObjectName("gApplication");
 }
 
 gApplication::~gApplication() {

@@ -24,6 +24,9 @@ public:
 	//logW(std::string);
 	//logI(std::string);
 
+	std::string objectName() const { return object_name; }
+	void setObjectName(std::string name) { object_name = name; }
+
 	/// <summary>
 	/// Events are received here
 	/// </summary>
@@ -55,6 +58,7 @@ private:
 	// data members
 	gCore* core_parent;
 	unsigned core_id;
+	std::string object_name = "gCore";
 	static std::atomic<unsigned> id_counter;
 	tree<gCore*>::iterator internal_tree;
 	/// <summary>
@@ -93,8 +97,8 @@ public:
 		i != t.end(); ++i)
 		{
 			for (int tabs = 1; tabs < i.level(); ++tabs)
-				printf("\t");
-			printf("object\n");
+				std::cout << "\t";
+			std::cout << i.data()->object_name << std::endl;
 
 			print_tree(i);
 		}

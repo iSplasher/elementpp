@@ -8,6 +8,7 @@ USING_NAMESPACE
 gCoreWidget::gCoreWidget(gCoreWidget* parent) : gLayoutable(parent) {
 	is_widget = true;
 	setParent(parent);
+	setObjectName("gWidget");
 }
 
 gCoreWidget::~gCoreWidget() {

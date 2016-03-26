@@ -57,9 +57,11 @@ public:
 
 	virtual gRect geometry() const { return gRect(pos(), size()); }
 
-	gLayout* layout() const {
-		return containing_layout;
-	}
+	/// <summary>
+	/// Returns the layout which handles this widget
+	/// </summary>
+	/// <returns>gLayout</returns>
+	gLayout* layout() const { return _layout; }
 
 protected:
 	// members methods
@@ -68,8 +70,8 @@ protected:
 
 private:
 	// data members
+	gLayout* _layout = nullptr;
 	gLayout* containing_layout = nullptr;
-	bool in_layout = false;
 	priv::ItemData c_data;
 	int _margin = 0;
 
@@ -106,7 +108,7 @@ public:
 
 	// member methods
 	//virtual gLayoutable* parent();
-	void setWigdet(gCoreWidget *new_parent) const;
+	void setWigdet(gCoreWidget *new_parent);
 
 	virtual void add(gLayoutable *item, Alignment align=Alignment::HCenter|Alignment::VCenter);
 
@@ -131,10 +133,11 @@ public:
 protected:
 
 	void event(EventPtr ev);
+	void beginLayoutChange() const;
+	void endLayoutChange() const;
 
 	// data members
 	priv::Layouter layouter;
-
 
 private:
 	// member methods

@@ -24,10 +24,10 @@ void LayoutImpl::addItem(gLayoutable* item) {
 	auto &c_data = item->c_data;
 
 	// item cannot go out of bounds
-	simplex->add_constraint(c_data->x >= 0, REQUIRED);
-	simplex->add_constraint(c_data->y >= 0, REQUIRED);
-	simplex->add_constraint(c_data->width >= 0, REQUIRED);
-	simplex->add_constraint(c_data->height >= 0, REQUIRED);
+	simplex->add_constraint(c_data->x >= layout->c_data->x, REQUIRED);
+	simplex->add_constraint(c_data->y >= layout->c_data->y, REQUIRED);
+	simplex->add_constraint(c_data->width <= layout->c_data->width, REQUIRED);
+	simplex->add_constraint(c_data->height <= layout->c_data->height, REQUIRED);
 
 	// minimum & maximum constraints
 	simplex->add_constraint(c_data->width >= c_data->minWidth, REQUIRED);

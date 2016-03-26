@@ -32,8 +32,7 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 	auto space = gLayout::spacing();
 	auto &solver = layouter->solver();
 
-	// save old size for resizeEvent
-	//for ()
+	beginLayoutChange();
 
 	for (auto it = items.begin(); it != items.end(); ++it) {
 		item = *it;
@@ -65,35 +64,28 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 		layouter->addConstraint(current_data->y >= this_data->y + space, REQUIRED);
 		layouter->addConstraint(current_data->y + current_data->height <= this_data->y + this_data->height - space, REQUIRED);
 
-
 		// the size can accommodate if not fixed
 		if (!current_data->fixed_w_constraint) {
-			solver->add_stay(current_data->width, WEAK);
-		} else {
+			layouter->addConstraint(current_data->x == this_data->x + space, MEDIUM);
+			layouter->addConstraint(current_data->x + current_data->width == this_data->x + this_data->width - space, MEDIUM);
+		}
+		else {
 			layouter->addConstraint(current_data->width == current_data->fixed_width, STRONG, 2);
 		}
 		if (!current_data->fixed_h_constraint) {
-			solver->add_stay(current_data->height, WEAK);
-		} else {
+			layouter->addConstraint(current_data->y == this_data->y + space, MEDIUM);
+			layouter->addConstraint(current_data->y + current_data->height == this_data->y + this_data->height - space, MEDIUM);
+		}
+		else {
 			layouter->addConstraint(current_data->height == current_data->fixed_height, STRONG, 2);
 		}
 
 		// if width is not fixed then width should be the same
 		if (next_item && !next_data->fixed_w_constraint) {
 			layouter->addConstraint(current_data->width == next_data->width, MEDIUM, 2);
-		} else {
-			layouter->addConstraint(current_data->x+current_data->width == this_data->x+this_data->width-space, MEDIUM, 2);
 		}
-
-		// make it expanding in both directions
-		layouter->addConstraint(current_data->x == this_data->x+space, MEDIUM);
-		layouter->addConstraint(current_data->x+current_data->width == this_data->x+this_data->width-space, MEDIUM);
-		layouter->addConstraint(current_data->y == this_data->y+space, MEDIUM);
-		layouter->addConstraint(current_data->y+current_data->height == this_data->y+this_data->height-space, MEDIUM);
-
-		// same with height
-		if (!current_data->fixed_h_constraint) {
-			layouter->addConstraint(current_data->height == this_data->height - (2 * space), MEDIUM);
+		else {
+			layouter->addConstraint(current_data->x + current_data->width == this_data->x + this_data->width - space, MEDIUM, 2);
 		}
 
 		prev_item = *it;
@@ -101,4 +93,5 @@ void gBoxLayout<Orientation::Horizontal>::invalidate() {
 
 	solver->solve();
 
+	endLayoutChange();
 }

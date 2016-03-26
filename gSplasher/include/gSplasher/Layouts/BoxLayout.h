@@ -7,9 +7,9 @@ NAMESPACE_BEGIN
 template<Orientation O>
 class GSPLASHER_API gBoxLayout : public gLayout {
 public:
-	gBoxLayout(gCoreWidget *parent) : gLayout(parent) {}
-	
-	void add(gLayoutable *item, Alignment align=Alignment::HCenter|Alignment::VCenter) override;
+	gBoxLayout(gCoreWidget *parent = nullptr) : gLayout(parent) {}
+
+	void add(gLayoutable *item, Alignment align = Alignment::HCenter | Alignment::VCenter) override;
 	void invalidate();
 };
 

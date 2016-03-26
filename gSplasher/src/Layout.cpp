@@ -6,8 +6,9 @@
 
 USING_NAMESPACE
 
-gLayoutable::gLayoutable(gLayoutable* parent): gCore(parent) {
+gLayoutable::gLayoutable(gLayoutable* parent) : gCore(parent) {
 	c_data = std::make_shared<priv::ItemConstraints>();
+	setObjectName("gLayoutable");
 }
 
 gLayoutable::~gLayoutable() {}
@@ -52,8 +53,10 @@ gPoint gLayoutable::pos() const {
 }
 
 void gLayoutable::move(gPoint new_p) {
-	c_data->x.change_value(new_p.x);
-	c_data->y.change_value(new_p.y);
+	if (!containing_layout) {
+		c_data->x.change_value(new_p.x);
+		c_data->y.change_value(new_p.y);
+	}
 }
 
 void gLayoutable::resize(gSize new_s) {
@@ -65,7 +68,7 @@ gSize gLayoutable::size() const {
 }
 
 void gLayoutable::resizeEvent(ResizeEventPtr ev) {
-	if (!layout()) {
+	if (!containing_layout) {
 		c_data->fixed_w_constraint = false;
 		c_data->fixed_h_constraint = false;
 		c_data->width.change_value(ev->new_size.width);
@@ -78,29 +81,52 @@ gLayout::gLayout(gCoreWidget* parent) : gLayoutable(parent) {
 	if (parent) {
 		setWigdet(parent);
 	}
+	setObjectName("gLayout");
 }
 
-void gLayout::setWigdet(gCoreWidget* new_parent) const {
-	layouter->setWidget(new_parent);
+void gLayout::setWigdet(gCoreWidget* new_parent) {
+	if (!new_parent->layout()) {
+		layouter->setWidget(new_parent);
+		new_parent->_layout = this;
+	}
+	else {
+		std::cout << "This wigdet is already handled by a layout\n";
+	}
 }
 
 void gLayout::add(gLayoutable* item, Alignment align) {
-	item->containing_layout = this;
 	item->setParent(parentWidget());
+	item->containing_layout = this;
 	layouter->addItem(item);
 	invalidate();
 }
 
 void gLayout::invalidate() {
-	
+
 }
 
 void gLayout::event(EventPtr ev) {
-	switch(ev->type()) {
+	switch (ev->type()) {
 	case gEvent::Type::Layout:
 		std::cout << "invalidate event" << std::endl;
 		invalidate();
 		break;
 	}
 	gLayoutable::event(ev);
+}
+
+void gLayout::beginLayoutChange() const {
+	
+	for (auto &i : layouter->items()) {
+		i->c_data->old_size = gSize(i->c_data->width.int_value(), i->c_data->height.int_value());
+	}
+
+}
+
+void gLayout::endLayoutChange() const {
+
+	for (auto &i : layouter->items()) {
+		gApp->sendEvent(i, std::make_shared<gResizeEvent>(gEvent::Type::Resize,
+			gSize(i->c_data->width.int_value(), i->c_data->height.int_value()), i->c_data->old_size));
+	}
 }
