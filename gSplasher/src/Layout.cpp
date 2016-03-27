@@ -86,8 +86,9 @@ gLayout::gLayout(gCoreWidget* parent) : gLayoutable(parent) {
 
 void gLayout::setWigdet(gCoreWidget* new_parent) {
 	if (!new_parent->layout()) {
-		layouter->setWidget(new_parent);
 		new_parent->_layout = this;
+		setParent(new_parent);
+		layouter->setWidget(new_parent);
 	}
 	else {
 		std::cout << "This wigdet is already handled by a layout\n";
@@ -95,10 +96,16 @@ void gLayout::setWigdet(gCoreWidget* new_parent) {
 }
 
 void gLayout::add(gLayoutable* item, Alignment align) {
-	item->setParent(parentWidget());
-	item->containing_layout = this;
-	layouter->addItem(item);
-	invalidate();
+	if (item) {
+		if (item->is_widget || item->is_window) {
+			static_cast<gCoreWidget*>(item)->setParent(parentWidget());
+		} else {
+			item->setParent(parentWidget());
+		}
+		item->containing_layout = this;
+		layouter->addItem(item);
+		invalidate();
+	}
 }
 
 void gLayout::invalidate() {
@@ -116,7 +123,7 @@ void gLayout::event(EventPtr ev) {
 }
 
 void gLayout::beginLayoutChange() const {
-	
+
 	for (auto &i : layouter->items()) {
 		i->c_data->old_size = gSize(i->c_data->width.int_value(), i->c_data->height.int_value());
 	}

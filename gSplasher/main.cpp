@@ -48,8 +48,8 @@ int main() {
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(window);
 	MyWidget *mywidget3 = new MyWidget(window);
-	MyWidget2 *mywidget4 = new MyWidget2(window);
-	MyWidget *mywidget5 = new MyWidget(window);
+	MyWidget2 *mywidget4 = new MyWidget2();
+	MyWidget *mywidget5 = new MyWidget();
 	//MyWidget *mywidget6 = new MyWidget(window);
 	//MyWidget *mywidget7 = new MyWidget(window);
 	//MyWidget *mywidget8 = new MyWidget(window);

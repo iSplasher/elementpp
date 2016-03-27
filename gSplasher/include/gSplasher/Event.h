@@ -55,52 +55,52 @@ struct GSPLASHER_API gEvent {
 		case Type::None:
 			s_type = "None";
 			break;
-		case Type::MouseMove: 
+		case Type::MouseMove:
 			s_type = "MouseMove";
 			break;
-		case Type::MouseButtonPress: 
+		case Type::MouseButtonPress:
 			s_type = "MouseButtonPress";
 			break;
-		case Type::MouseButtonRelease: 
+		case Type::MouseButtonRelease:
 			s_type = "MouseButtonRelease";
 			break;
-		case Type::KeyPress: 
+		case Type::KeyPress:
 			s_type = "KeyPress";
 			break;
-		case Type::KeyRelease: 
+		case Type::KeyRelease:
 			s_type = "KeyRelease";
 			break;
-		case Type::Enter: 
+		case Type::Enter:
 			s_type = "Enter";
 			break;
-		case Type::Leave: 
+		case Type::Leave:
 			s_type = "Leave";
 			break;
-		case Type::Layout: 
+		case Type::Layout:
 			s_type = "Layout";
 			break;
-		case Type::Paint: 
+		case Type::Paint:
 			s_type = "Paint";
 			break;
-		case Type::Move: 
+		case Type::Move:
 			s_type = "Move";
 			break;
-		case Type::Resize: 
+		case Type::Resize:
 			s_type = "Resize";
 			break;
-		case Type::Show: 
+		case Type::Show:
 			s_type = "Show";
 			break;
-		case Type::Hide: 
+		case Type::Hide:
 			s_type = "Hide";
 			break;
-		case Type::Close: 
+		case Type::Close:
 			s_type = "Close";
 			break;
-		case Type::Quit: 
+		case Type::Quit:
 			s_type = "Quit";
 			break;
-		default: 
+		default:
 			s_type = "Unnamed";
 			break;
 		}
@@ -122,38 +122,28 @@ using EventPtr = std::shared_ptr<gEvent>;
 // Input Events
 
 struct GSPLASHER_API gInputEvent : gEvent {
-	explicit gInputEvent(
-		Type t,
-		bool _alt = false,
-		bool _control = false,
-		bool _shift = false,
-		bool _system = false) :
-		gEvent(t),
-		alt(_alt),
-		control(_control),
-		shift(_shift),
-		system(_system) {}
+	gInputEvent(Type t, KeyModifier m) :gEvent(t), modifiers(m) {}
 
-	gInputEvent(const gInputEvent&);
-
-	bool alt;
-	bool control;
-	bool shift;
-	bool system;
+	KeyModifier modifiers;
 };
 
 using InputEventPtr = std::shared_ptr<gInputEvent>;
 
 struct GSPLASHER_API gMouseEvent : gInputEvent {
-	//gMouseEvent(Type t, Point pos);
-	//explicit gMouseEvent(sf::Event);
-	//gMouseEvent(const gMouseEvent&);
-	//// data members
-	//// pos
-	//int x, y, global_x = Mouse::getPosition().x, global_y = Mouse::getPosition().y;
-	//Mouse::Button button;
-	//Point pos() const { return Point(x, y); }
-	//Point globalPos() const { return Point(global_x, global_y); }
+	gMouseEvent(Type t, const gPoint local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers) :
+		gInputEvent(t, modifiers), pos(local_pos), button(b), buttons(bs) {}
+
+	const gPoint pos;
+
+	/// <summary>
+	/// State of button which caused the event
+	/// </summary>
+	MouseButton button;
+
+	/// <summary>
+	/// State of all mouse buttons
+	/// </summary>
+	MouseButton buttons; 
 };
 
 using MouseEventPtr = std::shared_ptr<gMouseEvent>;
@@ -170,14 +160,14 @@ struct GSPLASHER_API gKeyEvent : gInputEvent {
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
 struct GSPLASHER_API gMoveEvent : gEvent {
-	//gMoveEvent(Type t, int new_x, int new_y, int old_x, int old_y) :
-	//	gEvent(t), new_point(new_x, new_y), old_point(old_x, old_y) {}
-	//gMoveEvent(Type t, Point new_p, Point old_p) :
-	//	gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
+	gMoveEvent(Type t, const int new_x, const int new_y, const int old_x, const int old_y) :
+		gEvent(t), new_pos(new_x, new_y), old_pos(old_x, old_y) {}
+	gMoveEvent(Type t, const gPoint new_p, const gPoint old_p) :
+		gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
 
-	//// data members
-	//Point new_point;
-	//Point old_point;
+	// data members
+	const gPoint new_pos;
+	const gPoint old_pos;
 };
 
 using MoveEventPtr = std::shared_ptr<gMoveEvent>;
@@ -185,10 +175,10 @@ using MoveEventPtr = std::shared_ptr<gMoveEvent>;
 // Widget Events
 
 struct GSPLASHER_API gResizeEvent : gEvent {
-	gResizeEvent(Type t, gSize nsize, gSize osize) : gEvent(t), new_size(nsize), old_size(osize) {}
+	gResizeEvent(Type t, const gSize nsize, const gSize osize) : gEvent(t), new_size(nsize), old_size(osize) {}
 
-	gSize new_size;
-	gSize old_size;
+	const gSize new_size;
+	const gSize old_size;
 };
 
 using ResizeEventPtr = std::shared_ptr<gResizeEvent>;

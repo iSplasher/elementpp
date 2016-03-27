@@ -31,6 +31,8 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 		throw std::runtime_error("Could not create window");
 	}
 
+	glfwSetWindowUserPointer(r_window, this);
+
 	is_widget = false;
 	is_window = true;
 	parent_window = this;

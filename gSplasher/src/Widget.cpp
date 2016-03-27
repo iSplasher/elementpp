@@ -58,9 +58,9 @@ gPoint gCoreWidget::pos() const {
 
 void gCoreWidget::setParent(gCoreWidget* new_parent) {
 	parent_widget = new_parent;
+	move(0, 0);
 	if (new_parent) {
 		parent_window = new_parent->parent_window;
-		move(0, 0);
 	}
 	else {
 		parent_window = nullptr;

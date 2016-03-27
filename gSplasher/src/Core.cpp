@@ -70,11 +70,63 @@ std::vector<gCore*> gCore::children() {
 	return vec;
 }
 
-void error_cb(int err, const char *descr) {
-	//LOG_E << descr;
+// Callbacks
+
+// helper functions
+
+static gWindow* getWindow(GLFWwindow* r_window) {
+	return static_cast<gWindow*>(glfwGetWindowUserPointer(r_window));
 }
 
-void closeWindow_cb(GLFWwindow *r_window) {
+static MouseButton getMouseButtons(GLFWwindow* r_window) {
+	MouseButton buttons = MouseButton::None;
+
+	auto left = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_LEFT);
+	auto right = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_RIGHT);
+	auto middle = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_MIDDLE);
+
+	if (left == GLFW_PRESS) {
+		buttons |= MouseButton::Left;
+	}
+
+	if (right == GLFW_PRESS) {
+		buttons |= MouseButton::Right;
+	}
+
+	if (middle == GLFW_PRESS) {
+		buttons |= MouseButton::Middle;
+	}
+
+	if (left == GLFW_PRESS && left == right == middle) {
+		buttons = MouseButton::All;
+	}
+
+	return buttons;
+}
+
+static KeyModifier getKeyModifiers(GLFWwindow* r_window) {
+	
+}
+
+static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
+{
+	auto window = getWindow(r_window);
+	gPointD mouse_pos;
+	glfwGetCursorPos(r_window, &mouse_pos.x, &mouse_pos.y);
+	gApp->dispatchEvent(
+		window,
+		std::make_shared<gMouseEvent>(
+			gEvent::Type::MouseMove,
+			mouse_pos, MouseButton::None,
+			getMouseButtons(r_window),
+			));
+}
+
+static void errorCallback(int err, const char *descr) {
+	std::cout << descr;
+}
+
+static void closeWindowCallback(GLFWwindow *r_window) {
 	// TODO: delete gWindow object
 	glfwDestroyWindow(r_window);
 }
@@ -86,7 +138,7 @@ gApplication::gApplication() :
 	assert(self == nullptr);
 	self = this;
 
-	glfwSetErrorCallback(error_cb);
+	glfwSetErrorCallback(errorCallback);
 	if (!glfwInit()) {
 		throw std::runtime_error("Could not init glfw");
 	}

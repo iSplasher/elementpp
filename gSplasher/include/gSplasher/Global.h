@@ -75,4 +75,23 @@ enum class Alignment {
 	VCenter
 };
 
+DEFINE_ENUM_FLAGS(MouseButton)
+enum class MouseButton {
+	All = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Left = 0x1,
+	Right = 0x2,
+	Middle = 0x4
+};
+
+DEFINE_ENUM_FLAGS(KeyModifier)
+enum class KeyModifier {
+	None = 0x0,
+	Shift = 0x1,
+	Control = 0x2,
+	Alt = 0x4,
+	Meta = 0x8
+};
+
+
 NAMESPACE_END
