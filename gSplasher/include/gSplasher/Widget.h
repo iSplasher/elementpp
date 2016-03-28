@@ -95,6 +95,13 @@ public:
 
 
 protected:
+
+	struct Drag {
+		bool is_draggable = true;
+		gPoint start_mouse_pos;
+		gPoint start_pos;
+	};
+
 	// member methods
 	virtual void mousePressEvent(MouseEventPtr ev);
 	virtual void mouseMoveEvent(MouseEventPtr ev);
@@ -104,9 +111,9 @@ protected:
 	gWindow *parent_window = nullptr;
 	gCoreWidget *parent_widget;
 	MoveState move_state = Normal;
-	//gLayout &m_layout;
 	gFont _font;
 	PainterContext *this_paint = nullptr;
+	Drag drag;
 
 private:
 	void updateChildren();

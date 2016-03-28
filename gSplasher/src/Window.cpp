@@ -13,6 +13,128 @@
 
 USING_NAMESPACE
 
+// Callbacks start
+
+// helper functions
+
+static gWindow* getWindow(GLFWwindow* r_window) {
+	return static_cast<gWindow*>(glfwGetWindowUserPointer(r_window));
+}
+
+static MouseButton getMouseButtons(GLFWwindow* r_window) {
+	MouseButton buttons = MouseButton::None;
+
+	auto left = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_LEFT);
+	auto right = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_RIGHT);
+	auto middle = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_MIDDLE);
+
+	if (left == GLFW_PRESS) {
+		buttons |= MouseButton::Left;
+	}
+
+	if (right == GLFW_PRESS) {
+		buttons |= MouseButton::Right;
+	}
+
+	if (middle == GLFW_PRESS) {
+		buttons |= MouseButton::Middle;
+	}
+
+	if (left == GLFW_PRESS && left == right == middle) {
+		buttons = MouseButton::All;
+	}
+
+	return buttons;
+}
+
+static KeyModifier getKeyModifiers(GLFWwindow* r_window) {
+	KeyModifier modifiers = KeyModifier::None;
+
+	auto shift = glfwGetKey(r_window, GLFW_MOD_SHIFT);
+	auto control = glfwGetKey(r_window, GLFW_MOD_CONTROL);
+	auto alt = glfwGetKey(r_window, GLFW_MOD_ALT);
+	auto meta = glfwGetKey(r_window, GLFW_MOD_SUPER);
+
+	if (shift == GLFW_PRESS) {
+		modifiers |= KeyModifier::Shift;
+	}
+
+	if (control == GLFW_PRESS) {
+		modifiers |= KeyModifier::Control;
+	}
+
+	if (alt == GLFW_PRESS) {
+		modifiers |= KeyModifier::Alt;
+	}
+
+	if (meta == GLFW_PRESS) {
+		modifiers |= KeyModifier::Meta;
+	}
+
+	return modifiers;
+}
+
+static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
+{
+	auto window = getWindow(r_window);
+	gApp->dispatchEvent(
+		window,
+		std::make_shared<gMouseEvent>(
+			gEvent::Type::MouseMove,
+			gPoint(xpos, ypos), MouseButton::None,
+			getMouseButtons(r_window),
+			getKeyModifiers(r_window)));
+}
+
+static void mousePressCallback(GLFWwindow* r_window, int button, int action, int mods) {
+	auto ev_type = action == GLFW_PRESS ? gEvent::Type::MouseButtonPress : gEvent::Type::MouseButtonRelease;
+	auto m_button = MouseButton::None;
+	auto modifiers = KeyModifier::None;
+
+	switch(button) {
+	case GLFW_MOUSE_BUTTON_LEFT:
+		m_button = MouseButton::Left;
+		break;
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		m_button = MouseButton::Right;
+		break;
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		m_button = MouseButton::Middle;
+		break;
+	default:
+		return;
+	}
+
+	if (mods & GLFW_MOD_SHIFT) {
+		modifiers |= KeyModifier::Shift;
+	}
+
+	if (mods & GLFW_MOD_CONTROL) {
+		modifiers |= KeyModifier::Control;
+	}
+
+	if (mods & GLFW_MOD_ALT) {
+		modifiers |= KeyModifier::Alt;
+	}
+
+	if (mods & GLFW_MOD_SUPER) {
+		modifiers |= KeyModifier::Meta;
+	}
+
+	auto window = getWindow(r_window);
+	gPointD m_pos;
+	glfwGetCursorPos(r_window, &m_pos.x, &m_pos.y);
+	gApp->dispatchEvent(window,
+		std::make_shared<gMouseEvent>(
+			ev_type,
+			gPoint(m_pos), m_button,
+			getMouseButtons(r_window),
+			modifiers));
+
+}
+
+// Callbacks end
+
 gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -32,6 +154,8 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 	}
 
 	glfwSetWindowUserPointer(r_window, this);
+	glfwSetCursorPosCallback(r_window, mouseMoveCallback);
+	glfwSetMouseButtonCallback(r_window, mousePressCallback);
 
 	is_widget = false;
 	is_window = true;
@@ -43,7 +167,7 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 		glewExperimental = GL_TRUE;
 		auto glew_result = glewInit();
 		if (glew_result != GLEW_OK) {
-			throw std::runtime_error("Could not init glew");
+			throw std::runtime_error("Failed to init glew");
 		}
 		// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 		glGetError();
@@ -56,7 +180,7 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 	top_bar = std::make_unique<gTopBar>();
 
 	gWindow::move(gPoint(500, 300));
-	gWindow::resizeEvent( std::make_shared<gResizeEvent>(gEvent::Type::Resize, s, gLayoutable::size()));
+	gWindow::resizeEvent(std::make_shared<gResizeEvent>(gEvent::Type::Resize, s, gLayoutable::size()));
 	top_bar->setWindow(this);
 	setObjectName("gWindow");
 }
@@ -91,19 +215,6 @@ void gWindow::update() {
 	if (r_window) {
 		glfwSwapBuffers(r_window);
 	}
-
-	if (is_dragging) {
-		double xpos, ypos;
-		glfwGetCursorPos(r_window, &xpos, &ypos);
-
-		if (xpos != _old_mouse_x || ypos != _old_mouse_y) {
-			move(gPoint(xpos, ypos));
-		}
-	}
-
-	int state = glfwGetMouseButton(r_window, GLFW_MOUSE_BUTTON_LEFT);
-	is_dragging = state == GLFW_PRESS ? true : false;
-
 }
 
 //Point gWindow::pos() {

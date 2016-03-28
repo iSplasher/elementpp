@@ -10,13 +10,6 @@ gEvent::gEvent(const gEvent& other) {
 	m_type = other.type();
 }
 
-gInputEvent::gInputEvent(const gInputEvent &other) : gEvent(other.type()) {
-	alt = other.alt;
-	control = other.control;
-	shift = other.shift;
-	system = other.system;
-}
-
 //gMouseEvent::gMouseEvent(Type t, Point p) : gInputEvent(t), x(p.x), y(p.y){}
 //
 //gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None) {

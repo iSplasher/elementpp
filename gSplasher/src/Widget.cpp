@@ -127,27 +127,26 @@ gPoint gCoreWidget::mapToWindow(gPoint p) const {
 }
 
 void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
-	printf("A button was pressed!");
-	move_state = MoveState::Moving;
-	//move_offset = ev->pos();
-	//resize(style.size.width+5, style.size.height+5);
+	if (drag.is_draggable && flags(ev->button & MouseButton::Left) ) {
+		move_state = MoveState::Moving;
+		drag.start_mouse_pos = mapToGlobal(ev->pos);
+		drag.start_pos = pos();
+	}
 }
 
 void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
-	//printf("x=%d y=%d\n", ev->global_x, ev->global_y);
-	//if (ev->x >= 0 && ev->x < width() && ev->y >= 0 && ev->y < height()) {
-	//	under_mouse = true;
-	//} else {
-	//	under_mouse = false;
-	//}
+	if (ev->pos.x >= 0 && ev->pos.x < size().width && ev->pos.y >= 0 && ev->pos.y < size().height) {
+		under_mouse = true;
+	} else {
+		under_mouse = false;
+	}
 
-	//if (move_state == MoveState::Moving) {
-	//	move(mapToGlobal(ev->pos()) - move_offset);
-	//}
+	if (drag.is_draggable && move_state == MoveState::Moving) {
+		move(drag.start_pos+(mapToGlobal(ev->pos) - drag.start_mouse_pos));
+	}
 }
 
 void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
-	printf("A button was released!");
 	move_state = MoveState::Normal;
 }
 
