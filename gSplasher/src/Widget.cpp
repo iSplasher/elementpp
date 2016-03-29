@@ -29,7 +29,6 @@ void gCoreWidget::update() {
 }
 
 void gCoreWidget::event(EventPtr ev) {
-	// TODO: send events to children here
 	switch (ev->type()) {
 	case gEvent::Type::MouseMove:
 		mouseMoveEvent(std::static_pointer_cast<gMouseEvent>(ev));
@@ -39,9 +38,6 @@ void gCoreWidget::event(EventPtr ev) {
 		break;
 	case gEvent::Type::MouseButtonRelease:
 		mouseReleaseEvent(std::static_pointer_cast<gMouseEvent>(ev));
-		break;
-	case gEvent::Type::Resize:
-		resizeEvent(std::static_pointer_cast<gResizeEvent>(ev));
 		break;
 	}
 

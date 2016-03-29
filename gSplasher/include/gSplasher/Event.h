@@ -159,25 +159,25 @@ struct GSPLASHER_API gKeyEvent : gInputEvent {
 
 using KeyEventPtr = std::shared_ptr<gKeyEvent>;
 
+// Widget Events
+
 struct GSPLASHER_API gMoveEvent : gEvent {
 	gMoveEvent(Type t, const int new_x, const int new_y, const int old_x, const int old_y) :
-		gEvent(t), new_pos(new_x, new_y), old_pos(old_x, old_y) {}
+		gEvent(t), pos(new_x, new_y), old_pos(old_x, old_y) {}
 	gMoveEvent(Type t, const gPoint new_p, const gPoint old_p) :
 		gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
 
 	// data members
-	const gPoint new_pos;
+	const gPoint pos;
 	const gPoint old_pos;
 };
 
 using MoveEventPtr = std::shared_ptr<gMoveEvent>;
 
-// Widget Events
-
 struct GSPLASHER_API gResizeEvent : gEvent {
-	gResizeEvent(Type t, const gSize nsize, const gSize osize) : gEvent(t), new_size(nsize), old_size(osize) {}
+	gResizeEvent(Type t, const gSize nsize, const gSize osize) : gEvent(t), size(nsize), old_size(osize) {}
 
-	const gSize new_size;
+	const gSize size;
 	const gSize old_size;
 };
 

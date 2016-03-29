@@ -35,6 +35,7 @@ namespace priv
 		int fixed_height = 0;
 
 		gSize old_size;
+		gPoint old_pos;
 	};
 
 	class LayoutImpl {

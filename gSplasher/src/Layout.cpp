@@ -43,6 +43,9 @@ void gLayoutable::event(EventPtr ev) {
 	case gEvent::Type::Resize:
 		resizeEvent(std::static_pointer_cast<gResizeEvent>(ev));
 		break;
+	case gEvent::Type::Move:
+		moveEvent(std::static_pointer_cast<gMoveEvent>(ev));
+		break;
 	}
 
 	gCore::event(ev);
@@ -53,10 +56,12 @@ gPoint gLayoutable::pos() const {
 }
 
 void gLayoutable::move(gPoint new_p) {
+	gPoint old_pos = pos();
 	if (!containing_layout) {
 		c_data->x.change_value(new_p.x);
 		c_data->y.change_value(new_p.y);
 	}
+	gApp->dispatchEvent(this, std::make_shared<gMoveEvent>(gEvent::Type::Move, pos(), old_pos));
 }
 
 void gLayoutable::resize(gSize new_s) {
@@ -71,8 +76,8 @@ void gLayoutable::resizeEvent(ResizeEventPtr ev) {
 	if (!containing_layout) {
 		c_data->fixed_w_constraint = false;
 		c_data->fixed_h_constraint = false;
-		c_data->width.change_value(ev->new_size.width);
-		c_data->height.change_value(ev->new_size.height);
+		c_data->width.change_value(ev->size.width);
+		c_data->height.change_value(ev->size.height);
 	}
 }
 
@@ -126,6 +131,7 @@ void gLayout::beginLayoutChange() const {
 
 	for (auto &i : layouter->items()) {
 		i->c_data->old_size = gSize(i->c_data->width.int_value(), i->c_data->height.int_value());
+		i->c_data->old_pos = i->pos();
 	}
 
 }
@@ -135,5 +141,6 @@ void gLayout::endLayoutChange() const {
 	for (auto &i : layouter->items()) {
 		gApp->sendEvent(i, std::make_shared<gResizeEvent>(gEvent::Type::Resize,
 			gSize(i->c_data->width.int_value(), i->c_data->height.int_value()), i->c_data->old_size));
+		gApp->sendEvent(i, std::make_shared<gMoveEvent>(gEvent::Type::Move, i->c_data->old_pos, i->pos()));
 	}
 }

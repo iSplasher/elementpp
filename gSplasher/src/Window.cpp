@@ -228,16 +228,14 @@ void gWindow::move(gPoint new_p) {
 }
 
 void gWindow::resizeEvent(ResizeEventPtr ev) {
-	std::cout << "window resize\n";
 	gLayoutable::resizeEvent(ev);
 	auto s = size();
-	std::cout << s << "\n";
 	glfwSetWindowSize(r_window, s.width, s.height);
 }
 
 void gWindow::paint(gPainter& painter) {
 	gBrush b(painter);
-	b.setColor(gColor(250, 250, 250, 100));
+	b.setColor(gColor(250, 250, 250, 200));
 
 	painter.drawRect(gRect(0, 0, size()));
 }

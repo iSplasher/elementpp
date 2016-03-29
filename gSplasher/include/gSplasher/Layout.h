@@ -65,6 +65,19 @@ public:
 
 protected:
 	// members methods
+
+	/// <summary>
+	/// Move events are sent here
+	/// </summary>
+	/// <param name="ev">Move event</param>
+	/// <remarks>The item is already at the new position at the time of event</remarks>
+	virtual void moveEvent(MoveEventPtr ev) {}
+
+	/// <summary>
+	/// Resize events are sent here.
+	/// </summary>
+	/// <param name="ev">Resize event</param>
+	/// <remarks>The resizing has not yet been processed at the time of event</remarks>
 	virtual void resizeEvent(ResizeEventPtr ev);
 	//virtual gRect setContentsRect(gRect r);
 
