@@ -46,11 +46,19 @@ void gCore::event(EventPtr ev) {
 #ifdef _DEBUG
 	ev->printEvent();
 #endif
-	if (ev->receiver == nullptr || ev->receiver != this) {
+	if ((ev->receiver == nullptr || ev->receiver != this) && !ev->ignored) {
 		for (auto &c : children()) {
 			c->event(ev);
 		}
 	}
+
+	if (ev->ignored) {
+		if (core_parent) {
+			ev->ignored = false;
+			core_parent->event(ev);
+		}
+	}
+
 }
 
 void gCore::setParent(gCore* new_parent) {
@@ -101,7 +109,7 @@ gApplication::~gApplication() {
 	is_running = false;
 }
 
-int gApplication::run() {
+int gApplication::exec() {
 	is_running = true;
 	sendEvent(nullptr, std::make_shared<gEvent>(gEvent::Type::Layout));
 	glfwSwapInterval(0);

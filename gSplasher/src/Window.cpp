@@ -76,14 +76,24 @@ static KeyModifier getKeyModifiers(GLFWwindow* r_window) {
 
 static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
 {
-	auto window = getWindow(r_window);
+	auto ev = std::make_shared<gMouseEvent>(
+		gEvent::Type::MouseMove,
+		gPoint(xpos, ypos), MouseButton::None,
+		getMouseButtons(r_window),
+		getKeyModifiers(r_window));
+
+	gCoreWidget* widget = getWindow(r_window);
+	auto found = false;
+
+	while(!found) {
+		if (widget->geometry().contains(ev->pos)) {
+			
+		}
+	}
 	gApp->dispatchEvent(
 		window,
-		std::make_shared<gMouseEvent>(
-			gEvent::Type::MouseMove,
-			gPoint(xpos, ypos), MouseButton::None,
-			getMouseButtons(r_window),
-			getKeyModifiers(r_window)));
+		ev
+		);
 }
 
 static void mousePressCallback(GLFWwindow* r_window, int button, int action, int mods) {

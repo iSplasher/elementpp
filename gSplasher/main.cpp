@@ -19,7 +19,7 @@ public:
 		p.setColor(gColor(0, 255, 0));
 		p.setWidth(0.8);
 		gBrush b(painter);
-		b.setColor(gColor(255, 0, 0, 0));
+		b.setColor(gColor(255, 0, 0));
 		painter.drawRect(gRect(0, 0, size()));
 	}
 };
@@ -36,7 +36,7 @@ public:
 		gBrush b(painter);
 		p.setColor(gColor(255, 0, 0));
 		p.setWidth(0.8);
-		b.setColor(gColor(0, 255, 0, 0));
+		b.setColor(gColor(0, 255, 0));
 		painter.drawRect(gRect(0, 0, size()));
 	}
 };
@@ -97,7 +97,7 @@ int main() {
 	//printf("%d", app.core_objects->tree_size());
 
 
-	return app.run();
+	return app.exec();
 
 	return 0;
 }

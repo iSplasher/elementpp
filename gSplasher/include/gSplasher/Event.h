@@ -47,6 +47,8 @@ struct GSPLASHER_API gEvent {
 
 	// methods
 	Type type() const { return static_cast<Type>(m_type); };
+	void ignore() { ignored = true; }
+
 #ifdef _DEBUG
 	void printEvent() const {
 		std::string s_type("");
@@ -115,6 +117,9 @@ protected:
 
 	friend class gEventManager;
 	friend class gCore;
+
+private:
+	bool ignored = false;
 };
 
 using EventPtr = std::shared_ptr<gEvent>;

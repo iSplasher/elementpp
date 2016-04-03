@@ -29,6 +29,7 @@ void gCoreWidget::update() {
 }
 
 void gCoreWidget::event(EventPtr ev) {
+
 	switch (ev->type()) {
 	case gEvent::Type::MouseMove:
 		mouseMoveEvent(std::static_pointer_cast<gMouseEvent>(ev));
@@ -128,6 +129,8 @@ void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 		drag.start_mouse_pos = mapToGlobal(ev->pos);
 		drag.start_pos = pos();
 	}
+
+	ev->ignore();
 }
 
 void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
@@ -140,10 +143,13 @@ void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
 	if (drag.is_draggable && move_state == MoveState::Moving) {
 		move(drag.start_pos+(mapToGlobal(ev->pos) - drag.start_mouse_pos));
 	}
+
+	ev->ignore();
 }
 
 void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 	move_state = MoveState::Normal;
+	ev->ignore();
 }
 
 void gCoreWidget::updateChildren() {
