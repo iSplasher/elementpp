@@ -6,6 +6,7 @@
 
 #include <atomic>
 
+
 NAMESPACE_BEGIN
 
 class gWindow;

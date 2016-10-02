@@ -91,7 +91,7 @@ static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
 		}
 	}
 	gApp->dispatchEvent(
-		window,
+		widget,
 		ev
 		);
 }

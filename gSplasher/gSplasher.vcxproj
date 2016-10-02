@@ -94,13 +94,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GSPLASHER_EXPORTS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>C:\C++ Libs\Rhea\include;C:\Users\Autriche\Documents\Code\gSplasher\gSplasher\include;C:\C++ Libs\GLEW\glew-1.13.0\include;C:\C++ Libs\GLFW\GLFW\include;C:\C++ Libs\Plog\Plog-1.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\Rhea\include;C:\Users\Pew\Documents\Code\Github\gSplasher\gSplasher\include;C:\Libraries\GLEW\include;C:\Libraries\GLFW\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\C++ Libs\Rhea\lib;C:\C++ Libs\GLEW\glew-1.13.0\lib\Release\Win32;C:\C++ Libs\GLFW\GLFW\lib;C:\CppReact\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Libraries\Rhea\lib;C:\Libraries\GLEW\1.13\lib\Release\Win32;C:\Libraries\GLFW\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>rhea-s.lib;opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
