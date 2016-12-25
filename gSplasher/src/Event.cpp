@@ -10,9 +10,9 @@ gEvent::gEvent(const gEvent& other) {
 	m_type = other.type();
 }
 
-//gMouseEvent::gMouseEvent(Type t, Point p) : gInputEvent(t), x(p.x), y(p.y){}
+//MouseEvent::MouseEvent(Type t, Point p) : InputEvent(t), x(p.x), y(p.y){}
 //
-//gMouseEvent::gMouseEvent(sf::Event ev) : gInputEvent(gEvent::None) {
+//MouseEvent::MouseEvent(sf::Event ev) : InputEvent(Event::None) {
 	//using SE = sf::Event;
 
 	//// TODO: finish implementing these event types
@@ -36,16 +36,16 @@ gEvent::gEvent(const gEvent& other) {
 	//}
 //}
 
-//gMouseEvent::gMouseEvent(const gMouseEvent &other) :
-//	gInputEvent(other.type(), other.alt, other.control, other.shift, other.system) {
+//MouseEvent::MouseEvent(const MouseEvent &other) :
+//	InputEvent(other.type(), other.alt, other.control, other.shift, other.system) {
 //	button = other.button;
 //	x = other.x;
 //	y = other.y;
 //}
 //
-//gKeyEvent::gKeyEvent(Type t, int k, std::string txt) : gInputEvent(t), key(k), text(txt) {}
+//KeyEvent::KeyEvent(Type t, int k, std::string txt) : InputEvent(t), key(k), text(txt) {}
 //
-//gKeyEvent::gKeyEvent(sf::Event ev) : gInputEvent(gEvent::None), key(), text() {
+//KeyEvent::KeyEvent(sf::Event ev) : InputEvent(Event::None), key(), text() {
 //	using SE = sf::Event;
 //	switch(ev.type) {
 //	case SE::KeyPressed || SE::KeyReleased:
@@ -65,7 +65,7 @@ gEvent::gEvent(const gEvent& other) {
 //		system = ev.key.system;
 //		break;
 //	default:
-//		m_type = gEvent::None;
+//		m_type = Event::None;
 //		break;
 //	}
 //}

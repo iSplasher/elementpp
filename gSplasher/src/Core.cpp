@@ -6,19 +6,19 @@
 
 USING_NAMESPACE
 
-std::atomic<unsigned> gCore::id_counter;
-gApplication* gApplication::self = nullptr;
+std::atomic<unsigned> Core::id_counter;
+Application* Application::self = nullptr;
 
-gCore::gCore(gCore* parent) :
+Core::Core(Core* parent) :
 	core_parent(parent),
 	core_id(++id_counter) {
-	if (gApp != nullptr) {
-		gApp->insertCore(this);
+	if (App != nullptr) {
+		App->insertCore(this);
 	}
 
 }
 
-gCore::~gCore() {
+Core::~Core() {
 	// first we traverse the tree to tell our children that
 	// they shouldn't touch their internal tree.
 	// we also delete the cildrens
@@ -42,7 +42,7 @@ gCore::~gCore() {
 	}
 }
 
-void gCore::event(EventPtr ev) {
+void Core::event(EventPtr ev) {
 #ifdef _DEBUG
 	ev->printEvent();
 #endif
@@ -61,8 +61,8 @@ void gCore::event(EventPtr ev) {
 
 }
 
-void gCore::setParent(gCore* new_parent) {
-	if (gApp != nullptr) {
+void Core::setParent(Core* new_parent) {
+	if (App != nullptr) {
 		if (new_parent) {
 			internal_tree = new_parent->internal_tree.reinsert(internal_tree);
 		}
@@ -70,8 +70,8 @@ void gCore::setParent(gCore* new_parent) {
 	}
 }
 
-std::vector<gCore*> gCore::children() {
-	std::vector<gCore*> vec;
+std::vector<Core*> Core::children() {
+	std::vector<Core*> vec;
 	for (auto i = internal_tree.begin(); i != internal_tree.end(); ++i) {
 		vec.push_back(i.data());
 	}
@@ -83,12 +83,12 @@ static void errorCallback(int err, const char *descr) {
 }
 
 static void closeWindowCallback(GLFWwindow *r_window) {
-	// TODO: delete gWindow object
+	// TODO: delete Window object
 	glfwDestroyWindow(r_window);
 }
 
-gApplication::gApplication() :
-	gCore(), core_objects(std::make_unique<CoreList>()), event_manager() {
+Application::Application() :
+	Core(), core_objects(std::make_unique<CoreList>()), event_manager() {
 	internal_tree = core_objects->tree_iterator();
 
 	assert(self == nullptr);
@@ -101,17 +101,17 @@ gApplication::gApplication() :
 
 	glEnable(GL_MULTISAMPLE);
 	event_manager.init();
-	setObjectName("gApplication");
+	setObjectName("Application");
 }
 
-gApplication::~gApplication() {
+Application::~Application() {
 	glfwTerminate();
 	is_running = false;
 }
 
-int gApplication::exec() {
+int Application::exec() {
 	is_running = true;
-	sendEvent(nullptr, std::make_shared<gEvent>(gEvent::Type::Layout));
+	sendEvent(nullptr, std::make_shared<Event>(Event::Type::Layout));
 	glfwSwapInterval(0);
 	while (processEv()) {
 		event_manager.processEv();
@@ -119,12 +119,12 @@ int gApplication::exec() {
 	return 0;
 }
 
-void gApplication::event(EventPtr ev) {
+void Application::event(EventPtr ev) {
 	// TODO: handle quit event here
-	gCore::event(ev);
+	Core::event(ev);
 }
 
-void gApplication::sendEvent(gCore* reciever, EventPtr ev) {
+void Application::sendEvent(Core* reciever, EventPtr ev) {
 	if (!reciever || reciever == parentCore()) {
 		event(ev);
 	}
@@ -133,20 +133,20 @@ void gApplication::sendEvent(gCore* reciever, EventPtr ev) {
 	}
 }
 
-void gApplication::dispatchEvent(gCore* reciever, EventPtr ev) {
+void Application::dispatchEvent(Core* reciever, EventPtr ev) {
 	event_manager.dispatchEvent(reciever, ev);
 }
 
-gApplication* gApplication::instance() {
+Application* Application::instance() {
 	return self;
 }
 
-bool gApplication::processEv() const {
+bool Application::processEv() const {
 	// TODO: optimize this so it doesn't check all
 	for (auto &core : *core_objects) {
 
 		if (core->is_window) {
-			static_cast<gWindow*>(core)->update();
+			static_cast<Window*>(core)->update();
 		}
 	}
 	glfwWaitEvents();
@@ -156,7 +156,7 @@ bool gApplication::processEv() const {
 
 
 
-void gApplication::insertCore(gCore* core) const {
+void Application::insertCore(Core* core) const {
 	// if there is a parent
 	if (core->parentCore()) {
 		// insert in the parent branch

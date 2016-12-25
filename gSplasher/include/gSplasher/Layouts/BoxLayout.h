@@ -5,11 +5,11 @@
 NAMESPACE_BEGIN
 
 template<Orientation O>
-class GSPLASHER_API gBoxLayout : public gLayout {
+class GSPLASHER_API gBoxLayout : public Layout {
 public:
-	gBoxLayout(gCoreWidget *parent = nullptr) : gLayout(parent) {}
+	gBoxLayout(CoreWidget *parent = nullptr) : Layout(parent) {}
 
-	void add(gLayoutable *item, Alignment align = Alignment::HCenter | Alignment::VCenter) override;
+	void add(LayoutCore *item, Alignment align = Alignment::HCenter | Alignment::VCenter) override;
 	void invalidate();
 };
 

@@ -4,7 +4,7 @@
 
 NAMESPACE_BEGIN
 
-class gPainter;
+class Painter;
 
 class GSPLASHER_API gPen {
 public:
@@ -12,7 +12,7 @@ public:
 	enum class Join;
 
 	gPen() = default;
-	explicit gPen(gPainter &painter);
+	explicit gPen(Painter &painter);
 
 	/// <summary>
 	/// Set a new color to this pen
@@ -52,13 +52,13 @@ private:
 	float c_width = 0.1f;
 	gColor c_color;
 
-	friend class gPainter;
+	friend class Painter;
 };
 
 class GSPLASHER_API gBrush {
 public:
 	gBrush() = default;
-	explicit gBrush(gPainter &painter);
+	explicit gBrush(Painter &painter);
 
 	/// <summary>
 	/// Set a new color to this brush
@@ -79,15 +79,15 @@ private:
 	PainterContext* pc = nullptr;
 	gColor c_color;
 
-	friend class gPainter;
+	friend class Painter;
 };
 
 class gTopBar;
 
-class GSPLASHER_API gPainter {
+class GSPLASHER_API Painter {
 public:
-	gPainter(gWindow*);
-	~gPainter();
+	Painter(Window*);
+	~Painter();
 
 	/// <summary>
 	/// Begin painting
@@ -194,11 +194,11 @@ private:
 
 	// TODO: Create a save-stack struct to store old objects instead!
 
-	gCoreWidget *w = nullptr;
+	CoreWidget *w = nullptr;
 	// Coordinates will be translated to this widget's parent
 	gPointF origin;
 	gPointF o_origin;
-	gCoreWidget *current_widget = nullptr;
+	CoreWidget *current_widget = nullptr;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gPen *o_p = nullptr;
@@ -208,11 +208,11 @@ private:
 	// TODO: maybe extend this to a gMargins? and do all sides?
 	int top_margin = 0; // for window TopBar.. 
 
-	friend class gCoreWidget;
+	friend class CoreWidget;
 	friend class gTopBar;
 };
 
-using UniquePainter = std::unique_ptr<gPainter>;
-using SharedPainter = std::shared_ptr<gPainter>;
+using UniquePainter = std::unique_ptr<Painter>;
+using SharedPainter = std::shared_ptr<Painter>;
 
 NAMESPACE_END

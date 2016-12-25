@@ -12,13 +12,13 @@
 
 NAMESPACE_BEGIN
 
-class gCore;
-class gEventManager;
+class Core;
+class EventManager;
 
 /// <summary>
 /// Base event. Custom events should subclass this class.
 /// </summary>
-struct GSPLASHER_API gEvent {
+struct GSPLASHER_API Event {
 	enum class Type {
 		None,
 		MouseMove,
@@ -40,10 +40,10 @@ struct GSPLASHER_API gEvent {
 		Quit,
 	};
 
-	explicit gEvent(Type t) : m_type(t) {}
-	gEvent() = default;
-	gEvent(const gEvent&);
-	virtual ~gEvent() = default;
+	explicit Event(Type t) : m_type(t) {}
+	Event() = default;
+	Event(const Event&);
+	virtual ~Event() = default;
 
 	// methods
 	Type type() const { return static_cast<Type>(m_type); };
@@ -113,30 +113,30 @@ struct GSPLASHER_API gEvent {
 
 protected:
 	Type m_type;
-	gCore* receiver = nullptr;
+	Core* receiver = nullptr;
 
-	friend class gEventManager;
-	friend class gCore;
+	friend class EventManager;
+	friend class Core;
 
 private:
 	bool ignored = false;
 };
 
-using EventPtr = std::shared_ptr<gEvent>;
+using EventPtr = std::shared_ptr<Event>;
 
 // Input Events
 
-struct GSPLASHER_API gInputEvent : gEvent {
-	gInputEvent(Type t, KeyModifier m) :gEvent(t), modifiers(m) {}
+struct GSPLASHER_API InputEvent : Event {
+	InputEvent(Type t, KeyModifier m) :Event(t), modifiers(m) {}
 
 	KeyModifier modifiers;
 };
 
-using InputEventPtr = std::shared_ptr<gInputEvent>;
+using InputEventPtr = std::shared_ptr<InputEvent>;
 
-struct GSPLASHER_API gMouseEvent : gInputEvent {
-	gMouseEvent(Type t, const gPoint local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers) :
-		gInputEvent(t, modifiers), pos(local_pos), button(b), buttons(bs) {}
+struct GSPLASHER_API MouseEvent : InputEvent {
+	MouseEvent(Type t, const gPoint local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers) :
+		InputEvent(t, modifiers), pos(local_pos), button(b), buttons(bs) {}
 
 	const gPoint pos;
 
@@ -151,55 +151,55 @@ struct GSPLASHER_API gMouseEvent : gInputEvent {
 	MouseButton buttons; 
 };
 
-using MouseEventPtr = std::shared_ptr<gMouseEvent>;
+using MouseEventPtr = std::shared_ptr<MouseEvent>;
 
-struct GSPLASHER_API gKeyEvent : gInputEvent {
-	//gKeyEvent(Type t, int k, std::string txt = std::string());
-	//gKeyEvent(sf::Event);
+struct GSPLASHER_API KeyEvent : InputEvent {
+	//KeyEvent(Type t, int k, std::string txt = std::string());
+	//KeyEvent(sf::Event);
 
 	//// data members
 	//int key;
 	//std::string text;
 };
 
-using KeyEventPtr = std::shared_ptr<gKeyEvent>;
+using KeyEventPtr = std::shared_ptr<KeyEvent>;
 
 // Widget Events
 
-struct GSPLASHER_API gMoveEvent : gEvent {
-	gMoveEvent(Type t, const int new_x, const int new_y, const int old_x, const int old_y) :
-		gEvent(t), pos(new_x, new_y), old_pos(old_x, old_y) {}
-	gMoveEvent(Type t, const gPoint new_p, const gPoint old_p) :
-		gMoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
+struct GSPLASHER_API MoveEvent : Event {
+	MoveEvent(Type t, const int new_x, const int new_y, const int old_x, const int old_y) :
+		Event(t), pos(new_x, new_y), old_pos(old_x, old_y) {}
+	MoveEvent(Type t, const gPoint new_p, const gPoint old_p) :
+		MoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
 
 	// data members
 	const gPoint pos;
 	const gPoint old_pos;
 };
 
-using MoveEventPtr = std::shared_ptr<gMoveEvent>;
+using MoveEventPtr = std::shared_ptr<MoveEvent>;
 
-struct GSPLASHER_API gResizeEvent : gEvent {
-	gResizeEvent(Type t, const gSize nsize, const gSize osize) : gEvent(t), size(nsize), old_size(osize) {}
+struct GSPLASHER_API ResizeEvent : Event {
+	ResizeEvent(Type t, const gSize nsize, const gSize osize) : Event(t), size(nsize), old_size(osize) {}
 
 	const gSize size;
 	const gSize old_size;
 };
 
-using ResizeEventPtr = std::shared_ptr<gResizeEvent>;
+using ResizeEventPtr = std::shared_ptr<ResizeEvent>;
 
 /// <summary>
 /// Manages events
 /// </summary>
-class gEventManager {
-	using EventPair = std::pair<gCore*, EventPtr>;
+class EventManager {
+	using EventPair = std::pair<Core*, EventPtr>;
 	using EventQueue = std::vector<EventPair>;
 
 
 public:
 
-	gEventManager() : eventqueue() {}
-	~gEventManager() = default;
+	EventManager() : eventqueue() {}
+	~EventManager() = default;
 
 	// methods
 	/// <summary>
@@ -210,9 +210,9 @@ public:
 	/// <summary>
 	/// Dispatch event to the event loop
 	/// </summary>
-	/// <param name="receiver">a pointer to a gCore object</param>
-	/// <param name="event">a shared pointer to an gEvent or its deratives</param>
-	void dispatchEvent(gCore*, EventPtr);
+	/// <param name="receiver">a pointer to a Core object</param>
+	/// <param name="event">a shared pointer to an Event or its deratives</param>
+	void dispatchEvent(Core*, EventPtr);
 
 	/// <summary>
 	/// Processes events in the event queue

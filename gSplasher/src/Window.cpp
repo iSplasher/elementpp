@@ -192,7 +192,7 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 	gWindow::move(gPoint(500, 300));
 	gWindow::resizeEvent(std::make_shared<gResizeEvent>(gEvent::Type::Resize, s, gLayoutable::size()));
 	top_bar->setWindow(this);
-	setObjectName("gWindow");
+	setObjectName("Window");
 }
 
 gWindow::~gWindow() {
@@ -227,7 +227,7 @@ void gWindow::update() {
 	}
 }
 
-//Point gWindow::pos() {
+//Point Window::pos() {
 //	return r_window->getPosition();
 //}
 

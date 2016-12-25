@@ -4,43 +4,38 @@
 #include "Core.h"
 #include "Utils/Primitives.h"
 
+#include <unordered_map>
+
 NAMESPACE_BEGIN
 
-class gCoreWidget;
-class gLayout;
+class CoreWidget;
+class Layout;
+
 
 namespace priv {
-class LayoutImpl;
-struct ItemConstraints;
-using ItemData = std::shared_ptr<ItemConstraints>;
-using Layouter = std::shared_ptr<LayoutImpl>;
-}
+
+#include <yoga/Yoga.h>
+typedef YGNodeRef LayoutNode;
 
 /// <summary>
 /// Derived class can be managed by a layout
 /// </summary>
-class GSPLASHER_API gLayoutable : public gCore {
+class GSPLASHER_API LayoutCore : public Core {
 public:
 	// *structers
-	gLayoutable(gLayoutable* parent = nullptr);
-	virtual ~gLayoutable();
+	LayoutCore(LayoutCore* parent = nullptr);
+	virtual ~LayoutCore();
 
 	// member methods
 
-	void setFixedWidth(int width);
-	void setFixedHeight(int height);
-
-	/// <summary>
-	/// Returns pointer to parent gCoreWidget or nullptr if parent is not a widget or there is no parent.
-	/// </summary>
-	/// <returns>gCoreWidget or nullptr </returns>
-	gCoreWidget* parentWidget() const;
+	//void setFixedWidth(int width);
+	//void setFixedHeight(int height);
 
 	virtual void event(EventPtr ev);
 	virtual void update() = 0;
 	//virtual gRect contentsRect();
 	//virtual Rect contentsMargin();
-	int margin() const { return _margin; }
+	//int margin() const;
 
 	//virtual gSize minimumSize() const = 0;
 	//virtual gSize maximumSize() const = 0;
@@ -58,10 +53,10 @@ public:
 	virtual gRect geometry() const { return gRect(pos(), size()); }
 
 	/// <summary>
-	/// Returns the layout which handles this widget
+	/// Returns the layout which handles this item
 	/// </summary>
-	/// <returns>gLayout</returns>
-	gLayout* layout() const { return _layout; }
+	/// <returns>Layout</returns>
+	Layout* layout() const { return playout; }
 
 protected:
 	// members methods
@@ -83,55 +78,44 @@ protected:
 
 private:
 	// data members
-	gLayout* _layout = nullptr;
-	gLayout* containing_layout = nullptr;
-	priv::ItemData c_data;
-	int _margin = 0;
 
+	bool is_layout = false;
+	Layout* playout = nullptr;
+	Layout* bound_layout = nullptr;
+	LayoutNode node = nullptr;
 
-	friend class gLayout;
-	friend class priv::LayoutImpl;
+	friend class Layout;
 };
 
-//class SpaceFill : public gLayoutable {
-//public:
-//	SpaceFill(Size& s) : size(s) {}
-//	~SpaceFill();
-//
-//	void update();
-//	Rect boundingBox();
-//	Size prefferedSize();
-//	Size minimumSize();
-//	Size maximumSize();
-//	bool isEmpty();
-//private:
-//	Size size;
-//	Rect rect;
-//};
+}
+
 
 /// <summary>
 /// Abstract layout class. Derive this class to make a custom layout. 
 /// </summary>
-class GSPLASHER_API gLayout : public gLayoutable {
-	friend class gCoreWidget;
+class GSPLASHER_API Layout : public priv::LayoutCore {
+	friend class CoreWidget;
 public:
 	// * structers
-	explicit gLayout(gCoreWidget *parent = nullptr);
-	virtual ~gLayout() = default;
+	explicit Layout(LayoutCore *parent = nullptr);
+	virtual ~Layout() = default;
 
 	// member methods
-	//virtual gLayoutable* parent();
-	void setWigdet(gCoreWidget *new_parent);
+	//virtual LayoutCore* parent();
+	void setWigdet(CoreWidget *new_parent);
 
-	virtual void add(gLayoutable *item, Alignment align=Alignment::HCenter|Alignment::VCenter);
+	virtual void appendItem(LayoutCore *item, Alignment align = Alignment::Stretch);
 
-	//gCoreWidget& takeWidget();
-	//gLayout& takeLayout();
-	//void remove(gLayoutable&);
+	/// <summary>
+	/// Take item out of layout. 
+	/// </summary>
+	/// <param name="item">item to take out</param>
+	void takeItem(LayoutCore* item);
+	//void remove(LayoutCore&);
 
-	int spacing() const { return _spacing; }
+	//int spacing() const { return _spacing; }
 	//void setMargin();
-	void setSpacing(int s) { _spacing = s; invalidate(); }
+	//void setSpacing(int s) { _spacing = s; invalidate(); }
 
 	//virtual int count() const;
 	//bool isEmpty() const;
@@ -149,9 +133,6 @@ protected:
 	void beginLayoutChange() const;
 	void endLayoutChange() const;
 
-	// data members
-	priv::Layouter layouter;
-
 private:
 	// member methods
 	void update() override {};
@@ -159,7 +140,8 @@ private:
 	void setFixedheight(int height) {}
 
 	// data
-	int _spacing = 5;
+	std::unordered_map<priv::LayoutNode, LayoutCore*> nodemap;
+
 };
 
 NAMESPACE_END

@@ -42,7 +42,7 @@ enum class gPen::Join {
 	Bevel = NVG_BEVEL
 };
 
-gPen::gPen(gPainter& painter) {
+gPen::gPen(Painter& painter) {
 	painter.setPen(*this);
 	setJoin(Join::Bevel);
 	setCap(Cap::Round);
@@ -82,7 +82,7 @@ void gPen::apply() const {
 	}
 }
 
-gBrush::gBrush(gPainter& painter) {
+gBrush::gBrush(Painter& painter) {
 	painter.setBrush(*this);
 	setColor(gColor(0, 0, 0));
 }
@@ -100,7 +100,7 @@ void gBrush::apply() const {
 	}
 }
 
-gsp::gPainter::gPainter(gWindow* window) {
+gsp::Painter::Painter(gWindow* window) {
 	w = window;
 	if (!w->this_paint) {
 		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
@@ -112,12 +112,12 @@ gsp::gPainter::gPainter(gWindow* window) {
 	current_widget = window;
 }
 
-gPainter::~gPainter() {
+Painter::~Painter() {
 }
 
-void gPainter::begin(float pixel_ratio) {
+void Painter::begin(float pixel_ratio) {
 	if (begun) {
-		throw std::runtime_error("Inconsistent gPainter::begin call");
+		throw std::runtime_error("Inconsistent Painter::begin call");
 	}
 	begun = true;
 	w->parent_window->setActive();
@@ -128,34 +128,34 @@ void gPainter::begin(float pixel_ratio) {
 	nvgBeginFrame(context, s.width, s.height, pixel_ratio);
 }
 
-void gPainter::end() {
+void Painter::end() {
 	if (!begun) {
-		throw std::runtime_error("Inconsistent gPainter::end call");
+		throw std::runtime_error("Inconsistent Painter::end call");
 	}
 	begun = false;
 	nvgEndFrame(context);
 }
 
-void gPainter::setPen(gPen& pen) {
+void Painter::setPen(gPen& pen) {
 	pen.pc = context;
 	p = &pen;
 }
 
-void gPainter::save() {
+void Painter::save() {
 	nvgSave(context);
 	o_origin = origin;
 	o_p = p;
 	o_b = b;
 }
 
-void gPainter::restore() {
+void Painter::restore() {
 	nvgRestore(context);
 	origin = o_origin;
 	p = o_p;
 	b = o_b;
 }
 
-void gPainter::reset() {
+void Painter::reset() {
 	nvgReset(context);
 	o_origin = gPointF();
 	origin = gPointF();
@@ -165,44 +165,44 @@ void gPainter::reset() {
 	p = nullptr;
 }
 
-void gPainter::setGlobalAlpha(float alpha) const {
+void Painter::setGlobalAlpha(float alpha) const {
 	nvgGlobalAlpha(context, alpha);
 }
 
-void gPainter::setBrush(gBrush& brush) {
+void Painter::setBrush(gBrush& brush) {
 	brush.pc = context;
 	b = &brush;
 }
 
-void gPainter::drawRect(gRectF rect) const {
+void Painter::drawRect(gRectF rect) const {
 	beginPath();
 	translate(rect);
 	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
 	applyPB();
 }
 
-void gPainter::drawRoundedRect(gRectF rect, float radius) const {
+void Painter::drawRoundedRect(gRectF rect, float radius) const {
 	beginPath();
 	translate(rect);
 	nvgRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
 	applyPB();
 }
 
-void gPainter::drawEllipse(gPointF center, gSizeF size) const {
+void Painter::drawEllipse(gPointF center, gSizeF size) const {
 	beginPath();
 	translate(center);
 	nvgEllipse(context, center.x, center.y, size.width, size.height);
 	applyPB();
 }
 
-void gPainter::drawCircle(gPointF center, float radius) const {
+void Painter::drawCircle(gPointF center, float radius) const {
 	beginPath();
 	translate(center);
 	nvgCircle(context, center.x, center.y, radius);
 	applyPB();
 }
 
-void gPainter::drawLine(gPointF start, gPointF end) const {
+void Painter::drawLine(gPointF start, gPointF end) const {
 	beginPath();
 	translate(start);
 	translate(end);
@@ -211,25 +211,25 @@ void gPainter::drawLine(gPointF start, gPointF end) const {
 	applyPB();
 }
 
-void gPainter::translate(gRectF& r) const {
+void Painter::translate(gRectF& r) const {
 	if (!current_widget->is_window) {
 		r += origin;
 		r.y += top_margin;
 	}
 }
 
-void gPainter::translate(gPointF& p) const {
+void Painter::translate(gPointF& p) const {
 	if (!current_widget->is_window) {
 		p += origin;
 		p.y += top_margin;
 	}
 }
 
-void gPainter::beginPath() const {
+void Painter::beginPath() const {
 	nvgBeginPath(context);
 }
 
-void gPainter::applyPB() const {
+void Painter::applyPB() const {
 	if (p) {
 		p->apply();
 	}

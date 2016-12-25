@@ -10,7 +10,7 @@ NAMESPACE_BEGIN
 /// <summary>
 /// A window. 
 /// </summary>
-class GSPLASHER_API gWindow : public gCoreWidget {
+class GSPLASHER_API gWindow : public CoreWidget {
 public:
 	using TopBar = std::unique_ptr<gTopBar>;
 	explicit gWindow(gWindow* parent = nullptr) : gWindow(gSize(500, 300), parent) {}
@@ -35,7 +35,7 @@ private:
 	void setActive() const;
 
 	void update();
-	void paint(gPainter &painter) override;
+	void paint(Painter &painter) override;
 
 	//abitrary data members
 	double _old_mouse_x = 0;
@@ -50,9 +50,9 @@ private:
 	// render window
 	_privRWindow *r_window;
 
-	friend class gPainter;
+	friend class Painter;
 	friend class gApplication;
-	friend class gCoreWidget;
+	friend class CoreWidget;
 	friend class gTopBar;
 	friend class priv::LayoutImpl;
 };

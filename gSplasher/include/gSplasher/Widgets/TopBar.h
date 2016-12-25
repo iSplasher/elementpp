@@ -4,12 +4,12 @@
 
 NAMESPACE_BEGIN
 
-class gTopBar : public gCoreWidget {
+class gTopBar : public CoreWidget {
 public:
 	gTopBar();
 	~gTopBar();
 
-	void paint(gPainter &painter) override;
+	void paint(Painter &painter) override;
 	void update();
 
 private:

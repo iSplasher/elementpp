@@ -7,13 +7,13 @@ typedef struct NVGcontext PainterContext;
 
 NAMESPACE_BEGIN
 
-class gPainter;
-class gWindow;
+class Painter;
+class Window;
 
 /// <summary>
 /// Core widget. A very basic widget. Can be used as a container for other widgets
 /// </summary>
-class GSPLASHER_API gCoreWidget : public gLayoutable {
+class GSPLASHER_API CoreWidget : public priv::LayoutCore {
 public:
 
 	enum MoveState {
@@ -27,19 +27,19 @@ public:
 	};
 
 	// *structers
-	explicit gCoreWidget(gCoreWidget *parent = nullptr);
-	//gCoreWidget(const gCoreWidget&);
-	//explicit gCoreWidget(const gWidgetProperties s, gCoreWidget *parent = nullptr);
-	virtual ~gCoreWidget();
+	explicit CoreWidget(CoreWidget *parent = nullptr);
+	//CoreWidget(const CoreWidget&);
+	//explicit CoreWidget(const gWidgetProperties s, CoreWidget *parent = nullptr);
+	virtual ~CoreWidget();
 
 	// member methods
-	gWindow* parentWindow() const { return parent_window; }
-	virtual void paint(gPainter &painter);
+	Window* parentWindow() const { return parent_window; }
+	virtual void paint(Painter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);
 	gPoint pos() const override;
-	void setParent(gCoreWidget* new_parent);
-	void setLayout(gLayout& new_layout);
+	void setParent(CoreWidget* new_parent);
+	void setLayout(Layout& new_layout);
 	bool underMouse() const { return under_mouse; }
 
 	void setFont(gFont font) { _font = font; }
@@ -108,8 +108,8 @@ protected:
 	virtual void mouseReleaseEvent(MouseEventPtr ev);
 
 	// data members
-	gWindow *parent_window = nullptr;
-	gCoreWidget *parent_widget;
+	Window *parent_window = nullptr;
+	CoreWidget *parent_widget;
 	MoveState move_state = Normal;
 	gFont _font;
 	PainterContext *this_paint = nullptr;
@@ -121,11 +121,12 @@ private:
 	//Point move_offset;
 	bool under_mouse = false;
 
-friend class gPainter;
+friend class Painter;
+friend class Layout;
 };
 
-using WidgetPtr = std::shared_ptr<gCoreWidget>;
-using UniqueWidgetPtr = std::unique_ptr<gCoreWidget>;
+using WidgetPtr = std::shared_ptr<CoreWidget>;
+using UniqueWidgetPtr = std::unique_ptr<CoreWidget>;
 
 
 NAMESPACE_END

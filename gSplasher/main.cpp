@@ -4,17 +4,19 @@
 #include "gSplasher/Window.h"
 #include "gSplasher/Utils/Primitives.h"
 #include "gSplasher/Layouts/BoxLayout.h"
+#include "gSplasher/Global.h"
+#include "gSplasher/Widget.h"
 
 USING_NAMESPACE
 
-class MyWidget : public gCoreWidget {
+class MyWidget : public CoreWidget {
 public:
-	MyWidget(gCoreWidget* parent = nullptr) : gCoreWidget(parent){
+	MyWidget(CoreWidget* parent = nullptr) : CoreWidget(parent){
 		resize(50, 50);
 		move(20, 20);
 	}
 
-	void paint(gPainter &painter) override {
+	void paint(Painter &painter) override {
 		gPen p(painter);
 		p.setColor(gColor(0, 255, 0));
 		p.setWidth(0.8);
@@ -24,14 +26,14 @@ public:
 	}
 };
 
-class MyWidget2 : public gCoreWidget {
+class MyWidget2 : public CoreWidget {
 public:
-	MyWidget2(gCoreWidget* parent = nullptr) : gCoreWidget(parent) {
+	MyWidget2(CoreWidget* parent = nullptr) : CoreWidget(parent) {
 		resize(50, 50);
 		move(20, 20);
 	}
 
-	void paint(gPainter &painter) override {
+	void paint(Painter &painter) override {
 		gPen p(painter);
 		gBrush b(painter);
 		p.setColor(gColor(255, 0, 0));
@@ -42,9 +44,9 @@ public:
 };
 
 int main() {
-	gApplication app;
-	gWindow *window =  new gWindow{};
-	//gCoreWidget *window2 = new gWindow{};
+	Application app;
+	Window *window =  new Window{};
+	//CoreWidget *window2 = new Window{};
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(window);
 	MyWidget *mywidget3 = new MyWidget(window);
@@ -78,22 +80,22 @@ int main() {
 	std::cout << "topbar " << window->topBar()->geometry() << std::endl;
 	std::cout << "layout " << layout->geometry() << std::endl;
 	//std::cout << "layout2" << layout2->geometry() << std::endl;
-	//gCoreWidget *window3 = new gWindow{};
-	//gCoreWidget *window4 = new gWindow{};
+	//CoreWidget *window3 = new Window{};
+	//CoreWidget *window4 = new Window{};
 	//MyWidget* c_widget = new MyWidget(window);
 
-	//gCoreWidget *widget2 = new gCoreWidget(widget);
-	//gCoreWidget *widget3 = new gCoreWidget(widget);
-	//gCoreWidget *widget4 = new gCoreWidget(widget);
-	//gCoreWidget *widget5 = new gCoreWidget{};
-	//gCoreWidget *widget6 = new gCoreWidget(widget5);
-	//gCoreWidget *widget7 = new gCoreWidget(widget5);
-	//gCoreWidget *widget8 = new gCoreWidget(widget7);
-	//gCoreWidget *widget9 = new gCoreWidget(widget7);
-	//gCoreWidget *widget10 = new gCoreWidget(widget9);
-	//gCoreWidget *widget11 = new gCoreWidget(widget4);
+	//CoreWidget *widget2 = new CoreWidget(widget);
+	//CoreWidget *widget3 = new CoreWidget(widget);
+	//CoreWidget *widget4 = new CoreWidget(widget);
+	//CoreWidget *widget5 = new CoreWidget{};
+	//CoreWidget *widget6 = new CoreWidget(widget5);
+	//CoreWidget *widget7 = new CoreWidget(widget5);
+	//CoreWidget *widget8 = new CoreWidget(widget7);
+	//CoreWidget *widget9 = new CoreWidget(widget7);
+	//CoreWidget *widget10 = new CoreWidget(widget9);
+	//CoreWidget *widget11 = new CoreWidget(widget4);
 
-	app.print_tree(static_cast<gApplication::CoreList::const_iterator >(*app.core_objects));
+	app.print_tree(static_cast<Application::CoreList::const_iterator >(*app.core_objects));
 	//printf("%d", app.core_objects->tree_size());
 
 

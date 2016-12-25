@@ -9,16 +9,16 @@
 
 NAMESPACE_BEGIN
 
-class gWindow;
-class gApplication;
+class Window;
+class Application;
 
 /// <summary>
 /// Core object of the whole library. 
 /// </summary>
-class GSPLASHER_API gCore {
+class GSPLASHER_API Core {
 public:
-	gCore(gCore *parent = nullptr);
-	virtual ~gCore();
+	Core(Core *parent = nullptr);
+	virtual ~Core();
 
 	//logD(std::string);
 	//logE(std::string);
@@ -31,22 +31,22 @@ public:
 	/// <summary>
 	/// Events are received here
 	/// </summary>
-	/// <param name="ev">A gEvent object.</param>
+	/// <param name="ev">A Event object.</param>
 	virtual void event(EventPtr ev);
 
 	/// <summary>
-	/// Retrieve a pointer to parent gCore
+	/// Retrieve a pointer to parent Core
 	/// </summary>
-	/// <returns>gCore*</returns>
-	gCore* parentCore() const { return core_parent; }
+	/// <returns>Core*</returns>
+	Core* parentCore() const { return core_parent; }
 
 	/// <summary>
-	/// Change parent of gCore object
+	/// Change parent of Core object
 	/// </summary>
 	/// <param name="new_parent">The new parent object</param>
-	virtual void setParent(gCore*);
+	virtual void setParent(Core*);
 
-	std::vector<gCore*> children();
+	std::vector<Core*> children();
 
 	// data members
 	bool is_widget = false;
@@ -57,40 +57,40 @@ private:
 	//log(LogLevel, std::string);
 
 	// data members
-	gCore* core_parent;
+	Core* core_parent;
 	unsigned core_id;
-	std::string object_name = "gCore";
+	std::string object_name = "Core";
 	static std::atomic<unsigned> id_counter;
-	tree<gCore*>::iterator internal_tree;
+	tree<Core*>::iterator internal_tree;
 	/// <summary>
 	/// Used by parent to let us know if we should remove ourselves
 	/// from the internal tree container
 	/// </summary>
 	bool parent_is_deleting = false;
 
-	friend class gApplication;
+	friend class Application;
 
 };
 
 // A pointer to the application instance
-#define gApp gApplication::instance()
+#define App Application::instance()
 
 /// <summary>
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
-class GSPLASHER_API gApplication final : private gCore{
+class GSPLASHER_API Application final : private Core{
 public:
-	using CoreList = tree<gCore*>;
+	using CoreList = tree<Core*>;
 	using CoreListPtr = std::unique_ptr<CoreList>;
-	gApplication();
-	~gApplication();
+	Application();
+	~Application();
 
 	// member methods
 	int exec();
 	void event(EventPtr) override;
-	void sendEvent(gCore* reciever, EventPtr);
-	void dispatchEvent(gCore* reciever, EventPtr);
-	static gApplication *instance();
+	void sendEvent(Core* reciever, EventPtr);
+	void dispatchEvent(Core* reciever, EventPtr);
+	static Application *instance();
 	bool isRunning() const { return is_running; }
 
 	void print_tree(CoreList::const_iterator &t) const {
@@ -108,7 +108,7 @@ public:
 	// data members
 	CoreListPtr core_objects;
 private:
-	gApplication(const gApplication&) {}
+	Application(const Application&) {}
 
 	// member methods
 	/// <summary>
@@ -118,19 +118,19 @@ private:
 	bool processEv() const;
 
 	/// <summary>
-	/// Inserts gCore pointer to keep list in sync
+	/// Inserts Core pointer to keep list in sync
 	/// </summary>
-	/// <param name="gCore*">a pointer to the gCore object</param>
-	void insertCore(gCore*) const;
+	/// <param name="Core*">a pointer to the Core object</param>
+	void insertCore(Core*) const;
 
 	// data members
-	static gApplication *self;
-	gEventManager event_manager;
+	static Application *self;
+	EventManager event_manager;
 	bool should_quit = false;
 	bool is_running = false;
 
-	friend class gWindow;
-	friend class gCore;
+	friend class Window;
+	friend class Core;
 };
 
 

@@ -5,20 +5,18 @@
 
 USING_NAMESPACE
 
-gCoreWidget::gCoreWidget(gCoreWidget* parent) : gLayoutable(parent) {
-	is_widget = true;
-	setParent(parent);
-	setObjectName("gWidget");
+CoreWidget::CoreWidget(CoreWidget* parent) : LayoutCore(parent) {
+	setObjectName("Widget");
 }
 
-gCoreWidget::~gCoreWidget() {
+CoreWidget::~CoreWidget() {
 	// TODO: delete paint context
 }
 
-void gCoreWidget::paint(gPainter& painter) {
+void CoreWidget::paint(Painter& painter) {
 }
 
-void gCoreWidget::update() {
+void CoreWidget::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
 	painter.origin = gPointF(mapToWindow(gPoint(0, 0)));
@@ -28,32 +26,32 @@ void gCoreWidget::update() {
 	updateChildren();
 }
 
-void gCoreWidget::event(EventPtr ev) {
+void CoreWidget::event(EventPtr ev) {
 
 	switch (ev->type()) {
-	case gEvent::Type::MouseMove:
-		mouseMoveEvent(std::static_pointer_cast<gMouseEvent>(ev));
+	case Event::Type::MouseMove:
+		mouseMoveEvent(std::static_pointer_cast<MouseEvent>(ev));
 		break;
-	case gEvent::Type::MouseButtonPress:
-		mousePressEvent(std::static_pointer_cast<gMouseEvent>(ev));
+	case Event::Type::MouseButtonPress:
+		mousePressEvent(std::static_pointer_cast<MouseEvent>(ev));
 		break;
-	case gEvent::Type::MouseButtonRelease:
-		mouseReleaseEvent(std::static_pointer_cast<gMouseEvent>(ev));
+	case Event::Type::MouseButtonRelease:
+		mouseReleaseEvent(std::static_pointer_cast<MouseEvent>(ev));
 		break;
 	}
 
-	gLayoutable::event(ev);
+	LayoutCore::event(ev);
 }
 
-gPoint gCoreWidget::pos() const {
+gPoint CoreWidget::pos() const {
 
 	if (is_widget && !parent_widget) {
 		return gPoint();
 	}
-	return gLayoutable::pos();
+	return LayoutCore::pos();
 }
 
-void gCoreWidget::setParent(gCoreWidget* new_parent) {
+void CoreWidget::setParent(CoreWidget* new_parent) {
 	parent_widget = new_parent;
 	move(0, 0);
 	if (new_parent) {
@@ -62,22 +60,22 @@ void gCoreWidget::setParent(gCoreWidget* new_parent) {
 	else {
 		parent_window = nullptr;
 	}
-	gLayoutable::setParent(new_parent);
+	LayoutCore::setParent(new_parent);
 }
 
-void gCoreWidget::setLayout(gLayout& new_layout) {
+void CoreWidget::setLayout(Layout& new_layout) {
 	new_layout.setWigdet(this);
 }
 
-gPoint gCoreWidget::mapToParent(gPoint _p) const {
+gPoint CoreWidget::mapToParent(gPoint _p) const {
 	return _p + pos();
 }
 
-gPoint gCoreWidget::mapFromParent(gPoint _p) const {
+gPoint CoreWidget::mapFromParent(gPoint _p) const {
 	return _p - pos();
 }
 
-gPoint gCoreWidget::mapFromGlobal(gPoint p) const {
+gPoint CoreWidget::mapFromGlobal(gPoint p) const {
 	auto w = this;
 
 	while (w) {
@@ -87,7 +85,7 @@ gPoint gCoreWidget::mapFromGlobal(gPoint p) const {
 	return p;
 }
 
-gPoint gCoreWidget::mapToGlobal(gPoint p) const {
+gPoint CoreWidget::mapToGlobal(gPoint p) const {
 	auto w = this;
 
 	while (w) {
@@ -97,7 +95,7 @@ gPoint gCoreWidget::mapToGlobal(gPoint p) const {
 	return p;
 }
 
-gPoint gCoreWidget::mapFromWindow(gPoint p) const {
+gPoint CoreWidget::mapFromWindow(gPoint p) const {
 	if (is_window) {
 		return p;
 	}
@@ -110,7 +108,7 @@ gPoint gCoreWidget::mapFromWindow(gPoint p) const {
 	return p;
 }
 
-gPoint gCoreWidget::mapToWindow(gPoint p) const {
+gPoint CoreWidget::mapToWindow(gPoint p) const {
 	if (is_window) {
 		return p;
 	}
@@ -123,7 +121,7 @@ gPoint gCoreWidget::mapToWindow(gPoint p) const {
 	return p;
 }
 
-void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
+void CoreWidget::mousePressEvent(MouseEventPtr ev) {
 	if (drag.is_draggable && flags(ev->button & MouseButton::Left) ) {
 		move_state = MoveState::Moving;
 		drag.start_mouse_pos = mapToGlobal(ev->pos);
@@ -133,7 +131,7 @@ void gCoreWidget::mousePressEvent(MouseEventPtr ev) {
 	ev->ignore();
 }
 
-void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
+void CoreWidget::mouseMoveEvent(MouseEventPtr ev) {
 	if (ev->pos.x >= 0 && ev->pos.x < size().width && ev->pos.y >= 0 && ev->pos.y < size().height) {
 		under_mouse = true;
 	} else {
@@ -147,16 +145,15 @@ void gCoreWidget::mouseMoveEvent(MouseEventPtr ev) {
 	ev->ignore();
 }
 
-void gCoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
+void CoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
 	move_state = MoveState::Normal;
 	ev->ignore();
 }
 
-void gCoreWidget::updateChildren() {
+void CoreWidget::updateChildren() {
 	for (auto &c : children()) {
 		if (c->is_widget) {
-			static_cast<gCoreWidget*>(c)->update();
+			static_cast<CoreWidget*>(c)->update();
 		}
 	}
 }
-

@@ -9,6 +9,7 @@
 #define GSP_VERSION_MINOR 1
 #define GSP_VERSION_PATCH 0
 #define USING_NAMESPACE using namespace gsp;
+#define USING_NAMESPACE_PRIV using namespace gsp::priv;
 #define NAMESPACE_BEGIN namespace gsp {
 #define NAMESPACE_END }
 
@@ -72,7 +73,8 @@ enum class Alignment {
 	Right,
 	Bottom,
 	HCenter,
-	VCenter
+	VCenter,
+	Stretch
 };
 
 DEFINE_ENUM_FLAGS(MouseButton)
