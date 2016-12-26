@@ -4,7 +4,7 @@
 
 NAMESPACE_BEGIN
 
-class gTopBar : public CoreWidget {
+class gTopBar : public WidgetCore {
 public:
 	gTopBar();
 	~gTopBar();

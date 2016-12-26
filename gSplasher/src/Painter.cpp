@@ -157,8 +157,8 @@ void Painter::restore() {
 
 void Painter::reset() {
 	nvgReset(context);
-	o_origin = gPointF();
-	origin = gPointF();
+	o_origin = PointF();
+	origin = PointF();
 	o_b = nullptr;
 	b = nullptr;
 	o_p = nullptr;
@@ -188,21 +188,21 @@ void Painter::drawRoundedRect(gRectF rect, float radius) const {
 	applyPB();
 }
 
-void Painter::drawEllipse(gPointF center, gSizeF size) const {
+void Painter::drawEllipse(PointF center, SizeF size) const {
 	beginPath();
 	translate(center);
 	nvgEllipse(context, center.x, center.y, size.width, size.height);
 	applyPB();
 }
 
-void Painter::drawCircle(gPointF center, float radius) const {
+void Painter::drawCircle(PointF center, float radius) const {
 	beginPath();
 	translate(center);
 	nvgCircle(context, center.x, center.y, radius);
 	applyPB();
 }
 
-void Painter::drawLine(gPointF start, gPointF end) const {
+void Painter::drawLine(PointF start, PointF end) const {
 	beginPath();
 	translate(start);
 	translate(end);
@@ -218,7 +218,7 @@ void Painter::translate(gRectF& r) const {
 	}
 }
 
-void Painter::translate(gPointF& p) const {
+void Painter::translate(PointF& p) const {
 	if (!current_widget->is_window) {
 		p += origin;
 		p.y += top_margin;

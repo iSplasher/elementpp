@@ -59,6 +59,13 @@ inline T&	operator	|=	(T& x, T y)		{	x = x | y;	return x;	}; \
 inline T&	operator	^=	(T& x, T y)		{	x = x ^ y;	return x;	}; \
 inline bool	 flags(T x)	{	return static_cast<int>(x) != 0;};
 
+DEFINE_ENUM_FLAGS(Direction)
+enum class Direction {
+	Left,
+	Top,
+	Right,
+	Bottom,
+};
 
 DEFINE_ENUM_FLAGS(Orientation)
 enum class Orientation {

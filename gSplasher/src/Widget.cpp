@@ -5,28 +5,28 @@
 
 USING_NAMESPACE
 
-CoreWidget::CoreWidget(CoreWidget* parent) : LayoutCore(parent) {
+WidgetCore::WidgetCore(WidgetCore* parent) : LayoutCore(parent) {
 	setObjectName("Widget");
 }
 
-CoreWidget::~CoreWidget() {
+WidgetCore::~WidgetCore() {
 	// TODO: delete paint context
 }
 
-void CoreWidget::paint(Painter& painter) {
+void WidgetCore::paint(Painter& painter) {
 }
 
-void CoreWidget::update() {
+void WidgetCore::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
-	painter.origin = gPointF(mapToWindow(gPoint(0, 0)));
+	painter.origin = PointF(mapToWindow(Point(0, 0)));
 	painter.current_widget = this;
 	paint(painter);
 	painter.restore();
 	updateChildren();
 }
 
-void CoreWidget::event(EventPtr ev) {
+void WidgetCore::event(EventPtr ev) {
 
 	switch (ev->type()) {
 	case Event::Type::MouseMove:
@@ -43,15 +43,15 @@ void CoreWidget::event(EventPtr ev) {
 	LayoutCore::event(ev);
 }
 
-gPoint CoreWidget::pos() const {
+Point WidgetCore::pos() const {
 
 	if (is_widget && !parent_widget) {
-		return gPoint();
+		return Point();
 	}
 	return LayoutCore::pos();
 }
 
-void CoreWidget::setParent(CoreWidget* new_parent) {
+void WidgetCore::setParent(WidgetCore* new_parent) {
 	parent_widget = new_parent;
 	move(0, 0);
 	if (new_parent) {
@@ -63,19 +63,19 @@ void CoreWidget::setParent(CoreWidget* new_parent) {
 	LayoutCore::setParent(new_parent);
 }
 
-void CoreWidget::setLayout(Layout& new_layout) {
+void WidgetCore::setLayout(Layout& new_layout) {
 	new_layout.setWigdet(this);
 }
 
-gPoint CoreWidget::mapToParent(gPoint _p) const {
+Point WidgetCore::mapToParent(Point _p) const {
 	return _p + pos();
 }
 
-gPoint CoreWidget::mapFromParent(gPoint _p) const {
+Point WidgetCore::mapFromParent(Point _p) const {
 	return _p - pos();
 }
 
-gPoint CoreWidget::mapFromGlobal(gPoint p) const {
+Point WidgetCore::mapFromGlobal(Point p) const {
 	auto w = this;
 
 	while (w) {
@@ -85,7 +85,7 @@ gPoint CoreWidget::mapFromGlobal(gPoint p) const {
 	return p;
 }
 
-gPoint CoreWidget::mapToGlobal(gPoint p) const {
+Point WidgetCore::mapToGlobal(Point p) const {
 	auto w = this;
 
 	while (w) {
@@ -95,7 +95,7 @@ gPoint CoreWidget::mapToGlobal(gPoint p) const {
 	return p;
 }
 
-gPoint CoreWidget::mapFromWindow(gPoint p) const {
+Point WidgetCore::mapFromWindow(Point p) const {
 	if (is_window) {
 		return p;
 	}
@@ -108,7 +108,7 @@ gPoint CoreWidget::mapFromWindow(gPoint p) const {
 	return p;
 }
 
-gPoint CoreWidget::mapToWindow(gPoint p) const {
+Point WidgetCore::mapToWindow(Point p) const {
 	if (is_window) {
 		return p;
 	}
@@ -121,7 +121,7 @@ gPoint CoreWidget::mapToWindow(gPoint p) const {
 	return p;
 }
 
-void CoreWidget::mousePressEvent(MouseEventPtr ev) {
+void WidgetCore::mousePressEvent(MouseEventPtr ev) {
 	if (drag.is_draggable && flags(ev->button & MouseButton::Left) ) {
 		move_state = MoveState::Moving;
 		drag.start_mouse_pos = mapToGlobal(ev->pos);
@@ -131,7 +131,7 @@ void CoreWidget::mousePressEvent(MouseEventPtr ev) {
 	ev->ignore();
 }
 
-void CoreWidget::mouseMoveEvent(MouseEventPtr ev) {
+void WidgetCore::mouseMoveEvent(MouseEventPtr ev) {
 	if (ev->pos.x >= 0 && ev->pos.x < size().width && ev->pos.y >= 0 && ev->pos.y < size().height) {
 		under_mouse = true;
 	} else {
@@ -145,15 +145,15 @@ void CoreWidget::mouseMoveEvent(MouseEventPtr ev) {
 	ev->ignore();
 }
 
-void CoreWidget::mouseReleaseEvent(MouseEventPtr ev) {
+void WidgetCore::mouseReleaseEvent(MouseEventPtr ev) {
 	move_state = MoveState::Normal;
 	ev->ignore();
 }
 
-void CoreWidget::updateChildren() {
+void WidgetCore::updateChildren() {
 	for (auto &c : children()) {
 		if (c->is_widget) {
-			static_cast<CoreWidget*>(c)->update();
+			static_cast<WidgetCore*>(c)->update();
 		}
 	}
 }

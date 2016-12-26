@@ -40,7 +40,7 @@ NAMESPACE_BEGIN
 //};
 //
 ///// <summary>
-///// A painter used to paint on a CoreWidget
+///// A painter used to paint on a WidgetCore
 ///// </summary>
 //using Painter = sf::Drawable;
 //using Mouse = sf::Mouse;

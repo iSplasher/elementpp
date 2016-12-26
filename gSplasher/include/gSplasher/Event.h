@@ -135,10 +135,10 @@ struct GSPLASHER_API InputEvent : Event {
 using InputEventPtr = std::shared_ptr<InputEvent>;
 
 struct GSPLASHER_API MouseEvent : InputEvent {
-	MouseEvent(Type t, const gPoint local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers) :
+	MouseEvent(Type t, const Point local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers) :
 		InputEvent(t, modifiers), pos(local_pos), button(b), buttons(bs) {}
 
-	const gPoint pos;
+	const Point pos;
 
 	/// <summary>
 	/// State of button which caused the event
@@ -169,21 +169,21 @@ using KeyEventPtr = std::shared_ptr<KeyEvent>;
 struct GSPLASHER_API MoveEvent : Event {
 	MoveEvent(Type t, const int new_x, const int new_y, const int old_x, const int old_y) :
 		Event(t), pos(new_x, new_y), old_pos(old_x, old_y) {}
-	MoveEvent(Type t, const gPoint new_p, const gPoint old_p) :
+	MoveEvent(Type t, const Point new_p, const Point old_p) :
 		MoveEvent(t, new_p.x, new_p.y, old_p.x, old_p.y) {}
 
 	// data members
-	const gPoint pos;
-	const gPoint old_pos;
+	const Point pos;
+	const Point old_pos;
 };
 
 using MoveEventPtr = std::shared_ptr<MoveEvent>;
 
 struct GSPLASHER_API ResizeEvent : Event {
-	ResizeEvent(Type t, const gSize nsize, const gSize osize) : Event(t), size(nsize), old_size(osize) {}
+	ResizeEvent(Type t, const Size nsize, const Size osize) : Event(t), size(nsize), old_size(osize) {}
 
-	const gSize size;
-	const gSize old_size;
+	const Size size;
+	const Size old_size;
 };
 
 using ResizeEventPtr = std::shared_ptr<ResizeEvent>;

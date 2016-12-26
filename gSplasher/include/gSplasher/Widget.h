@@ -13,7 +13,7 @@ class Window;
 /// <summary>
 /// Core widget. A very basic widget. Can be used as a container for other widgets
 /// </summary>
-class GSPLASHER_API CoreWidget : public priv::LayoutCore {
+class GSPLASHER_API WidgetCore : public priv::LayoutCore {
 public:
 
 	enum MoveState {
@@ -27,18 +27,18 @@ public:
 	};
 
 	// *structers
-	explicit CoreWidget(CoreWidget *parent = nullptr);
-	//CoreWidget(const CoreWidget&);
-	//explicit CoreWidget(const gWidgetProperties s, CoreWidget *parent = nullptr);
-	virtual ~CoreWidget();
+	explicit WidgetCore(WidgetCore *parent = nullptr);
+	//WidgetCore(const WidgetCore&);
+	//explicit WidgetCore(const gWidgetProperties s, WidgetCore *parent = nullptr);
+	virtual ~WidgetCore();
 
 	// member methods
 	Window* parentWindow() const { return parent_window; }
 	virtual void paint(Painter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);
-	gPoint pos() const override;
-	void setParent(CoreWidget* new_parent);
+	Point pos() const override;
+	void setParent(WidgetCore* new_parent);
 	void setLayout(Layout& new_layout);
 	bool underMouse() const { return under_mouse; }
 
@@ -50,14 +50,14 @@ public:
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in the parent widget</returns>
-	gPoint mapToParent(gPoint p) const;
+	Point mapToParent(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in this widget</returns>
-	gPoint mapFromParent(gPoint p) const;
+	Point mapFromParent(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p from the containing window's
@@ -67,7 +67,7 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate from containing window</returns>
-	gPoint mapFromWindow(gPoint p) const;
+	Point mapFromWindow(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p to the containing window's
@@ -77,29 +77,29 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate in containing window</returns>
-	gPoint mapToWindow(gPoint p) const;
+	Point mapToWindow(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p from the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine from desktop</returns>
-	gPoint mapFromGlobal(gPoint p) const;
+	Point mapFromGlobal(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p to the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine in desktop</returns>
-	gPoint mapToGlobal(gPoint p) const;
+	Point mapToGlobal(Point p) const;
 
 
 protected:
 
 	struct Drag {
 		bool is_draggable = true;
-		gPoint start_mouse_pos;
-		gPoint start_pos;
+		Point start_mouse_pos;
+		Point start_pos;
 	};
 
 	// member methods
@@ -109,7 +109,7 @@ protected:
 
 	// data members
 	Window *parent_window = nullptr;
-	CoreWidget *parent_widget;
+	WidgetCore *parent_widget;
 	MoveState move_state = Normal;
 	gFont _font;
 	PainterContext *this_paint = nullptr;
@@ -125,8 +125,8 @@ friend class Painter;
 friend class Layout;
 };
 
-using WidgetPtr = std::shared_ptr<CoreWidget>;
-using UniqueWidgetPtr = std::unique_ptr<CoreWidget>;
+using WidgetPtr = std::shared_ptr<WidgetCore>;
+using UniqueWidgetPtr = std::unique_ptr<WidgetCore>;
 
 
 NAMESPACE_END

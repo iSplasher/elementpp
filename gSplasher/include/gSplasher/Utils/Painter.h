@@ -168,37 +168,37 @@ public:
 	/// </summary>
 	/// <param name="center">Center of ellipse</param>
 	/// <param name="size">Width and height of ellipse</param>
-	void drawEllipse(gPointF center, gSizeF size) const;
+	void drawEllipse(PointF center, SizeF size) const;
 
 	/// <summary>
 	/// Draw a circle shape
 	/// </summary>
 	/// <param name="center">Center of circle</param>
 	/// <param name="radius">Circle radius</param>
-	void drawCircle(gPointF center, float radius) const;
+	void drawCircle(PointF center, float radius) const;
 
 	/// <summary>
 	/// Draw a line
 	/// </summary>
 	/// <param name="start">Start point of line</param>
 	/// <param name="end">End point of line</param>
-	void drawLine(gPointF start, gPointF end) const;
+	void drawLine(PointF start, PointF end) const;
 
 private:
 
 	// helper methods
 	void translate(gRectF &r) const;
-	void translate(gPointF &p) const;
+	void translate(PointF &p) const;
 	void beginPath() const;
 	void applyPB() const;
 
 	// TODO: Create a save-stack struct to store old objects instead!
 
-	CoreWidget *w = nullptr;
+	WidgetCore *w = nullptr;
 	// Coordinates will be translated to this widget's parent
-	gPointF origin;
-	gPointF o_origin;
-	CoreWidget *current_widget = nullptr;
+	PointF origin;
+	PointF o_origin;
+	WidgetCore *current_widget = nullptr;
 	PainterContext* context = nullptr;
 	gPen *p = nullptr;
 	gPen *o_p = nullptr;
@@ -208,7 +208,7 @@ private:
 	// TODO: maybe extend this to a gMargins? and do all sides?
 	int top_margin = 0; // for window TopBar.. 
 
-	friend class CoreWidget;
+	friend class WidgetCore;
 	friend class gTopBar;
 };
 

@@ -10,17 +10,17 @@ NAMESPACE_BEGIN
 /// <summary>
 /// A window. 
 /// </summary>
-class GSPLASHER_API gWindow : public CoreWidget {
+class GSPLASHER_API gWindow : public WidgetCore {
 public:
 	using TopBar = std::unique_ptr<gTopBar>;
-	explicit gWindow(gWindow* parent = nullptr) : gWindow(gSize(500, 300), parent) {}
-	explicit gWindow(gSize size, gWindow* parent = nullptr);
+	explicit gWindow(gWindow* parent = nullptr) : gWindow(Size(500, 300), parent) {}
+	explicit gWindow(Size size, gWindow* parent = nullptr);
 	virtual ~gWindow();
 
 	// methods
 	TopBar& topBar() { return top_bar; }
 	//Point pos() override;
-	void move(gPoint new_p) override;
+	void move(Point new_p) override;
 
 protected:
 	// methods
@@ -52,7 +52,7 @@ private:
 
 	friend class Painter;
 	friend class gApplication;
-	friend class CoreWidget;
+	friend class WidgetCore;
 	friend class gTopBar;
 	friend class priv::LayoutImpl;
 };

@@ -76,13 +76,13 @@ static KeyModifier getKeyModifiers(GLFWwindow* r_window) {
 
 static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
 {
-	auto ev = std::make_shared<gMouseEvent>(
-		gEvent::Type::MouseMove,
-		gPoint(xpos, ypos), MouseButton::None,
+	auto ev = std::make_shared<MouseEvent>(
+		Event::Type::MouseMove,
+		Point(xpos, ypos), MouseButton::None,
 		getMouseButtons(r_window),
 		getKeyModifiers(r_window));
 
-	gCoreWidget* widget = getWindow(r_window);
+	WidgetCore* widget = getWindow(r_window);
 	auto found = false;
 
 	while(!found) {
@@ -90,14 +90,14 @@ static void mouseMoveCallback(GLFWwindow* r_window, double xpos, double ypos)
 			
 		}
 	}
-	gApp->dispatchEvent(
+	App->dispatchEvent(
 		widget,
 		ev
 		);
 }
 
 static void mousePressCallback(GLFWwindow* r_window, int button, int action, int mods) {
-	auto ev_type = action == GLFW_PRESS ? gEvent::Type::MouseButtonPress : gEvent::Type::MouseButtonRelease;
+	auto ev_type = action == GLFW_PRESS ? Event::Type::MouseButtonPress : Event::Type::MouseButtonRelease;
 	auto m_button = MouseButton::None;
 	auto modifiers = KeyModifier::None;
 
@@ -132,12 +132,12 @@ static void mousePressCallback(GLFWwindow* r_window, int button, int action, int
 	}
 
 	auto window = getWindow(r_window);
-	gPointD m_pos;
+	PointD m_pos;
 	glfwGetCursorPos(r_window, &m_pos.x, &m_pos.y);
-	gApp->dispatchEvent(window,
-		std::make_shared<gMouseEvent>(
+	App->dispatchEvent(window,
+		std::make_shared<MouseEvent>(
 			ev_type,
-			gPoint(m_pos), m_button,
+			Point(m_pos), m_button,
 			getMouseButtons(r_window),
 			modifiers));
 
@@ -145,7 +145,7 @@ static void mousePressCallback(GLFWwindow* r_window, int button, int action, int
 
 // Callbacks end
 
-gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
+gWindow::gWindow(Size s, gWindow* parent) : WidgetCore(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -185,12 +185,12 @@ gWindow::gWindow(gSize s, gWindow* parent) : gCoreWidget(parent) {
 		_inited = true;
 	}
 
-	painter = std::make_unique<gPainter>(this);
+	painter = std::make_unique<Painter>(this);
 
 	top_bar = std::make_unique<gTopBar>();
 
-	gWindow::move(gPoint(500, 300));
-	gWindow::resizeEvent(std::make_shared<gResizeEvent>(gEvent::Type::Resize, s, gLayoutable::size()));
+	gWindow::move(Point(500, 300));
+	gWindow::resizeEvent(std::make_shared<ResizeEvent>(Event::Type::Resize, s, LayoutCore::size()));
 	top_bar->setWindow(this);
 	setObjectName("Window");
 }
@@ -217,7 +217,7 @@ void gWindow::update() {
 	float px_ratio = static_cast<float>(fb_width) / static_cast<float>(s.width);
 
 	painter->begin(px_ratio);
-	gCoreWidget::update();
+	WidgetCore::update();
 	if (top_bar) {
 		top_bar->update();
 	}
@@ -231,19 +231,19 @@ void gWindow::update() {
 //	return r_window->getPosition();
 //}
 
-void gWindow::move(gPoint new_p) {
-	gCoreWidget::move(new_p);
+void gWindow::move(Point new_p) {
+	WidgetCore::move(new_p);
 	auto p = pos();
 	glfwSetWindowPos(r_window, p.x, p.y);
 }
 
 void gWindow::resizeEvent(ResizeEventPtr ev) {
-	gLayoutable::resizeEvent(ev);
+	LayoutCore::resizeEvent(ev);
 	auto s = size();
 	glfwSetWindowSize(r_window, s.width, s.height);
 }
 
-void gWindow::paint(gPainter& painter) {
+void gWindow::paint(Painter& painter) {
 	gBrush b(painter);
 	b.setColor(gColor(250, 250, 250, 200));
 

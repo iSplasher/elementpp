@@ -9,9 +9,9 @@
 
 USING_NAMESPACE
 
-class MyWidget : public CoreWidget {
+class MyWidget : public WidgetCore {
 public:
-	MyWidget(CoreWidget* parent = nullptr) : CoreWidget(parent){
+	MyWidget(WidgetCore* parent = nullptr) : WidgetCore(parent){
 		resize(50, 50);
 		move(20, 20);
 	}
@@ -26,9 +26,9 @@ public:
 	}
 };
 
-class MyWidget2 : public CoreWidget {
+class MyWidget2 : public WidgetCore {
 public:
-	MyWidget2(CoreWidget* parent = nullptr) : CoreWidget(parent) {
+	MyWidget2(WidgetCore* parent = nullptr) : WidgetCore(parent) {
 		resize(50, 50);
 		move(20, 20);
 	}
@@ -46,7 +46,7 @@ public:
 int main() {
 	Application app;
 	Window *window =  new Window{};
-	//CoreWidget *window2 = new Window{};
+	//WidgetCore *window2 = new Window{};
 	MyWidget *mywidget = new MyWidget(window);
 	MyWidget2 *mywidget2 = new MyWidget2(window);
 	MyWidget *mywidget3 = new MyWidget(window);
@@ -70,9 +70,9 @@ int main() {
 
 	mywidget4->setFixedHeight(100);
 	mywidget4->setFixedWidth(450);
-	//std::cout << "mywidget to window " << mywidget->mapToWindow(gPoint(0, 0)) << std::endl;
-	//std::cout << "mywidget2 to window " << mywidget2->mapToWindow(gPoint(0, 0)) << std::endl;
-	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(gPoint(0, 0)) << std::endl;
+	//std::cout << "mywidget to window " << mywidget->mapToWindow(Point(0, 0)) << std::endl;
+	//std::cout << "mywidget2 to window " << mywidget2->mapToWindow(Point(0, 0)) << std::endl;
+	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(Point(0, 0)) << std::endl;
 	std::cout << "mywidget " << mywidget->geometry() << std::endl;
 	std::cout << "mywidget2 " << mywidget2->geometry() << std::endl;
 	std::cout << "mywidget3 " << mywidget3->geometry() << std::endl;
@@ -80,20 +80,20 @@ int main() {
 	std::cout << "topbar " << window->topBar()->geometry() << std::endl;
 	std::cout << "layout " << layout->geometry() << std::endl;
 	//std::cout << "layout2" << layout2->geometry() << std::endl;
-	//CoreWidget *window3 = new Window{};
-	//CoreWidget *window4 = new Window{};
+	//WidgetCore *window3 = new Window{};
+	//WidgetCore *window4 = new Window{};
 	//MyWidget* c_widget = new MyWidget(window);
 
-	//CoreWidget *widget2 = new CoreWidget(widget);
-	//CoreWidget *widget3 = new CoreWidget(widget);
-	//CoreWidget *widget4 = new CoreWidget(widget);
-	//CoreWidget *widget5 = new CoreWidget{};
-	//CoreWidget *widget6 = new CoreWidget(widget5);
-	//CoreWidget *widget7 = new CoreWidget(widget5);
-	//CoreWidget *widget8 = new CoreWidget(widget7);
-	//CoreWidget *widget9 = new CoreWidget(widget7);
-	//CoreWidget *widget10 = new CoreWidget(widget9);
-	//CoreWidget *widget11 = new CoreWidget(widget4);
+	//WidgetCore *widget2 = new WidgetCore(widget);
+	//WidgetCore *widget3 = new WidgetCore(widget);
+	//WidgetCore *widget4 = new WidgetCore(widget);
+	//WidgetCore *widget5 = new WidgetCore{};
+	//WidgetCore *widget6 = new WidgetCore(widget5);
+	//WidgetCore *widget7 = new WidgetCore(widget5);
+	//WidgetCore *widget8 = new WidgetCore(widget7);
+	//WidgetCore *widget9 = new WidgetCore(widget7);
+	//WidgetCore *widget10 = new WidgetCore(widget9);
+	//WidgetCore *widget11 = new WidgetCore(widget4);
 
 	app.print_tree(static_cast<Application::CoreList::const_iterator >(*app.core_objects));
 	//printf("%d", app.core_objects->tree_size());
