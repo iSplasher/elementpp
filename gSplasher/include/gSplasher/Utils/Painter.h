@@ -82,7 +82,7 @@ private:
 	friend class Painter;
 };
 
-class gTopBar;
+class TopBar;
 
 class GSPLASHER_API Painter {
 public:
@@ -152,16 +152,16 @@ public:
 	/// Draw a rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
-	void drawRect(gRectF rect) const;
-	void drawRect(gRect rect) const { drawRect(gRectF(rect)); }
+	void drawRect(RectF rect) const;
+	void drawRect(Rect rect) const { drawRect(RectF(rect)); }
 
 	/// <summary>
 	/// Draw a rounded rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
 	/// <param name="radius">Radius of the rect corners</param>
-	void drawRoundedRect(gRectF rect, float radius) const;
-	void drawRoundedRect(gRect rect, int radius) const { drawRoundedRect(gRectF(rect), radius); }
+	void drawRoundedRect(RectF rect, float radius) const;
+	void drawRoundedRect(Rect rect, int radius) const { drawRoundedRect(RectF(rect), radius); }
 
 	/// <summary>
 	/// Draw an ellipse shape
@@ -187,7 +187,7 @@ public:
 private:
 
 	// helper methods
-	void translate(gRectF &r) const;
+	void translate(RectF &r) const;
 	void translate(PointF &p) const;
 	void beginPath() const;
 	void applyPB() const;
@@ -209,7 +209,7 @@ private:
 	int top_margin = 0; // for window TopBar.. 
 
 	friend class WidgetCore;
-	friend class gTopBar;
+	friend class TopBar;
 };
 
 using UniquePainter = std::unique_ptr<Painter>;

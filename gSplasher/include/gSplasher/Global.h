@@ -81,7 +81,7 @@ enum class Alignment {
 	Bottom,
 	HCenter,
 	VCenter,
-	Stretch
+	Default
 };
 
 DEFINE_ENUM_FLAGS(MouseButton)

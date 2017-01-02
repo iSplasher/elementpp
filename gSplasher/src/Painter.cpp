@@ -100,7 +100,7 @@ void gBrush::apply() const {
 	}
 }
 
-gsp::Painter::Painter(gWindow* window) {
+gsp::Painter::Painter(Window* window) {
 	w = window;
 	if (!w->this_paint) {
 		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
@@ -174,14 +174,14 @@ void Painter::setBrush(gBrush& brush) {
 	b = &brush;
 }
 
-void Painter::drawRect(gRectF rect) const {
+void Painter::drawRect(RectF rect) const {
 	beginPath();
 	translate(rect);
 	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
 	applyPB();
 }
 
-void Painter::drawRoundedRect(gRectF rect, float radius) const {
+void Painter::drawRoundedRect(RectF rect, float radius) const {
 	beginPath();
 	translate(rect);
 	nvgRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
@@ -211,7 +211,7 @@ void Painter::drawLine(PointF start, PointF end) const {
 	applyPB();
 }
 
-void Painter::translate(gRectF& r) const {
+void Painter::translate(RectF& r) const {
 	if (!current_widget->is_window) {
 		r += origin;
 		r.y += top_margin;

@@ -4,24 +4,26 @@
 
 USING_NAMESPACE
 
-gTopBar::gTopBar(): gCoreWidget() {
-	setFixedWidth(0);
-	setFixedHeight(0);
+TopBar::TopBar(Window* w) : WidgetCore(w)
+{
+	if (w)
+		setWindow(w);
 }
 
-gTopBar::~gTopBar() {
+TopBar::~TopBar() {
 }
 
-void gTopBar::paint(gPainter &painter) {
+void TopBar::paint(Painter &painter) {
 	gPen p(painter);
 	gBrush b(painter);
 	p.setColor(gColor(178, 178, 178));
 	p.setWidth(3);
 	b.setColor(gColor(250, 250, 250));
-	painter.drawRect(gRect(0, 0, size()));
+	painter.drawRect(Rect(0, 0, size()));
 }
 
-void gTopBar::update() {
+void TopBar::update()
+{
 	if (parent_window->painter) {
 		auto &painter = *parent_window->painter;
 		auto x = painter.top_margin;
@@ -33,8 +35,12 @@ void gTopBar::update() {
 	}
 }
 
-void gTopBar::setWindow(gWindow* w) {
-	parent_window = w;
-	setFixedWidth(w->size().width);
-	setFixedHeight(20);
+void TopBar::setWindow(Window* w) {
+	if (w)
+	{
+		parent_window = w;
+		//setFixedWidth(w->size().width);
+		//setFixedHeight(20);
+		resize(w->size().width, 20);
+	}
 }

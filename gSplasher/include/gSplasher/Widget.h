@@ -37,7 +37,7 @@ public:
 	virtual void paint(Painter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);
-	Point pos() const override;
+	Point pos() override;
 	void setParent(WidgetCore* new_parent);
 	void setLayout(Layout& new_layout);
 	bool underMouse() const { return under_mouse; }
@@ -50,14 +50,14 @@ public:
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in the parent widget</returns>
-	Point mapToParent(Point p) const;
+	Point mapToParent(Point p);
 
 	/// <summary>
 	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in this widget</returns>
-	Point mapFromParent(Point p) const;
+	Point mapFromParent(Point p);
 
 	/// <summary>
 	/// Translates the coordinates p from the containing window's
@@ -67,7 +67,7 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate from containing window</returns>
-	Point mapFromWindow(Point p) const;
+	Point mapFromWindow(Point p);
 
 	/// <summary>
 	/// Translates the coordinates p to the containing window's
@@ -77,21 +77,21 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate in containing window</returns>
-	Point mapToWindow(Point p) const;
+	Point mapToWindow(Point p);
 
 	/// <summary>
 	/// Translates the coordinates p from the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine from desktop</returns>
-	Point mapFromGlobal(Point p) const;
+	Point mapFromGlobal(Point p);
 
 	/// <summary>
 	/// Translates the coordinates p to the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine in desktop</returns>
-	Point mapToGlobal(Point p) const;
+	Point mapToGlobal(Point p);
 
 
 protected:

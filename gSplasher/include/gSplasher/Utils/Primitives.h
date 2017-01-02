@@ -305,30 +305,30 @@ using SizeF = SizeT<float>;
 using SizeD = SizeT<double>;
 
 /// <summary>
-/// gRect. Defines x, y, width and height.
+/// Rect. Defines x, y, width and height.
 /// </summary>
 template <typename T>
-struct GSPLASHER_API gRectT {
-	gRectT() : gRectT(0, 0, 0, 0) {}
-	gRectT(T X, T Y, T W, T H) : x(X), y(Y), width(W), height(H) {}
-	gRectT(PointT<T> p, SizeT<T> s) : gRectT(p.x, p.y, s.width, s.height) {}
-	gRectT(PointT<T> p, T W, T H) : gRectT(p.x, p.y, W, H) {}
-	gRectT(T X, T Y, SizeT<T> s) : gRectT(X, Y, s.width, s.height) {}
+struct GSPLASHER_API RectT {
+	RectT() : RectT(0, 0, 0, 0) {}
+	RectT(T X, T Y, T W, T H) : x(X), y(Y), width(W), height(H) {}
+	RectT(PointT<T> p, SizeT<T> s) : RectT(p.x, p.y, s.width, s.height) {}
+	RectT(PointT<T> p, T W, T H) : RectT(p.x, p.y, W, H) {}
+	RectT(T X, T Y, SizeT<T> s) : RectT(X, Y, s.width, s.height) {}
 
 	template <typename O>
-	explicit gRectT(const gRectT<O>& rect) : gRectT(rect.x, rect.y, rect.width, rect.height) {}
+	explicit RectT(const RectT<O>& rect) : RectT(rect.x, rect.y, rect.width, rect.height) {}
 
 	// methods
 
 	/// <summary>
-	/// If gRect is within this gRect
+	/// If Rect is within this Rect
 	/// </summary>
-	bool contains(const gRectT<T>& r) const {
+	bool contains(const RectT<T>& r) const {
 		return contains(r.x, r.y, r.width, r.height);
 	}
 
 	/// <summary>
-	/// If Point is within this gRect
+	/// If Point is within this Rect
 	/// </summary>
 	template <typename O>
 	bool contains(const PointT<O>& p) const {
@@ -336,7 +336,7 @@ struct GSPLASHER_API gRectT {
 	}
 
 	/// <summary>
-	/// If Size is within this gRect
+	/// If Size is within this Rect
 	/// </summary>
 	template <typename O>
 	bool contains(const SizeT<O>& s) const {
@@ -344,14 +344,14 @@ struct GSPLASHER_API gRectT {
 	}
 
 	/// <summary>
-	/// If x, y, width and height are within this gRect
+	/// If x, y, width and height are within this Rect
 	/// </summary>
 	bool contains(T X, T Y, T W, T H) const {
 		return contains(PointT<T>(X, Y)) && contains(SizeT<T>(W, H));
 	}
 
 	/// <summary>
-	/// Position of gRect
+	/// Position of Rect
 	/// </summary>
 	/// <returns>PointT/<T/></returns>
 	PointT<T> pos() const {
@@ -359,10 +359,10 @@ struct GSPLASHER_API gRectT {
 	}
 
 	/// <summary>
-	/// Size of gRect
+	/// Size of Rect
 	/// </summary>
 	/// <returns>SizeT/<T/></returns>
-	/// <remarks>If type of gRect is int, an unsigned type of Size will be returned</remarks>
+	/// <remarks>If type of Rect is int, an unsigned type of Size will be returned</remarks>
 	SizeT<T> size() const {
 		return SizeT<T>(width, height);
 	}
@@ -371,23 +371,23 @@ struct GSPLASHER_API gRectT {
 	//	return Size(width, height);
 	//}
 
-	// operators for gRectT
+	// operators for RectT
 
-	gRectT<T> operator -(const gRectT<T>& rh) {
-		return gRectT<T>(x - rh.x, y - rh.y, width - rh.width, height - rh.height);
+	RectT<T> operator -(const RectT<T>& rh) {
+		return RectT<T>(x - rh.x, y - rh.y, width - rh.width, height - rh.height);
 	}
 
 	template <typename O>
-	gRectT<T> operator -(const PointT<O>& rh) {
-		return gRectT<T>(x - rh.x, y - rh.y, width, height);
+	RectT<T> operator -(const PointT<O>& rh) {
+		return RectT<T>(x - rh.x, y - rh.y, width, height);
 	}
 
 	template <typename O>
-	gRectT<T> operator -(const SizeT<O>& rh) {
-		return gRectT<T>(x, y, width - rh.width, height - rh.height);
+	RectT<T> operator -(const SizeT<O>& rh) {
+		return RectT<T>(x, y, width - rh.width, height - rh.height);
 	}
 
-	gRectT<T> &operator +=(const gRectT<T>& rh) {
+	RectT<T> &operator +=(const RectT<T>& rh) {
 		x += rh.x;
 		y += rh.y;
 		width += rh.width;
@@ -396,20 +396,20 @@ struct GSPLASHER_API gRectT {
 	}
 
 	template <typename O>
-	gRectT<T> &operator +=(const PointT<O>& rh) {
+	RectT<T> &operator +=(const PointT<O>& rh) {
 		x += rh.x;
 		y += rh.y;
 		return *this;
 	}
 
 	template <typename O>
-	gRectT<T> &operator +=(const SizeT<O>& rh) {
+	RectT<T> &operator +=(const SizeT<O>& rh) {
 		width += rh.width;
 		height += rh.height;
 		return *this;
 	}
 
-	gRectT<T> &operator -=(const gRectT<T>& rh) {
+	RectT<T> &operator -=(const RectT<T>& rh) {
 		x -= rh.x;
 		y -= rh.y;
 		width -= rh.width;
@@ -418,48 +418,48 @@ struct GSPLASHER_API gRectT {
 	}
 
 	template <typename O>
-	gRectT<T> &operator -=(const PointT<O>& rh) {
+	RectT<T> &operator -=(const PointT<O>& rh) {
 		x -= rh.x;
 		y -= rh.y;
 		return *this;
 	}
 
 	template <typename O>
-	gRectT<T> &operator -=(const SizeT<O>& rh) {
+	RectT<T> &operator -=(const SizeT<O>& rh) {
 		width -= rh.width;
 		height -= rh.height;
 		return *this;
 	}
 
-	gRectT<T> operator +(const gRectT<T>& rh) {
-		return gRectT<T>(x + rh.x, y + rh.y, width + rh.width, height + rh.height);
+	RectT<T> operator +(const RectT<T>& rh) {
+		return RectT<T>(x + rh.x, y + rh.y, width + rh.width, height + rh.height);
 	}
 
 	template <typename O>
-	gRectT<T> operator +(const PointT<O>& rh) {
-		return gRectT<T>(x + rh.x, y + rh.y, width, height);
+	RectT<T> operator +(const PointT<O>& rh) {
+		return RectT<T>(x + rh.x, y + rh.y, width, height);
 	}
 
 	template <typename O>
-	gRectT<T> operator +(const SizeT<O>& rh) {
-		return gRectT<T>(x, y, width + rh.width, height + rh.height);
+	RectT<T> operator +(const SizeT<O>& rh) {
+		return RectT<T>(x, y, width + rh.width, height + rh.height);
 	}
 
-	gRectT<T> operator *(const gRectT<T>& rh) {
-		return gRectT<T>(x * rh.x, y * rh.y, width * rh.width, height * rh.height);
-	}
-
-	template <typename O>
-	gRectT<T> operator *(const PointT<O>& rh) {
-		return gRectT<T>(x * rh.x, y * rh.y, width, height);
+	RectT<T> operator *(const RectT<T>& rh) {
+		return RectT<T>(x * rh.x, y * rh.y, width * rh.width, height * rh.height);
 	}
 
 	template <typename O>
-	gRectT<T> operator *(const SizeT<O>& rh) {
-		return gRectT<T>(x, y, width * rh.width, height * rh.height);
+	RectT<T> operator *(const PointT<O>& rh) {
+		return RectT<T>(x * rh.x, y * rh.y, width, height);
 	}
 
-	gRectT<T> &operator *=(const gRectT<T>& rh) {
+	template <typename O>
+	RectT<T> operator *(const SizeT<O>& rh) {
+		return RectT<T>(x, y, width * rh.width, height * rh.height);
+	}
+
+	RectT<T> &operator *=(const RectT<T>& rh) {
 		x *= rh.x;
 		y *= rh.y;
 		width *= rh.width;
@@ -468,34 +468,34 @@ struct GSPLASHER_API gRectT {
 	}
 
 	template <typename O>
-	gRectT<T> &operator *=(const PointT<O>& rh) {
+	RectT<T> &operator *=(const PointT<O>& rh) {
 		x *= rh.x;
 		y *= rh.y;
 		return *this;
 	}
 
 	template <typename O>
-	gRectT<T> &operator *=(const SizeT<O>& rh) {
+	RectT<T> &operator *=(const SizeT<O>& rh) {
 		width *= rh.width;
 		height *= rh.height;
 		return *this;
 	}
 
-	gRectT<T> operator /(const gRectT<T>& rh) {
-		return gRectT<T>(x / rh.x, y / rh.y, width / rh.width, height / rh.height);
+	RectT<T> operator /(const RectT<T>& rh) {
+		return RectT<T>(x / rh.x, y / rh.y, width / rh.width, height / rh.height);
 	}
 
 	template <typename O>
-	gRectT<T> operator /(const PointT<O>& rh) {
-		return gRectT<T>(x / rh.x, y / rh.y, width, height);
+	RectT<T> operator /(const PointT<O>& rh) {
+		return RectT<T>(x / rh.x, y / rh.y, width, height);
 	}
 
 	template <typename O>
-	gRectT<T> operator /(const SizeT<O>& rh) {
-		return gRectT<T>(x, y, width / rh.width, height / rh.height);
+	RectT<T> operator /(const SizeT<O>& rh) {
+		return RectT<T>(x, y, width / rh.width, height / rh.height);
 	}
 
-	gRectT<T> &operator /=(const gRectT<T>& rh) {
+	RectT<T> &operator /=(const RectT<T>& rh) {
 		x /= rh.x;
 		y /= rh.y;
 		width /= rh.width;
@@ -504,20 +504,20 @@ struct GSPLASHER_API gRectT {
 	}
 
 	template <typename O>
-	gRectT<T> &operator /=(const PointT<O>& rh) {
+	RectT<T> &operator /=(const PointT<O>& rh) {
 		x /= rh.x;
 		y /= rh.y;
 		return *this;
 	}
 
 	template <typename O>
-	gRectT<T> &operator /=(const SizeT<O>& rh) {
+	RectT<T> &operator /=(const SizeT<O>& rh) {
 		width /= rh.width;
 		height /= rh.height;
 		return *this;
 	}
 
-	bool operator ==(const gRectT<T>& rh) {
+	bool operator ==(const RectT<T>& rh) {
 		return x == rh.x && y == rh.y && width == rh.width && height == rh.height;
 	}
 
@@ -531,7 +531,7 @@ struct GSPLASHER_API gRectT {
 		return width == rh.width && height == rh.height;
 	}
 
-	bool operator !=(const gRectT<T>& rh) {
+	bool operator !=(const RectT<T>& rh) {
 		return x != rh.x || y != rh.y || width != rh.width || height != rh.height;
 	}
 
@@ -545,7 +545,7 @@ struct GSPLASHER_API gRectT {
 		return width != rh.width || height != rh.height;
 	}
 
-	bool operator >(const gRectT<T>& rh) {
+	bool operator >(const RectT<T>& rh) {
 		return x > rh.x || y > rh.y || width > rh.width || height > rh.height;
 	}
 
@@ -559,7 +559,7 @@ struct GSPLASHER_API gRectT {
 		return width > rh.width || height > rh.height;
 	}
 
-	bool operator <(const gRectT<T>& rh) {
+	bool operator <(const RectT<T>& rh) {
 		return x < rh.y || y < rh.y || width < rh.width || height < rh.height;
 	}
 
@@ -587,11 +587,11 @@ struct GSPLASHER_API gRectT {
 
 	// operators for T
 
-	gRectT<T> operator -(T rh) {
-		return gRectT<T>(x - rh, y - rh, width - rh, height - rh);
+	RectT<T> operator -(T rh) {
+		return RectT<T>(x - rh, y - rh, width - rh, height - rh);
 	}
 
-	gRectT<T> &operator +=(T rh) {
+	RectT<T> &operator +=(T rh) {
 		x += rh;
 		y += rh;
 		width += rh;
@@ -599,7 +599,7 @@ struct GSPLASHER_API gRectT {
 		return *this;
 	}
 
-	gRectT<T> &operator -=(T rh) {
+	RectT<T> &operator -=(T rh) {
 		x -= rh;
 		y -= rh;
 		width -= rh;
@@ -607,15 +607,15 @@ struct GSPLASHER_API gRectT {
 		return *this;
 	}
 
-	gRectT<T> operator +(T rh) {
-		return gRectT<T>(x + rh, y + rh, width + rh, height + rh);
+	RectT<T> operator +(T rh) {
+		return RectT<T>(x + rh, y + rh, width + rh, height + rh);
 	}
 
-	gRectT<T> operator *(T rh) {
-		return gRectT<T>(x * rh, y * rh, width * rh, height * rh);
+	RectT<T> operator *(T rh) {
+		return RectT<T>(x * rh, y * rh, width * rh, height * rh);
 	}
 
-	gRectT<T> &operator *=(T rh) {
+	RectT<T> &operator *=(T rh) {
 		x *= rh;
 		y *= rh;
 		width *= rh;
@@ -623,11 +623,11 @@ struct GSPLASHER_API gRectT {
 		return *this;
 	}
 
-	gRectT<T> operator /(T rh) {
-		return gRectT<T>(x / rh, y / rh, width / rh, height / rh);
+	RectT<T> operator /(T rh) {
+		return RectT<T>(x / rh, y / rh, width / rh, height / rh);
 	}
 
-	gRectT<T> &operator /=(T rh) {
+	RectT<T> &operator /=(T rh) {
 		x /= rh;
 		y /= rh;
 		width /= rh;
@@ -665,15 +665,15 @@ struct GSPLASHER_API gRectT {
 };
 
 template<typename T>
-std::ostream &operator <<(std::ostream &out, const gRectT<T> &r) {
-	out << "gRect(" << r.x << ", " << r.y << ", " << r.width << ", " << r.height << ")";
+std::ostream &operator <<(std::ostream &out, const RectT<T> &r) {
+	out << "Rect(" << r.x << ", " << r.y << ", " << r.width << ", " << r.height << ")";
 	return out;
 }
 
-using gRect = gRectT<int>;
-using gRectF = gRectT<float>;
-using gRectD = gRectT<double>;
-using gRectU = gRectT<unsigned>;
+using Rect = RectT<int>;
+using RectF = RectT<float>;
+using RectD = RectT<double>;
+using RectU = RectT<unsigned>;
 
 class GSPLASHER_API gColor {
 public:

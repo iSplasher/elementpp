@@ -4,17 +4,17 @@
 
 NAMESPACE_BEGIN
 
-class gTopBar : public WidgetCore {
+class TopBar : public WidgetCore {
 public:
-	gTopBar();
-	~gTopBar();
+	TopBar(Window *w = nullptr);
+	~TopBar();
 
 	void paint(Painter &painter) override;
-	void update();
+	void update() override;
 
 private:
-	void setWindow(gWindow *w);
-	friend gWindow;
+	void setWindow(Window *w);
+	friend class Window;
 };
 
 NAMESPACE_END

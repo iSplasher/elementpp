@@ -43,7 +43,7 @@ void WidgetCore::event(EventPtr ev) {
 	LayoutCore::event(ev);
 }
 
-Point WidgetCore::pos() const {
+Point WidgetCore::pos() {
 
 	if (is_widget && !parent_widget) {
 		return Point();
@@ -67,15 +67,15 @@ void WidgetCore::setLayout(Layout& new_layout) {
 	new_layout.setWigdet(this);
 }
 
-Point WidgetCore::mapToParent(Point _p) const {
+Point WidgetCore::mapToParent(Point _p) {
 	return _p + pos();
 }
 
-Point WidgetCore::mapFromParent(Point _p) const {
+Point WidgetCore::mapFromParent(Point _p) {
 	return _p - pos();
 }
 
-Point WidgetCore::mapFromGlobal(Point p) const {
+Point WidgetCore::mapFromGlobal(Point p) {
 	auto w = this;
 
 	while (w) {
@@ -85,7 +85,7 @@ Point WidgetCore::mapFromGlobal(Point p) const {
 	return p;
 }
 
-Point WidgetCore::mapToGlobal(Point p) const {
+Point WidgetCore::mapToGlobal(Point p) {
 	auto w = this;
 
 	while (w) {
@@ -95,7 +95,7 @@ Point WidgetCore::mapToGlobal(Point p) const {
 	return p;
 }
 
-Point WidgetCore::mapFromWindow(Point p) const {
+Point WidgetCore::mapFromWindow(Point p) {
 	if (is_window) {
 		return p;
 	}
@@ -108,7 +108,7 @@ Point WidgetCore::mapFromWindow(Point p) const {
 	return p;
 }
 
-Point WidgetCore::mapToWindow(Point p) const {
+Point WidgetCore::mapToWindow(Point p) {
 	if (is_window) {
 		return p;
 	}
@@ -122,7 +122,7 @@ Point WidgetCore::mapToWindow(Point p) const {
 }
 
 void WidgetCore::mousePressEvent(MouseEventPtr ev) {
-	if (drag.is_draggable && flags(ev->button & MouseButton::Left) ) {
+	if (drag.is_draggable && flags(ev->button & MouseButton::Left)) {
 		move_state = MoveState::Moving;
 		drag.start_mouse_pos = mapToGlobal(ev->pos);
 		drag.start_pos = pos();
@@ -134,12 +134,13 @@ void WidgetCore::mousePressEvent(MouseEventPtr ev) {
 void WidgetCore::mouseMoveEvent(MouseEventPtr ev) {
 	if (ev->pos.x >= 0 && ev->pos.x < size().width && ev->pos.y >= 0 && ev->pos.y < size().height) {
 		under_mouse = true;
-	} else {
+	}
+	else {
 		under_mouse = false;
 	}
 
 	if (drag.is_draggable && move_state == MoveState::Moving) {
-		move(drag.start_pos+(mapToGlobal(ev->pos) - drag.start_mouse_pos));
+		move(drag.start_pos + (mapToGlobal(ev->pos) - drag.start_mouse_pos));
 	}
 
 	ev->ignore();

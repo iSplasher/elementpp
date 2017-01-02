@@ -32,16 +32,15 @@ LayoutCore::~LayoutCore()
 {
 }
 
-Point LayoutCore::pos() const
+void LayoutCore::event(EventPtr ev)
 {
-	Point p;
-	if (node)
-	{
-		p.x =YGNodeLayoutGetLeft(node);
-		p.y = YGNodeLayoutGetTop(node);
-	}
+	Core::event(ev);
+}
 
-	return p;
+Point LayoutCore::pos()
+{
+	updateGeometry();
+	return properties.position;
 }
 
 void LayoutCore::move(Point new_p)
@@ -51,22 +50,45 @@ void LayoutCore::move(Point new_p)
 
 void LayoutCore::resize(Size new_s)
 {
-	auto &s = properties.size;
-	if (node)
-	{
-		YGNodeStyleSetWidth(node, s.width);
-		YGNodeStyleSetHeight(node, s.height);
-		layout()->invalidate();
-		s.width = YGNodeLayoutGetWidth(node);
-		s.height = YGNodeLayoutGetHeight(node);
-		return;
-	}
-	s = new_s;
+	resizeEvent(std::make_shared<ResizeEvent>(Event::Type::Resize, new_s, size()));
 }
 
-Size LayoutCore::size() const
+Size LayoutCore::size()
 {
+	updateGeometry();
 	return properties.size;
+}
+
+void LayoutCore::resizeEvent(ResizeEventPtr ev)
+{
+	properties.size.width = ev->size.width;
+	properties.size.height = ev->size.height;
+	if (node)
+	{
+		YGNodeStyleSetWidth(node, properties.size.width);
+		YGNodeStyleSetHeight(node, properties.size.height);
+	}
+	if (playout)
+	{
+		playout->invalidate();
+	}
+
+}
+
+void LayoutCore::updateGeometry()
+{
+	if (dirty_layuot)
+	{
+		if (node)
+		{
+			auto &p = properties;
+			p.position.x = YGNodeLayoutGetLeft(node);
+			p.position.y = YGNodeLayoutGetTop(node);
+			p.size.width = YGNodeLayoutGetWidth(node);
+			p.size.height = YGNodeLayoutGetHeight(node);
+		}
+		dirty_layuot = false;
+	}
 }
 
 Layout::Layout(LayoutCore* parent) : LayoutCore(parent)
@@ -92,6 +114,7 @@ void Layout::setWigdet(WidgetCore* new_parent) {
 		new_parent->playout = this;
 		setParent(new_parent);
 		new_parent->bound_layout = this;
+		properties.size = new_parent->properties.size;
 		playout = this;
 	}
 	else {
@@ -99,7 +122,7 @@ void Layout::setWigdet(WidgetCore* new_parent) {
 	}
 }
 
-void Layout::appendItem(LayoutCore* item, Alignment align)
+void Layout::appendItem(LayoutCore* item, Alignment align, float grow)
 {
 	if (item->layout() == this)
 		return; // TODO: maybe warn?
@@ -116,10 +139,7 @@ void Layout::appendItem(LayoutCore* item, Alignment align)
 	YGNodeInsertChild(node, item->node, n);
 	nodemap.insert({ item->node, item });
 
-	// TODO
-	//switch (align)
-	//{
-	//}
+	applyItemProperties(item, align, grow);
 
 	invalidate();
 }
@@ -135,13 +155,23 @@ void Layout::takeItem(LayoutCore* item)
 }
 
 void Layout::invalidate() {
-	if (static_cast<LayoutCore*>(parentCore())->bound_layout == this)
+	auto p = static_cast<LayoutCore*>(parentCore());
+	if (parentCore() && p->bound_layout == this)
 	{
-		YGNodeCalculateLayout(node, properties.size.width, properties.size.height, YGDirectionInherit);
+		auto &pr = properties;
+		auto r = p->contentGeometry();
+		pr.size.width = r.width;
+		pr.size.height = r.height;
+		YGNodeCalculateLayout(node, pr.size.width, pr.size.height, YGDirectionInherit);
 	}
 	else
 	{
 		YGNodeCalculateLayout(node, YGUndefined, YGUndefined, YGDirectionInherit);
+	}
+
+	for (auto i : nodemap)
+	{
+		i.second->dirty_layuot = true;
 	}
 }
 
@@ -155,3 +185,34 @@ void Layout::event(EventPtr ev) {
 	LayoutCore::event(ev);
 }
 
+void Layout::applyItemProperties(LayoutCore* item, Alignment align, float grow)
+{
+	auto prop = item->properties;
+	if (grow > 0)
+	{
+		prop.grow = grow;
+		prop.shrink = 0;
+	}
+	else if (grow < 0)
+	{
+		prop.grow = 0;
+		prop.shrink = grow;
+	}
+	YGNodeStyleSetFlexGrow(item->node, prop.grow);
+	YGNodeStyleSetFlexShrink(item->node, prop.shrink);
+
+	YGNodeStyleSetMargin(item->node, YGEdgeLeft, prop.margin_left);
+	YGNodeStyleSetMargin(item->node, YGEdgeTop, prop.margin_top);
+	YGNodeStyleSetMargin(item->node, YGEdgeRight, prop.margin_right);
+	YGNodeStyleSetMargin(item->node, YGEdgeBottom, prop.margin_bottom);
+
+	YGNodeStyleSetBorder(item->node, YGEdgeLeft, prop.border_left);
+	YGNodeStyleSetBorder(item->node, YGEdgeTop, prop.border_top);
+	YGNodeStyleSetBorder(item->node, YGEdgeRight, prop.border_right);
+	YGNodeStyleSetBorder(item->node, YGEdgeBottom, prop.border_bottom);
+
+	YGNodeStyleSetPadding(item->node, YGEdgeLeft, prop.padding_left);
+	YGNodeStyleSetPadding(item->node, YGEdgeTop, prop.padding_top);
+	YGNodeStyleSetPadding(item->node, YGEdgeRight, prop.padding_right);
+	YGNodeStyleSetPadding(item->node, YGEdgeBottom, prop.padding_bottom);
+}

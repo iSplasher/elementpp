@@ -3,10 +3,10 @@
 
 USING_NAMESPACE
 
-int gEventManager::head;
-int gEventManager::tail;
+int EventManager::head;
+int EventManager::tail;
 
-gEvent::gEvent(const gEvent& other) {
+Event::Event(const Event& other) {
 	m_type = other.type();
 }
 
@@ -70,23 +70,23 @@ gEvent::gEvent(const gEvent& other) {
 //	}
 //}
 
-void gEventManager::init() {
+void EventManager::init() {
 	head = 0;
 	tail = 0;
 }
 
-void gEventManager::dispatchEvent(gCore* receiver, EventPtr ev) {
+void EventManager::dispatchEvent(Core* receiver, EventPtr ev) {
 	ev->receiver = receiver;
 
 	// TODO: no need for pair
 	eventqueue.push_back(std::make_pair(receiver, ev));
 }
 
-void gEventManager::processEv() {
+void EventManager::processEv() {
 	while (!eventqueue.empty()) {
 		EventPair &ev = eventqueue.front();
-		if (gApp) {
-			gApp->sendEvent(ev.first, ev.second);
+		if (App) {
+			App->sendEvent(ev.first, ev.second);
 		}
 		eventqueue.erase(eventqueue.begin());
 	}

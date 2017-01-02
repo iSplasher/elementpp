@@ -1,11 +1,11 @@
-/// <summary>
-/// Here is where stuff is tested!
-/// </summary>
+ //<summary>
+ //Here is where stuff is tested!
+ //</summary>
 #include "gSplasher/Window.h"
 #include "gSplasher/Utils/Primitives.h"
-#include "gSplasher/Layouts/BoxLayout.h"
 #include "gSplasher/Global.h"
 #include "gSplasher/Widget.h"
+#include "gSplasher/Layout.h"
 
 USING_NAMESPACE
 
@@ -22,7 +22,7 @@ public:
 		p.setWidth(0.8);
 		gBrush b(painter);
 		b.setColor(gColor(255, 0, 0));
-		painter.drawRect(gRect(0, 0, size()));
+		painter.drawRect(Rect(0, 0, size()));
 	}
 };
 
@@ -39,7 +39,7 @@ public:
 		p.setColor(gColor(255, 0, 0));
 		p.setWidth(0.8);
 		b.setColor(gColor(0, 255, 0));
-		painter.drawRect(gRect(0, 0, size()));
+		painter.drawRect(Rect(0, 0, size()));
 	}
 };
 
@@ -56,20 +56,20 @@ int main() {
 	//MyWidget *mywidget7 = new MyWidget(window);
 	//MyWidget *mywidget8 = new MyWidget(window);
 
-	gBoxLayout<Orientation::Horizontal> *layout = new gBoxLayout<Orientation::Horizontal>{window};
-	gBoxLayout<Orientation::Horizontal> *layout2 = new gBoxLayout<Orientation::Horizontal>;
-	layout->add(mywidget);
-	layout->add(mywidget2);
-	layout->add(mywidget3);
-	layout->add(layout2);
-	layout2->add(mywidget4);
-	layout2->add(mywidget5);
+	Layout *layout = new Layout(window);
+	Layout *layout2 = new Layout;
+	layout->appendItem(mywidget);
+	layout->appendItem(mywidget2);
+	layout->appendItem(mywidget3);
+	layout->appendItem(layout2);
+	layout2->appendItem(mywidget4);
+	layout2->appendItem(mywidget5);
 	//layout.add(mywidget6);
 	//layout.add(mywidget7);
 	//layout.add(mywidget8);
 
-	mywidget4->setFixedHeight(100);
-	mywidget4->setFixedWidth(450);
+	//mywidget4->setFixedHeight(100);
+	//mywidget4->setFixedWidth(450);
 	//std::cout << "mywidget to window " << mywidget->mapToWindow(Point(0, 0)) << std::endl;
 	//std::cout << "mywidget2 to window " << mywidget2->mapToWindow(Point(0, 0)) << std::endl;
 	//std::cout << "mywidget3 " << mywidget3->mapFromGlobal(Point(0, 0)) << std::endl;
@@ -104,3 +104,44 @@ int main() {
 	return 0;
 }
 
+//#include <yoga/Yoga.h>
+//#include <iostream>
+//
+//void print(YGNodeRef n, char name[])
+//{
+//	std::cout << name << "{ " <<
+//		YGNodeLayoutGetLeft(n) << ", " <<
+//		YGNodeLayoutGetTop(n) << ", " <<
+//		YGNodeLayoutGetWidth(n) << ", " <<
+//		YGNodeLayoutGetHeight(n) <<
+//		" }" << std::endl;
+//
+//}
+//
+//int main() {
+//
+//	YGNodeRef root = YGNodeNew();
+//	YGNodeStyleSetFlexDirection(root, YGFlexDirectionRow);
+//	//YGNodeStyleSetJustifyContent(root, YGJustifyFlexStart);
+//	//YGNodeStyleSetAlignItems(root, YGAlignStretch);
+//
+//	//YGNodeStyleSetWidth(root, 500);
+//	//YGNodeStyleSetHeight(root, 120);
+//
+//	YGNodeRef child1 = YGNodeNew();
+//	YGNodeStyleSetFlexGrow(child1, 1);
+//	YGNodeRef child2 = YGNodeNew();
+//	YGNodeStyleSetFlexGrow(child2, 1);
+//
+//	YGNodeInsertChild(root, child1, 0);
+//	YGNodeInsertChild(root, child2, 1);
+//
+//	YGNodeCalculateLayout(root, 500, 120, YGDirectionLTR);
+//	print(root, "Root");
+//	print(child1, "Child1");
+//	print(child2, "Child2");
+//
+//	YGNodeFreeRecursive(root);
+//	return 0;
+//}
+//
