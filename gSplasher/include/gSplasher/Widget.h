@@ -8,10 +8,10 @@ typedef struct NVGcontext PainterContext;
 NAMESPACE_BEGIN
 
 class Painter;
-class Window;
+class RWindow;
 
 /// <summary>
-/// Core widget. A very basic widget. Can be used as a container for other widgets
+/// Component widget. A very basic widget. Can be used as a container for other widgets
 /// </summary>
 class GSPLASHER_API WidgetCore : public priv::LayoutCore {
 public:
@@ -33,7 +33,7 @@ public:
 	virtual ~WidgetCore();
 
 	// member methods
-	Window* parentWindow() const { return parent_window; }
+	RWindow* parentWindow() const { return parent_window; }
 	virtual void paint(Painter &painter);
 	void update() override;
 	virtual void event(EventPtr ev);
@@ -108,7 +108,7 @@ protected:
 	virtual void mouseReleaseEvent(MouseEventPtr ev);
 
 	// data members
-	Window *parent_window = nullptr;
+	RWindow *parent_window = nullptr;
 	WidgetCore *parent_widget;
 	MoveState move_state = Normal;
 	gFont _font;
@@ -116,8 +116,6 @@ protected:
 	Drag drag;
 
 private:
-	void updateChildren();
-
 	//Point move_offset;
 	bool under_mouse = false;
 

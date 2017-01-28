@@ -17,8 +17,8 @@ USING_NAMESPACE
 
 // helper functions
 
-static Window* getWindow(GLFWwindow* r_window) {
-	return static_cast<Window*>(glfwGetWindowUserPointer(r_window));
+static RWindow* getWindow(GLFWwindow* r_window) {
+	return static_cast<RWindow*>(glfwGetWindowUserPointer(r_window));
 }
 
 static MouseButton getMouseButtons(GLFWwindow* r_window) {
@@ -145,7 +145,7 @@ static void mousePressCallback(GLFWwindow* r_window, int button, int action, int
 
 // Callbacks end
 
-Window::Window(Size s, Window* parent) : WidgetCore(parent) {
+RWindow::RWindow(Size s, RWindow* parent) : WidgetCore(parent) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -189,19 +189,19 @@ Window::Window(Size s, Window* parent) : WidgetCore(parent) {
 
 	top_bar = std::make_unique<TopBar>();
 
-	Window::move(Point(500, 300));
-	Window::resizeEvent(std::make_shared<ResizeEvent>(Event::Type::Resize, s, LayoutCore::size()));
+	RWindow::move(Point(500, 300));
+	RWindow::resizeEvent(std::make_shared<ResizeEvent>(Event::Type::Resize, s, LayoutCore::size()));
 	top_bar->setWindow(this);
-	setObjectName("Window");
+	objectName = "RWindow";
 }
 
-Window::~Window() {
+RWindow::~RWindow() {
 	if (r_window) {
 		glfwDestroyWindow(r_window);
 	}
 }
 
-void Window::update() {
+void RWindow::update() {
 	int fb_width;
 	int fb_height;
 	auto s = size();
@@ -227,37 +227,37 @@ void Window::update() {
 	}
 }
 
-//Point Window::pos() {
+//Point RWindow::pos() {
 //	return r_window->getPosition();
 //}
 
-void Window::move(Point new_p) {
+void RWindow::move(Point new_p) {
 	WidgetCore::move(new_p);
 	auto p = pos();
 	glfwSetWindowPos(r_window, p.x, p.y);
 }
 
-Rect Window::contentGeometry()
+Rect RWindow::contentGeometry()
 {
 	auto r = geometry();
 	r.height -= top_bar->size().height;
 	return r;
 }
 
-void Window::resizeEvent(ResizeEventPtr ev) {
+void RWindow::resizeEvent(ResizeEventPtr ev) {
 	LayoutCore::resizeEvent(ev);
 	auto s = size();
 	glfwSetWindowSize(r_window, s.width, s.height); // TODO: confirm size
 }
 
-void Window::paint(Painter& painter) {
+void RWindow::paint(Painter& painter) {
 	gBrush b(painter);
 	b.setColor(gColor(250, 250, 250, 200));
 
 	painter.drawRect(Rect(Point(0, 0), size()));
 }
 
-void Window::setActive() const {
+void RWindow::setActive() const {
 	glfwMakeContextCurrent(r_window);
 }
 

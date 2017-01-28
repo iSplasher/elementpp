@@ -2,17 +2,19 @@
 
 #include "Global.h"
 #include "Utils/Primitives.h"
-#include "Utils/CoreUtils.h"
 
 #include <vector>
 #include <utility>
+#include <functional>
+#include <memory>
+#include <list>
 #ifdef _DEBUG
 #include <string>
 #endif
 
 NAMESPACE_BEGIN
 
-class Core;
+class Component;
 class EventManager;
 
 /// <summary>
@@ -113,10 +115,10 @@ struct GSPLASHER_API Event {
 
 protected:
 	Type m_type;
-	Core* receiver = nullptr;
+	Component* receiver = nullptr;
 
 	friend class EventManager;
-	friend class Core;
+	friend class Component;
 
 private:
 	bool ignored = false;
@@ -192,7 +194,7 @@ using ResizeEventPtr = std::shared_ptr<ResizeEvent>;
 /// Manages events
 /// </summary>
 class EventManager {
-	using EventPair = std::pair<Core*, EventPtr>;
+	using EventPair = std::pair<Component*, EventPtr>;
 	using EventQueue = std::vector<EventPair>;
 
 
@@ -210,9 +212,9 @@ public:
 	/// <summary>
 	/// Dispatch event to the event loop
 	/// </summary>
-	/// <param name="receiver">a pointer to a Core object</param>
+	/// <param name="receiver">a pointer to a Component object</param>
 	/// <param name="event">a shared pointer to an Event or its deratives</param>
-	void dispatchEvent(Core*, EventPtr);
+	void dispatchEvent(Component*, EventPtr);
 
 	/// <summary>
 	/// Processes events in the event queue

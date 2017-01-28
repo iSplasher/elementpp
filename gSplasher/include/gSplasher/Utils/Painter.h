@@ -86,7 +86,7 @@ class TopBar;
 
 class GSPLASHER_API Painter {
 public:
-	Painter(Window*);
+	Painter(RWindow*);
 	~Painter();
 
 	/// <summary>

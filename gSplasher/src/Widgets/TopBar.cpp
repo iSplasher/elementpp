@@ -4,7 +4,7 @@
 
 USING_NAMESPACE
 
-TopBar::TopBar(Window* w) : WidgetCore(w)
+TopBar::TopBar(RWindow* w) : WidgetCore(w)
 {
 	if (w)
 		setWindow(w);
@@ -35,7 +35,7 @@ void TopBar::update()
 	}
 }
 
-void TopBar::setWindow(Window* w) {
+void TopBar::setWindow(RWindow* w) {
 	if (w)
 	{
 		parent_window = w;

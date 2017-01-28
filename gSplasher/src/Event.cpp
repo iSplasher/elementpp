@@ -75,7 +75,7 @@ void EventManager::init() {
 	tail = 0;
 }
 
-void EventManager::dispatchEvent(Core* receiver, EventPtr ev) {
+void EventManager::dispatchEvent(Component* receiver, EventPtr ev) {
 	ev->receiver = receiver;
 
 	// TODO: no need for pair

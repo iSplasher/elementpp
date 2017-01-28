@@ -6,7 +6,7 @@
 USING_NAMESPACE
 
 WidgetCore::WidgetCore(WidgetCore* parent) : LayoutCore(parent) {
-	setObjectName("Widget");
+	objectName = "Widget";
 }
 
 WidgetCore::~WidgetCore() {
@@ -23,7 +23,6 @@ void WidgetCore::update() {
 	painter.current_widget = this;
 	paint(painter);
 	painter.restore();
-	updateChildren();
 }
 
 void WidgetCore::event(EventPtr ev) {
@@ -60,7 +59,7 @@ void WidgetCore::setParent(WidgetCore* new_parent) {
 	else {
 		parent_window = nullptr;
 	}
-	LayoutCore::setParent(new_parent);
+	this->parent = new_parent;
 }
 
 void WidgetCore::setLayout(Layout& new_layout) {
@@ -151,10 +150,3 @@ void WidgetCore::mouseReleaseEvent(MouseEventPtr ev) {
 	ev->ignore();
 }
 
-void WidgetCore::updateChildren() {
-	for (auto &c : children()) {
-		if (c->is_widget) {
-			static_cast<WidgetCore*>(c)->update();
-		}
-	}
-}

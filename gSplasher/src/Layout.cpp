@@ -18,14 +18,14 @@ YGFlexDirection getOrientation(Orientation o, bool reverse)
 	}
 }
 
-LayoutCore::LayoutCore(LayoutCore* parent) : Core(parent)
+LayoutCore::LayoutCore(LayoutCore* parent) : Component(parent)
 {
-	Core::setParent(parent);
 	if (parent && parent->is_layout)
 	{
 		auto l = static_cast<Layout*>(parent);
 		l->appendItem(this);
 	}
+	this->parent = parent;
 }
 
 LayoutCore::~LayoutCore()
@@ -34,7 +34,12 @@ LayoutCore::~LayoutCore()
 
 void LayoutCore::event(EventPtr ev)
 {
-	Core::event(ev);
+	Component::event(ev);
+}
+
+void LayoutCore::update()
+{
+	updateChildren();
 }
 
 Point LayoutCore::pos()
@@ -75,6 +80,13 @@ void LayoutCore::resizeEvent(ResizeEventPtr ev)
 
 }
 
+void LayoutCore::updateChildren()
+{
+	for (auto &c : children()) {
+		static_cast<LayoutCore*>(c)->update();
+	}
+}
+
 void LayoutCore::updateGeometry()
 {
 	if (dirty_layuot)
@@ -106,13 +118,13 @@ Layout::Layout(LayoutCore* parent) : LayoutCore(parent)
 		properties = l->properties;
 	}
 
-	setObjectName("Layout");
+	objectName = "Layout";
 }
 
 void Layout::setWigdet(WidgetCore* new_parent) {
 	if (!new_parent->layout()) {
 		new_parent->playout = this;
-		setParent(new_parent);
+		this->parent = new_parent;
 		new_parent->bound_layout = this;
 		properties.size = new_parent->properties.size;
 		playout = this;
@@ -126,6 +138,8 @@ void Layout::appendItem(LayoutCore* item, Alignment align, float grow)
 {
 	if (item->layout() == this)
 		return; // TODO: maybe warn?
+
+	noOwnership(item);
 
 	if (item->layout())
 		item->layout()->takeItem(item);
@@ -155,8 +169,12 @@ void Layout::takeItem(LayoutCore* item)
 }
 
 void Layout::invalidate() {
-	auto p = static_cast<LayoutCore*>(parentCore());
-	if (parentCore() && p->bound_layout == this)
+	LayoutCore* p = nullptr;
+	Component* pa = parent;
+	if (parent)
+		p = static_cast<LayoutCore*>(pa);
+
+	if (p && p->bound_layout == this)
 	{
 		auto &pr = properties;
 		auto r = p->contentGeometry();
@@ -215,4 +233,9 @@ void Layout::applyItemProperties(LayoutCore* item, Alignment align, float grow)
 	YGNodeStyleSetPadding(item->node, YGEdgeTop, prop.padding_top);
 	YGNodeStyleSetPadding(item->node, YGEdgeRight, prop.padding_right);
 	YGNodeStyleSetPadding(item->node, YGEdgeBottom, prop.padding_bottom);
+}
+
+void Layout::noOwnership(LayoutCore* item)
+{
+	if (parent) {}
 }

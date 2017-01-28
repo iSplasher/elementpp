@@ -20,7 +20,7 @@ typedef YGNodeRef LayoutNode;
 /// <summary>
 /// Derived class can be managed by a layout
 /// </summary>
-class GSPLASHER_API LayoutCore : public Core {
+class GSPLASHER_API LayoutCore : public Component {
 public:
 	// *structers
 	LayoutCore(LayoutCore* parent = nullptr);
@@ -32,7 +32,7 @@ public:
 	//void setFixedHeight(int height);
 
 	virtual void event(EventPtr ev);
-	virtual void update() = 0;
+	virtual void update();
 	//virtual Rect contentsRect();
 	//virtual Rect contentsMargin();
 	//int margin() const;
@@ -107,7 +107,7 @@ protected:
 	//virtual Rect setContentsRect(Rect r);
 
 private:
-
+	virtual void updateChildren();
 	void updateGeometry();
 
 	// data members
@@ -172,6 +172,7 @@ private:
 	// member methods
 	void update() override {};
 	void applyItemProperties(LayoutCore *item, Alignment align, float grow);
+	void noOwnership(LayoutCore* item);
 	void setFixedWidth(int width) {}
 	void setFixedheight(int height) {}
 

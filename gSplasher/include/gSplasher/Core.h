@@ -2,6 +2,7 @@
 
 #include "Global.h"
 #include "Event.h"
+#include "Property.h"
 #include "Utils/Tree.h" // TODO: move this to cpp and forward declare tree class
 
 #include <atomic>
@@ -9,59 +10,59 @@
 
 NAMESPACE_BEGIN
 
-class Window;
+class Component;
+using ComponentPtr = std::unique_ptr<Component>;
+class RWindow;
 class Application;
 
 /// <summary>
-/// Core object of the whole library. 
+/// Component object of the whole library. 
 /// </summary>
-class GSPLASHER_API Core {
+class GSPLASHER_API Component {
 public:
-	Core(Core *parent = nullptr);
-	virtual ~Core();
 
-	//logD(std::string);
-	//logE(std::string);
-	//logW(std::string);
-	//logI(std::string);
+	// META
 
-	std::string objectName() const { return object_name; }
-	void setObjectName(std::string name) { object_name = name; }
+	Component();
+	explicit Component(ComponentPtr &parent);
+	virtual ~Component();
 
-	/// <summary>
-	/// Events are received here
-	/// </summary>
-	/// <param name="ev">A Event object.</param>
-	virtual void event(EventPtr ev);
+	// move
 
-	/// <summary>
-	/// Retrieve a pointer to parent Core
-	/// </summary>
-	/// <returns>Core*</returns>
-	Core* parentCore() const { return core_parent; }
+	// not copyable
+	Component(const Component&) = delete;
+	Component& operator=(const Component&) = delete;
 
-	/// <summary>
-	/// Change parent of Core object
-	/// </summary>
-	/// <param name="new_parent">The new parent object</param>
-	virtual void setParent(Core*);
+	// PROPERTIES
 
-	std::vector<Core*> children();
+	Property<std::string> objectName;
 
-	// data members
+	std::vector<ComponentPtr*> children();
+
+	// FUNCTIONS
+
+	ComponentPtr& getParent() const;
+	void setParent(ComponentPtr&);
+
+	// DATA
+
 	bool is_widget = false;
 	bool is_window = false;
 
 private:
-	// methods
+	using ComponentTree = tree<ComponentPtr*>;
+
+	// FUNCTIONS
+
 	//log(LogLevel, std::string);
 
-	// data members
-	Core* core_parent;
+	// DATA
+	ComponentPtr *parent = nullptr;
 	unsigned core_id;
-	std::string object_name = "Core";
 	static std::atomic<unsigned> id_counter;
-	tree<Core*>::iterator internal_tree;
+	static ComponentPtr nulltype;
+	ComponentTree::iterator internal_tree;
+
 	/// <summary>
 	/// Used by parent to let us know if we should remove ourselves
 	/// from the internal tree container
@@ -78,35 +79,48 @@ private:
 /// <summary>
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
-class GSPLASHER_API Application final : private Core{
+class GSPLASHER_API Application final : private Component{
 public:
-	using CoreList = tree<Core*>;
-	using CoreListPtr = std::unique_ptr<CoreList>;
+	using ComponentContainer = std::vector<ComponentPtr>;
+	using ComponentContainerPtr = std::unique_ptr<ComponentContainer>;
+	using ComponentTreePtr = std::unique_ptr<ComponentTree>;
+
+	/**
+	 * \brief
+	 */
 	Application();
 	~Application();
 
 	// member methods
+	template<class T, typename... Args>
+	std::unique_ptr<T>& createItem(Args... args);
 	int exec();
-	void event(EventPtr) override;
-	void sendEvent(Core* reciever, EventPtr);
-	void dispatchEvent(Core* reciever, EventPtr);
 	static Application *instance();
-	bool isRunning() const { return is_running; }
-
-	void print_tree(CoreList::const_iterator &t) const {
-		for (CoreList::const_iterator i = t.begin();
-		i != t.end(); ++i)
-		{
-			for (int tabs = 1; tabs < i.level(); ++tabs)
-				std::cout << "\t";
-			std::cout << i.data()->object_name << std::endl;
-
-			print_tree(i);
-		}
-	}
 
 	// data members
-	CoreListPtr core_objects;
+	Property<bool> isRunning; // TODO: Read-only property
+
+
+	void print_tree() const {
+
+		std::function<void(const ComponentTree::const_iterator &t)> pp = [&](const ComponentTree::const_iterator &t)
+		{
+
+			for (ComponentTree::const_iterator i = t.begin();
+				i != t.end(); ++i)
+			{
+				for (int tabs = 1; tabs < i.level(); ++tabs)
+					std::cout << "\t";
+
+				std::string p = (*i.data())->objectName;
+
+				std::cout << p << std::endl;
+
+				pp(i);
+			}};
+		pp(*component_tree);
+	}
+
 private:
 	Application(const Application&) {}
 
@@ -117,22 +131,35 @@ private:
 	/// <returns>false if application should quit else true</returns>
 	bool processEv() const;
 
-	/// <summary>
-	/// Inserts Core pointer to keep list in sync
-	/// </summary>
-	/// <param name="Core*">a pointer to the Core object</param>
-	void insertCore(Core*) const;
-
 	// data members
 	static Application *self;
-	EventManager event_manager;
 	bool should_quit = false;
 	bool is_running = false;
 
-	friend class Window;
-	friend class Core;
+	ComponentContainerPtr component_objects;
+	ComponentTreePtr component_tree;
+
+	friend class RWindow;
+	friend class Component;
 };
 
+template <class T, typename ... Args>
+std::unique_ptr<T>& Application::createItem(Args... args)
+{
+	static_assert(std::is_base_of<Component, T>::value, "Must be same or inherited of Component");
+	component_objects->push_back(std::move(std::make_unique<T>(std::forward<Args>(args)...)));
+	auto &item = component_objects->back();
+
+	if (item->getParent())
+	{
+		item->internal_tree = item->getParent()->internal_tree.push_back(&item);
+	} else
+	{
+		item->internal_tree = component_tree->push_back(&item);
+	}
+
+	return item;
+}
 
 NAMESPACE_END
 

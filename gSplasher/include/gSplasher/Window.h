@@ -10,12 +10,12 @@ NAMESPACE_BEGIN
 /// <summary>
 /// A window. 
 /// </summary>
-class GSPLASHER_API Window : public WidgetCore {
+class GSPLASHER_API RWindow : public WidgetCore {
 public:
 	using TopBarPtr = std::unique_ptr<TopBar>;
-	explicit Window(Window* parent = nullptr) : Window(Size(500, 300), parent) {}
-	explicit Window(Size size, Window* parent = nullptr);
-	virtual ~Window();
+	explicit RWindow(RWindow* parent = nullptr) : RWindow(Size(500, 300), parent) {}
+	explicit RWindow(Size size, RWindow* parent = nullptr);
+	virtual ~RWindow();
 
 	// methods
 	TopBarPtr& topBar() { return top_bar; }
@@ -47,7 +47,7 @@ private:
 	bool _inited = false;
 
 	UniquePainter painter;
-	// Top bar of Window
+	// Top bar of RWindow
 	TopBarPtr top_bar;
 	// render window
 	_privRWindow *r_window;

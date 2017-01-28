@@ -8,9 +8,12 @@
 #define GSP_VERSION_MAJOR 0
 #define GSP_VERSION_MINOR 1
 #define GSP_VERSION_PATCH 0
-#define USING_NAMESPACE using namespace gsp;
-#define USING_NAMESPACE_PRIV using namespace gsp::priv;
-#define NAMESPACE_BEGIN namespace gsp {
+#define NAMESPACE gsp
+#define PRIV_NAMESPACE priv
+#define USING_NAMESPACE using namespace NAMESPACE;
+#define USING_NAMESPACE_PRIV using namespace NAMESPACE::PRIV_NAMESPACE;
+#define PRIV_NAMESPACE_BEGIN namespace PRIV_NAMESPACE {
+#define NAMESPACE_BEGIN namespace NAMESPACE {
 #define NAMESPACE_END }
 
 // Define system
@@ -101,6 +104,5 @@ enum class KeyModifier {
 	Alt = 0x4,
 	Meta = 0x8
 };
-
 
 NAMESPACE_END

@@ -100,7 +100,7 @@ void gBrush::apply() const {
 	}
 }
 
-gsp::Painter::Painter(Window* window) {
+gsp::Painter::Painter(RWindow* window) {
 	w = window;
 	if (!w->this_paint) {
 		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);

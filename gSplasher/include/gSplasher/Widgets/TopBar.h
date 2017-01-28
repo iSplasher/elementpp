@@ -6,15 +6,15 @@ NAMESPACE_BEGIN
 
 class TopBar : public WidgetCore {
 public:
-	TopBar(Window *w = nullptr);
+	TopBar(RWindow *w = nullptr);
 	~TopBar();
 
 	void paint(Painter &painter) override;
 	void update() override;
 
 private:
-	void setWindow(Window *w);
-	friend class Window;
+	void setWindow(RWindow *w);
+	friend class RWindow;
 };
 
 NAMESPACE_END
