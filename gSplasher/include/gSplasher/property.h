@@ -90,8 +90,8 @@ public:
 	Property() : reactive(react::MakeVar<PRIV_NAMESPACE::D>(T())) {
 	}
 
-	Property(const T value) : reactive(react::MakeVar<PRIV_NAMESPACE::D>(value))
-	{
+	template <typename ... Args>
+	explicit Property(Args... args) : reactive(react::MakeVar<PRIV_NAMESPACE::D>(T(std::forward<Args>(args)...))) {
 	}
 
 	/// <summary>
@@ -100,7 +100,7 @@ public:
 	/// <param name="value"></param>
 	/// <returns></returns>
 	auto operator=(T value) {
-		reactive <<= value;
+		reactive <<= std::forward<T>(value);
 		return *this;
 	}
 
@@ -108,8 +108,8 @@ public:
 	/// bool(property)
 	/// </summary>
 	/// <returns></returns>
-	//operator bool() const {
-	//	return reactive.Value() ? true : false;
+	//explicit operator bool() const {
+	//	return reactive ? true : false;
 
 	//}
 
@@ -117,7 +117,7 @@ public:
 	/// property->member
 	/// </summary>
 	/// <returns></returns>
-	T operator->() const
+	T operator->()
 	{
 		return reactive.Value();
 	}

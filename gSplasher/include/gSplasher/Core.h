@@ -30,7 +30,6 @@ public:
 	// move
 
 	// not copyable
-	Component(const Component&) = delete;
 	Component& operator=(const Component&) = delete;
 
 	// PROPERTIES
@@ -81,7 +80,7 @@ private:
 /// </summary>
 class GSPLASHER_API Application final : private Component{
 public:
-	using ComponentContainer = std::vector<ComponentPtr>;
+	using ComponentContainer = std::list<ComponentPtr>;
 	using ComponentContainerPtr = std::unique_ptr<ComponentContainer>;
 	using ComponentTreePtr = std::unique_ptr<ComponentTree>;
 
@@ -112,9 +111,7 @@ public:
 				for (int tabs = 1; tabs < i.level(); ++tabs)
 					std::cout << "\t";
 
-				std::string p = (*i.data())->objectName;
-
-				std::cout << p << std::endl;
+				std::cout << (*i.data())->objectName << std::endl;
 
 				pp(i);
 			}};
@@ -147,7 +144,7 @@ template <class T, typename ... Args>
 std::unique_ptr<T>& Application::createItem(Args... args)
 {
 	static_assert(std::is_base_of<Component, T>::value, "Must be same or inherited of Component");
-	component_objects->push_back(std::move(std::make_unique<T>(std::forward<Args>(args)...)));
+	component_objects->push_back(std::make_unique<T>(std::forward<Args>(args)...));
 	auto &item = component_objects->back();
 
 	if (item->getParent())

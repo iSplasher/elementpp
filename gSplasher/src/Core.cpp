@@ -10,9 +10,8 @@ std::atomic<unsigned> Component::id_counter;
 ComponentPtr Component::nulltype = ComponentPtr();
 Application* Application::self = nullptr;
 
-Component::Component() : objectName(), core_id(++id_counter)
+Component::Component() : objectName("Component" + std::to_string(++id_counter)), core_id(id_counter)
 {
-	objectName = "Component";
 }
 
 Component::Component(ComponentPtr& parent) : Component()

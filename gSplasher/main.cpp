@@ -6,15 +6,17 @@
 USING_NAMESPACE
 
 int main() {
+
 	Application app;
 
 	auto &item1 = app.createItem<Component>();
 	auto &item2 = app.createItem<Component>();
-	//auto &item3 = app.createItem<Component>();
+	auto &item3 = app.createItem<Component>();
 
 	app.print_tree();
 
 	return app.exec();
+
 }
 
 //#include <yoga/Yoga.h>
