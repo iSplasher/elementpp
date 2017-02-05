@@ -86,6 +86,7 @@ class Property<T, Write>
 {
 	using Reactive = PRIV_NAMESPACE::VarSignalT<T>;
 	using func = std::function<void(T)>;
+
 public:
 	Property() : reactive(react::MakeVar<PRIV_NAMESPACE::D>(T())) {
 	}
@@ -103,15 +104,6 @@ public:
 		reactive <<= std::forward<T>(value);
 		return *this;
 	}
-
-	/// <summary>
-	/// bool(property)
-	/// </summary>
-	/// <returns></returns>
-	//explicit operator bool() const {
-	//	return reactive ? true : false;
-
-	//}
 
 	/// <summary>
 	/// property->member

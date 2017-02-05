@@ -14,15 +14,15 @@ Component::Component() : objectName("Component" + std::to_string(++id_counter)),
 {
 }
 
-Component::Component(ComponentPtr& parent) : Component()
+Component::Component(ComponentPtr *parent) : Component()
 {
-	this->parent = &parent;
+	this->parent = parent;
 }
 
 Component::~Component() {
 	// first we traverse the tree to tell our children that
 	// they shouldn't touch their internal tree.
-	// we also delete the cildrens
+	// we also delete the children
 
 	if (!parent_is_deleting) {
 		for (auto iter = internal_tree.begin(); iter != internal_tree.end(); ++iter)

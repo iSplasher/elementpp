@@ -24,7 +24,7 @@ public:
 	// META
 
 	Component();
-	explicit Component(ComponentPtr &parent);
+	explicit Component(ComponentPtr *parent);
 	virtual ~Component();
 
 	// move
@@ -36,12 +36,11 @@ public:
 
 	Property<std::string> objectName;
 
-	std::vector<ComponentPtr*> children();
-
 	// FUNCTIONS
 
 	ComponentPtr& getParent() const;
 	void setParent(ComponentPtr&);
+	std::vector<ComponentPtr*> children();
 
 	// DATA
 
@@ -79,28 +78,51 @@ private:
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
 class GSPLASHER_API Application final : private Component{
-public:
 	using ComponentContainer = std::list<ComponentPtr>;
 	using ComponentContainerPtr = std::unique_ptr<ComponentContainer>;
 	using ComponentTreePtr = std::unique_ptr<ComponentTree>;
 
-	/**
-	 * \brief
-	 */
+public:
+
+	// META
+
 	Application();
 	~Application();
 
-	// member methods
+	// FUNCTIONS
+
+	/// <summary>
+	/// Create Component objects
+	/// </summary>
 	template<class T, typename... Args>
-	std::unique_ptr<T>& createItem(Args... args);
+	std::unique_ptr<T>& create(Args... args);
+
+	/// <summary>
+	/// Delete Component objects
+	/// </summary>
+	template<class T>
+	void destroy(T&);
+
+	/// <summary>
+	/// Start application, blocking
+	/// </summary>
+	/// <returns></returns>
 	int exec();
+
+	/// <summary>
+	/// Get Application singleton instance
+	/// </summary>
+	/// <returns></returns>
 	static Application *instance();
 
-	// data members
+	// PROPERTIES
+
 	Property<bool> isRunning; // TODO: Read-only property
 
 
 	void print_tree() const {
+
+		std::cout << objectName << std::endl;
 
 		std::function<void(const ComponentTree::const_iterator &t)> pp = [&](const ComponentTree::const_iterator &t)
 		{
@@ -108,7 +130,7 @@ public:
 			for (ComponentTree::const_iterator i = t.begin();
 				i != t.end(); ++i)
 			{
-				for (int tabs = 1; tabs < i.level(); ++tabs)
+				for (int tabs = 0; tabs < i.level(); ++tabs)
 					std::cout << "\t";
 
 				std::cout << (*i.data())->objectName << std::endl;
@@ -140,8 +162,9 @@ private:
 	friend class Component;
 };
 
+
 template <class T, typename ... Args>
-std::unique_ptr<T>& Application::createItem(Args... args)
+std::unique_ptr<T>& Application::create(Args... args)
 {
 	static_assert(std::is_base_of<Component, T>::value, "Must be same or inherited of Component");
 	component_objects->push_back(std::make_unique<T>(std::forward<Args>(args)...));
@@ -150,12 +173,21 @@ std::unique_ptr<T>& Application::createItem(Args... args)
 	if (item->getParent())
 	{
 		item->internal_tree = item->getParent()->internal_tree.push_back(&item);
-	} else
+	}
+	else
 	{
 		item->internal_tree = component_tree->push_back(&item);
 	}
 
 	return item;
+}
+
+template <class T>
+void Application::destroy(T& object)
+{
+	static_assert(std::is_convertible<T, ComponentPtr>::value, "Must be same or inherited of Component");
+	if (object)
+		component_objects->remove(object);
 }
 
 NAMESPACE_END

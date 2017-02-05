@@ -9,11 +9,16 @@ int main() {
 
 	Application app;
 
-	auto &item1 = app.createItem<Component>();
-	auto &item2 = app.createItem<Component>();
-	auto &item3 = app.createItem<Component>();
+	auto &item2 = app.create<Component>();
+	auto &item1 = app.create<Component>();
+	auto &item3 = app.create<Component>(&item1);
+	auto &item4 = app.create<Component>(&item2);
 
 	app.print_tree();
+
+	auto s = item4 ? "exist" : "destroyed";
+
+	std::cout << s << std::endl;
 
 	return app.exec();
 
