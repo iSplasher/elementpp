@@ -16,7 +16,7 @@ SCENARIO("Application object can be created", "[Application]")
 	}
 }
 
-SCENARIO("Component objects can be created and destroyed", "[Comoponent]")
+SCENARIO("Component objects can be created and destroyed", "[Component]")
 {
 	Application *app = Application::instance();
 	if (!app)
@@ -40,6 +40,33 @@ SCENARIO("Component objects can be created and destroyed", "[Comoponent]")
 				REQUIRE(comp1->children().size() == 1);
 				REQUIRE(comp2->children().size() == 1);
 			}
+
+			WHEN("One get destroyed")
+			{
+				app->destroy(child1);
+
+				THEN("One parent has no children")
+				{
+					REQUIRE(comp1->children().size() == 0);
+					REQUIRE(comp2->children().size() == 1);
+				}
+
+			}
+
+			WHEN("Both get destroyed")
+			{
+				app->destroy(child1);
+				app->destroy(child2);
+
+				THEN("All parent has no children")
+				{
+					REQUIRE(comp1->children().size() == 0);
+					REQUIRE(comp2->children().size() == 0);
+				}
+
+			}
+
+			// TODO: check if parent is valid
 
 		}
 	}

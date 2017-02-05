@@ -122,6 +122,58 @@ public:
 		return reactive.Value();
 	}
 
+	// Relational operators
+
+	bool operator==(const T &rhs) {
+		return (rhs == reactive.Value());
+	}
+
+	bool operator==(const Property<T> &rhs) {
+		return (rhs.reactive.Value() == reactive.Value());
+	}
+
+	bool operator!=(const T &rhs) {
+		return !(rhs == reactive.Value());
+	}
+
+	bool operator!=(const Property<T> &rhs) {
+		return !(rhs.reactive.Value() == reactive.Value());
+	}
+
+	bool operator<(const T &rhs) {
+		return (rhs < reactive.Value());
+	}
+
+	bool operator<(const Property<T> &rhs) {
+		return (rhs.reactive.Value() < reactive.Value());
+	}
+
+	bool operator>(const T &rhs) {
+		return (rhs > reactive.Value());
+	}
+
+	bool operator>(const Property<T> &rhs) {
+		return (rhs.reactive.Value() > reactive.Value());
+	}
+
+	bool operator>=(const T &rhs) {
+		return (rhs >= reactive.Value());
+	}
+
+	bool operator>=(const Property<T> &rhs) {
+		return (rhs.reactive.Value() >= reactive.Value());
+	}
+
+	bool operator<=(const T &rhs) {
+		return (rhs <= reactive.Value());
+	}
+
+	bool operator<=(const Property<T> &rhs) {
+		return (rhs.reactive.Value() <= reactive.Value());
+	}
+
+	// FUNCTIONS
+
 	void connect(func f)
 	{
 		react::Observe(reactive, f);
