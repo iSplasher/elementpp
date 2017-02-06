@@ -201,3 +201,4 @@ ModelManifest.xml
 *.vsdx
 *.sln
 *.diagsession
+/docs/html
