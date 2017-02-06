@@ -36,17 +36,16 @@
 #endif
 
 #ifndef _DEBUG
-	#ifdef GSPLASHER_EXPORTS
+#ifdef GSPLASHER_EXPORTS
 		#define GSPLASHER_API __declspec(dllexport)
-	#else
-		#define GSPLASHER_API __declspec(dllimport)
-	#endif
 #else
-	#define GSPLASHER_API
+		#define GSPLASHER_API __declspec(dllimport)
+#endif
+#else
+#define GSPLASHER_API
 #endif
 
 NAMESPACE_BEGIN
-
 // enums 
 
 // to allow scoped enum bitwise operations 
@@ -63,6 +62,8 @@ inline T&	operator	^=	(T& x, T y)		{	x = x ^ y;	return x;	}; \
 inline bool	 flags(T x)	{	return static_cast<int>(x) != 0;};
 
 DEFINE_ENUM_FLAGS(Direction)
+
+
 enum class Direction {
 	Left,
 	Top,
@@ -70,13 +71,19 @@ enum class Direction {
 	Bottom,
 };
 
+
 DEFINE_ENUM_FLAGS(Orientation)
+
+
 enum class Orientation {
 	Vertical,
 	Horizontal
 };
 
+
 DEFINE_ENUM_FLAGS(Alignment)
+
+
 enum class Alignment {
 	Left,
 	Top,
@@ -87,7 +94,10 @@ enum class Alignment {
 	Default
 };
 
+
 DEFINE_ENUM_FLAGS(MouseButton)
+
+
 enum class MouseButton {
 	All = 0xF, // 28bits = 0xFFFFFFFF,
 	None = 0x0,
@@ -96,7 +106,10 @@ enum class MouseButton {
 	Middle = 0x4
 };
 
+
 DEFINE_ENUM_FLAGS(KeyModifier)
+
+
 enum class KeyModifier {
 	None = 0x0,
 	Shift = 0x1,
@@ -104,5 +117,6 @@ enum class KeyModifier {
 	Alt = 0x4,
 	Meta = 0x8
 };
+
 
 NAMESPACE_END

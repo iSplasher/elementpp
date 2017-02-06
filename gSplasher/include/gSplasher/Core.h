@@ -9,11 +9,11 @@
 
 
 NAMESPACE_BEGIN
-
 class Component;
-using ComponentPtr = std::unique_ptr<Component>;
+using ComponentPtr = std::unique_ptr< Component >;
 class RWindow;
 class Application;
+
 
 /// <summary>
 /// Component object of the whole library. 
@@ -24,23 +24,27 @@ public:
 	// META
 
 	Component();
-	explicit Component(ComponentPtr *parent);
+
+	explicit Component( ComponentPtr* parent );
+
 	virtual ~Component();
 
 	// move
 
 	// not copyable
-	Component& operator=(const Component&) = delete;
+	Component& operator=( const Component& ) = delete;
 
 	// PROPERTIES
 
-	Property<std::string> objectName;
+	Property< std::string > objectName;
 
 	// FUNCTIONS
 
 	ComponentPtr& getParent() const;
-	void setParent(ComponentPtr&);
-	std::vector<ComponentPtr*> children();
+
+	void setParent( ComponentPtr& );
+
+	std::vector< ComponentPtr* > children();
 
 	// DATA
 
@@ -48,16 +52,16 @@ public:
 	bool is_window = false;
 
 private:
-	using ComponentTree = tree<ComponentPtr*>;
+	using ComponentTree = tree< ComponentPtr* >;
 
 	// FUNCTIONS
 
 	//log(LogLevel, std::string);
 
 	// DATA
-	ComponentPtr *parent = nullptr;
+	ComponentPtr* parent = nullptr;
 	unsigned core_id;
-	static std::atomic<unsigned> id_counter;
+	static std::atomic< unsigned > id_counter;
 	static ComponentPtr nulltype;
 	ComponentTree::iterator internal_tree;
 
@@ -71,22 +75,25 @@ private:
 
 };
 
+
 // A pointer to the application instance
 #define App Application::instance()
+
 
 /// <summary>
 /// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
 /// </summary>
-class GSPLASHER_API Application final : private Component{
-	using ComponentContainer = std::list<ComponentPtr>;
-	using ComponentContainerPtr = std::unique_ptr<ComponentContainer>;
-	using ComponentTreePtr = std::unique_ptr<ComponentTree>;
+class GSPLASHER_API Application final : private Component {
+	using ComponentContainer = std::list< ComponentPtr >;
+	using ComponentContainerPtr = std::unique_ptr< ComponentContainer >;
+	using ComponentTreePtr = std::unique_ptr< ComponentTree >;
 
 public:
 
 	// META
 
 	Application();
+
 	~Application();
 
 	// FUNCTIONS
@@ -94,14 +101,14 @@ public:
 	/// <summary>
 	/// Create Component objects
 	/// </summary>
-	template<class T, typename... Args>
-	std::unique_ptr<T>& create(Args... args);
+	template< class T, typename... Args >
+	std::unique_ptr< T >& create( Args ... args );
 
 	/// <summary>
 	/// Delete Component objects
 	/// </summary>
-	template<class T>
-	void destroy(T&);
+	template< class T >
+	void destroy( T& );
 
 	/// <summary>
 	/// Start application, blocking
@@ -113,35 +120,34 @@ public:
 	/// Get Application singleton instance
 	/// </summary>
 	/// <returns></returns>
-	static Application *instance();
+	static Application* instance();
 
 	// PROPERTIES
 
-	Property<bool> isRunning; // TODO: Read-only property
+	Property< bool > isRunning; // TODO: Read-only property
 
 
 	void print_tree() const {
 
 		std::cout << objectName << std::endl;
 
-		std::function<void(const ComponentTree::const_iterator &t)> pp = [&](const ComponentTree::const_iterator &t)
-		{
+		std::function< void( const ComponentTree::const_iterator& t ) > pp = [&](const ComponentTree::const_iterator& t) {
 
-			for (ComponentTree::const_iterator i = t.begin();
-				i != t.end(); ++i)
-			{
-				for (int tabs = 0; tabs < i.level(); ++tabs)
-					std::cout << "\t";
+					for( ComponentTree::const_iterator i = t.begin();
+					     i != t.end(); ++i ) {
+						for( int tabs = 0; tabs < i.level(); ++tabs )
+							std::cout << "\t";
 
-				std::cout << (*i.data())->objectName << std::endl;
+						std::cout << ( *i.data() )->objectName << std::endl;
 
-				pp(i);
-			}};
-		pp(*component_tree);
+						pp( i );
+					}
+				};
+		pp( *component_tree );
 	}
 
 private:
-	Application(const Application&) {}
+	Application( const Application& ) {}
 
 	// member methods
 	/// <summary>
@@ -151,7 +157,7 @@ private:
 	bool processEv() const;
 
 	// data members
-	static Application *self;
+	static Application* self;
 	bool should_quit = false;
 	bool is_running = false;
 
@@ -163,32 +169,23 @@ private:
 };
 
 
-template <class T, typename ... Args>
-std::unique_ptr<T>& Application::create(Args... args)
-{
-	static_assert(std::is_base_of<Component, T>::value, "Must be same or inherited of Component");
-	component_objects->push_back(std::make_unique<T>(std::forward<Args>(args)...));
-	auto &item = component_objects->back();
+template< class T, typename ... Args >
+std::unique_ptr< T >& Application::create( Args ... args ) {
+	static_assert(std::is_base_of< Component, T >::value, "Must be same or inherited of Component");
+	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
+	auto& item = component_objects->back();
 
-	if (item->getParent())
-	{
-		item->internal_tree = item->getParent()->internal_tree.push_back(&item);
-	}
-	else
-	{
-		item->internal_tree = component_tree->push_back(&item);
-	}
+	if( item->getParent() ) { item->internal_tree = item->getParent()->internal_tree.push_back( &item ); }
+	else { item->internal_tree = component_tree->push_back( &item ); }
 
 	return item;
 }
 
-template <class T>
-void Application::destroy(T& object)
-{
-	static_assert(std::is_convertible<T, ComponentPtr>::value, "Must be same or inherited of Component");
-	if (object)
-		component_objects->remove(object);
+template< class T >
+void Application::destroy( T& object ) {
+	static_assert(std::is_convertible< T, ComponentPtr >::value, "Must be same or inherited of Component");
+	if( object )
+		component_objects->remove( object );
 }
 
 NAMESPACE_END
-

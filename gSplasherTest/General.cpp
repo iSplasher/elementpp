@@ -4,62 +4,52 @@
 
 USING_NAMESPACE
 
-SCENARIO("Application object can be created", "[Application]")
-{
-	Application *app = Application::instance();
-	if (!app)
+SCENARIO("Application object can be created", "[Application]") {
+	Application* app = Application::instance();
+	if( !app )
 		app = new Application();
 
-	GIVEN("An Application object is created")
-	{
+	GIVEN("An Application object is created") {
 		REQUIRE(app);
 	}
 }
 
-SCENARIO("Component objects can be created and destroyed", "[Component]")
-{
-	Application *app = Application::instance();
-	if (!app)
+SCENARIO("Component objects can be created and destroyed", "[Component]") {
+	Application* app = Application::instance();
+	if( !app )
 		app = new Application();
 
-	GIVEN("Component objects are created")
-	{
-		auto &comp1 = app->create<Component>();
-		auto &comp2 = app->create<Component>();
+	GIVEN("Component objects are created") {
+		auto& comp1 = app->create< Component >();
+		auto& comp2 = app->create< Component >();
 
 		REQUIRE(comp1);
 		REQUIRE(comp2);
 
-		WHEN("Children are created")
-		{
-			auto &child1 = app->create<Component>(&comp1);
-			auto &child2 = app->create<Component>(&comp2);
+		WHEN("Children are created") {
+			auto& child1 = app->create< Component >( &comp1 );
+			auto& child2 = app->create< Component >( &comp2 );
 
-			THEN("they get appended to their parents")
-			{
+			THEN("they get appended to their parents") {
 				REQUIRE(comp1->children().size() == 1);
 				REQUIRE(comp2->children().size() == 1);
 			}
 
-			WHEN("One get destroyed")
-			{
-				app->destroy(child1);
+			WHEN("One get destroyed") {
+				app->destroy( child1 );
 
-				THEN("One parent has no children")
-				{
+				THEN("One parent has no children") {
 					REQUIRE(comp1->children().size() == 0);
 					REQUIRE(comp2->children().size() == 1);
 				}
 
 			}
 
-			WHEN("Both get destroyed")
-			{
-				app->destroy(child1);
-				app->destroy(child2);
+			WHEN("Both get destroyed") {
+				app->destroy( child1 );
+				app->destroy( child2 );
 
-				THEN("All parent has no children")
-				{
+				THEN("All parent has no children") {
 					REQUIRE(comp1->children().size() == 0);
 					REQUIRE(comp2->children().size() == 0);
 				}
@@ -71,5 +61,3 @@ SCENARIO("Component objects can be created and destroyed", "[Component]")
 		}
 	}
 }
-
-
