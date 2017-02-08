@@ -3,6 +3,9 @@
 
 #include "catch.hpp"
 
+#include <chrono>
+#include <thread>
+
 USING_NAMESPACE
 
 SCENARIO("Properties", "[Property]") {
@@ -70,40 +73,51 @@ SCENARIO("Properties", "[Property]") {
 
 		}
 
-		WHEN("Property is connected forever to function") {
+		WHEN("Property connection is made") {
 			std::string value1 = "";
 			prop1.connect( [&value1](std::string s) { value1 = s; } );
 
-			THEN("function is called on property change") {
+			THEN("connection is called on property change") {
 				REQUIRE(value1 == "");
 				prop1 = "new value";
 				REQUIRE(value1 == "new value");
 			}
-
 		}
 
-		WHEN("Property is connected once to function") {
-			std::string value1 = "";
-			prop1.connect< Temporary >( [&value1](std::string s) { value1 = s; } );
-
-			THEN("function is called on property change") {
-				REQUIRE(value1 == "");
-				prop1 = "new value";
-				REQUIRE(value1 == "new value");
-			}
-
-		}
-
-		WHEN("Two properties dependency") {
+		WHEN("Two properties dependency sync") {
 			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
-					                           prop2 = "hej";
+					                           prop2 = "changed";
 				                           };
 			                           } );
 
 			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
-					                           prop1 = "hej";
+					                           prop1 = "changed";
+				                           };
+			                           } );
+
+			THEN("function is called sync on property change") {
+				REQUIRE(prop1 == "");
+				REQUIRE(prop2 == "hello world");
+				prop1 = "test";
+				REQUIRE(prop1 == "changed");
+				REQUIRE(prop2 == "changed");
+
+			}
+
+		}
+
+		WHEN("Two properties dependency async") {
+			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
+				                           if( prop2 != prop1 ) {
+					                           prop2 = "changed";
+				                           };
+			                           } );
+
+			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
+				                           if( prop2 != prop1 ) {
+					                           prop1 = "changed";
 				                           };
 			                           } );
 
@@ -112,9 +126,91 @@ SCENARIO("Properties", "[Property]") {
 				REQUIRE(prop2 == "hello world");
 				prop1 << "test";
 				prop1.wait();
-				REQUIRE(prop1 == "hej");
-				REQUIRE(prop2 == "hej");
+				REQUIRE(prop1 == "changed");
+				REQUIRE(prop2 == "changed");
 
+			}
+
+		}
+
+		WHEN("Two properties dependency async with sleep") {
+			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
+				                           if( prop2 != prop1 ) {
+					                           std::cout << "sleeping for 1 second.." << std::endl;
+					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+					                           prop2 = "changed";
+				                           };
+			                           } );
+
+			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
+				                           if( prop2 != prop1 ) {
+					                           std::cout << "sleeping for 1 second.." << std::endl;
+					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+					                           prop1 = "changed";
+				                           };
+			                           } );
+
+			THEN("function is called async on property change") {
+				REQUIRE(prop1 == "");
+				REQUIRE(prop2 == "hello world");
+				prop1 << "test";
+				REQUIRE(prop2 == "hello world");
+				prop1.wait();
+				REQUIRE(prop1 == "changed");
+				REQUIRE(prop2 == "changed");
+
+			}
+
+		}
+
+		WHEN("Property is connected forever to function") {
+			std::string value1 = "";
+			prop1.connect( [&value1](std::string s) { value1 = s; } );
+
+			THEN("function is called on every property change") {
+				REQUIRE(value1 == "");
+				prop1 = "value1";
+				REQUIRE(value1 == "value1");
+				prop1 = "value2";
+				REQUIRE(value1 == "value2");
+			}
+
+		}
+
+		WHEN("Property is connected once to function") {
+			std::string value1 = "";
+			prop1.connect< Temporary >( [&value1](std::string s) {
+				                           value1 = s;
+			                           } );
+
+			THEN("function is called on only one property change") {
+				REQUIRE(value1 == "");
+				prop1 = "value1";
+				REQUIRE(value1 == "value1");
+				prop1 = "value2";
+				REQUIRE(value1 == "value1");
+			}
+
+		}
+
+		WHEN("Property constructs a scoped connection") {
+			std::string value1 = "";
+
+			THEN("function is only called when connection is in scope") { {
+
+					auto conn = prop1.connect< Scoped >( [&value1](std::string s) {
+						                                    value1 = s;
+					                                    } );
+					REQUIRE(value1 == "");
+					prop1 = "value1";
+					REQUIRE(value1 == "value1");
+					prop1 = "value2";
+					REQUIRE(value1 == "value2");
+				}
+
+				REQUIRE(value1 == "value2");
+				prop1 = "value3";
+				REQUIRE(value1 == "value2");
 			}
 
 		}

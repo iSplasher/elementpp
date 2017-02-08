@@ -8,6 +8,7 @@
 #include <react/Signal.h>
 
 #include "gSplasher/Global.h"
+#include <GL/glew.h>
 
 NAMESPACE_BEGIN
 PRIV_NAMESPACE_BEGIN
@@ -45,79 +46,89 @@ enum ConnectionType {
 	/**
 	 * \brief Create a permanent connection that will be permanently connected to handler
 	 */
-	Permanent
+	Permanent,
+
+	/**
+	* \brief Create a permanent connection that will be released when the connection object goes out of scope
+	*/
+	Scoped
 };
 
 
 /**
  * \brief A connection object returned when connecting property to functions
  * \tparam T Property<T>
- * \tparam R Connection release policy
  */
 template< typename T > // TODO: static assert T is Property object
 class Connection {
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 public:
 
-	Connection( T* t, react::TransactionStatus& s, PRIV_NAMESPACE::ObserverT&& o ) : prop( t ),
-	                                                                                 status( s ),
-	                                                                                 obs( std::move( o ) ) {}
-
 	Connection( const Connection& other )
-		: prop( other.prop ),
+		: scoped( other.scoped ),
+		  prop( other.prop ),
 		  status( other.status ),
-		  obs( other.obs ),
-		  released( other.released ) {}
+		  cont( other.cont ) {}
 
 	Connection( Connection&& other ) noexcept
-		: prop( other.prop ),
+		: scoped( other.scoped ),
+		  prop( other.prop ),
 		  status( other.status ),
-		  obs( std::move( other.obs ) ),
-		  released( other.released ) {}
+		  cont( other.cont ) {}
 
 	Connection& operator=( const Connection& other ) {
 		if( this == &other )
 			return *this;
+		scoped = other.scoped;
 		prop = other.prop;
 		status = other.status;
-		obs = other.obs;
-		released = other.released;
+		cont = other.cont;
 		return *this;
 	}
 
 	Connection& operator=( Connection&& other ) noexcept {
 		if( this == &other )
 			return *this;
+		scoped = other.scoped;
 		prop = other.prop;
 		status = other.status;
-		obs = std::move( other.obs );
-		released = other.released;
+		cont = other.cont;
 		return *this;
+	}
+
+	~ Connection() {
+		if( scoped )
+			release();
 	}
 
 	/**
 	 * \brief Disconnect from property
-	 * \return If release was successful or not
 	 */
-	bool release() {
-		if( obs.IsValid() )
-			obs.Detach();
-		released = !obs.IsValid();
-		return released;
+	void release() const {
+		if( cont ) {
+			cont.reset();
+		}
 	};
 
 	/**
 	 * \brief Check if connection is linked to property
 	 * \return 
 	 */
-	bool isReleased() const { return released; }; // TODO: maybe property?
+	bool isReleased() const { return cont ? false : true; }; // TODO: maybe property?
 
 private:
 
+	Connection( T* t, react::TransactionStatus& s, std::unique_ptr< Continuation >& o, bool scope = false ) : scoped( scope ),
+	                                                                                                          prop( t ),
+	                                                                                                          status( s ),
+	                                                                                                          cont( o ) {}
+
+	bool scoped;
 	T* prop;
 	react::TransactionStatus& status;
-	PRIV_NAMESPACE::ObserverT obs;
-	bool released = false;
+	std::unique_ptr< Continuation >& cont;
 
+	friend typename T;
 };
 
 
@@ -170,6 +181,7 @@ template< typename T >
 class Property< T, Write > {
 	using Reactive = PRIV_NAMESPACE::VarSignalT< T >;
 	using func = std::function< void( T ) >;
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 
 public:
 
@@ -177,6 +189,46 @@ public:
 
 	template< typename ... Args >
 	explicit Property( Args ... args ) : reactive( react::MakeVar< PRIV_NAMESPACE::D >( T( std::forward< Args >( args )... ) ) ) { }
+
+	Property( const Property& other )
+		: continuations( other.continuations ),
+		  temporary_connections( other.temporary_connections ),
+		  reactive( other.reactive ),
+		  status( other.status ) {}
+
+	Property( Property&& other ) noexcept
+		: continuations( std::move( other.continuations ) ),
+		  temporary_connections( std::move( other.temporary_connections ) ),
+		  reactive( std::move( other.reactive ) ),
+		  status( std::move( other.status ) ) {}
+
+	Property& operator=( const Property& other ) {
+		if( this == &other )
+			return *this;
+		continuations = other.continuations;
+		temporary_connections = other.temporary_connections;
+		reactive = other.reactive;
+		status = other.status;
+		return *this;
+	}
+
+	Property& operator=( Property&& other ) noexcept {
+		if( this == &other )
+			return *this;
+		continuations = std::move( other.continuations );
+		temporary_connections = std::move( other.temporary_connections );
+		reactive = std::move( other.reactive );
+		status = std::move( other.status );
+		return *this;
+	}
+
+	~Property() {
+		for( auto& p : continuations ) {
+			if( p ) {
+				p.reset();
+			}
+		}
+	}
 
 	/**
 	 * \brief property = value
@@ -205,7 +257,7 @@ public:
 	 * \param value T
 	 * \see wait()
 	 */
-	void operator<<( T value ) { react::AsyncTransaction< PRIV_NAMESPACE::D >( status, [&] { reactive <<= std::forward< T >( value ); } ); }
+	void operator<<( T value ) { react::AsyncTransaction< PRIV_NAMESPACE::D >( status, [=] { reactive <<= value; } ); }
 
 	/**
 	 * \brief Property << {value, value, ...}. This operator will append the value asynchronously
@@ -213,9 +265,9 @@ public:
 	 * \see wait()
 	 */
 	void operator<<( std::initializer_list< T > value ) {
-		react::AsyncTransaction< PRIV_NAMESPACE::D >( status, [&] {
+		react::AsyncTransaction< PRIV_NAMESPACE::D >( status, [=] {
 			                                              for( auto& x : value ) {
-				                                              reactive <<= std::forward< T >( x );
+				                                              reactive <<= x;
 			                                              }
 		                                              } );
 	}
@@ -230,26 +282,29 @@ public:
 	 */
 	template< ConnectionType C = Permanent >
 	auto connect( func f ) {
-		PRIV_NAMESPACE::ObserverT obs;
+		std::unique_ptr< Continuation > _cont = nullptr;
+		continuations.push_back( std::move( _cont ) );
+		auto& cont = continuations.back();
 
 		switch( C ) {
+			case Scoped:
 			case Permanent:
 			{
-				obs = std::move( react::Observe( reactive, f ) );
+				cont.reset( new Continuation( std::move( react::MakeContinuation( reactive, f ) ) ) );
 				break;
 			}
-			case Temporary:
-			{ 
-				// only run once
-				std::move( react::Observe( reactive, [=](T t) -> react::ObserverAction {
-					                           f( std::forward< T >( t ) );
-					                           return react::ObserverAction::stop_and_detach;
-				                           } ) );
+			case Temporary: // run only once
+			{
+
+				cont.reset( new Continuation( std::move( react::MakeContinuation( reactive, [=, &cont](T t) {
+					                                                             f( std::forward< T >( t ) );
+																				 if (cont)
+																					 cont.reset();
+				                                                             } ) ) ));
 				break;
 			}
 		}
-
-		return Connection< Property< T, Write > >(this, status, std::move(obs));
+		return Connection< Property< T, Write > >( this, status, cont, C == Scoped );
 	}
 
 
@@ -287,6 +342,7 @@ public:
 	bool operator<=( const Property< T >& rhs ) { return ( rhs.reactive.Value() <= reactive.Value() ); }
 
 private:
+	std::list< std::unique_ptr< Continuation > > continuations;
 	Reactive reactive;
 	react::TransactionStatus status;
 
