@@ -458,7 +458,7 @@ public:
 	virtual ~tree()
 	{
 		// Disconnect ourselves -- very important for decrementing the
-		// size of our parent
+		// size of our _parent
 		this->disconnect_();
 
 		// Now get rid of our children -- but be smart about it,

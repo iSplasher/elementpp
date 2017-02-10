@@ -7,18 +7,22 @@
 USING_NAMESPACE
 
 std::atomic< unsigned > Component::id_counter;
-ComponentPtr Component::nulltype = ComponentPtr();
+ComponentPtr Component::nullparent = nullptr;
 Application* Application::self = nullptr;
 
-Component::Component() : objectName( "Component" + std::to_string( ++id_counter ) ),
-                         core_id( id_counter ) {}
+Component::Component() :
+	parent(this,  std::mem_fn(&Component::getParent), std::mem_fn(&Component::setParent)),
+	objectName( "Component" + std::to_string( ++id_counter ) ), core_id( id_counter ) {
+}
 
-Component::Component( ComponentPtr* parent ) : Component() { this->parent = parent; }
+Component::Component( ComponentPtr& parent ) : Component() { this->parent = parent ? parent : nullparent; }
 
 Component::~Component() {
 	// first we traverse the tree to tell our children that
 	// they shouldn't touch their internal tree.
 	// we also delete the children
+
+	// NOTE: Set child parent to nullparent if not deleting!!!
 
 	if( !parent_is_deleting ) {
 		for( auto iter = internal_tree.begin(); iter != internal_tree.end(); ++iter ) {
@@ -44,17 +48,15 @@ std::vector< ComponentPtr* > Component::children() {
 }
 
 ComponentPtr& Component::getParent() const {
-	if( parent )
-		return *parent;
-	return nulltype;
+	return *_parent;
 }
 
-void Component::setParent( ComponentPtr& new_parent ) {
-	if( App != nullptr ) {
-		if( new_parent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
+void Component::setParent(ComponentPtr& new_parent ) {
+	if( App != nullptr && init ) {
+		if( new_parent && new_parent != nullparent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
 		else { this->internal_tree = App->internal_tree.reinsert( internal_tree ); }
 	}
-	this->parent = &new_parent;
+	_parent = &new_parent;
 }
 
 static void errorCallback( int err, const char* descr ) { std::cout << descr; }

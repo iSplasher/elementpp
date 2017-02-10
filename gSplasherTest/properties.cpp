@@ -85,13 +85,13 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency sync") {
-			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           prop2 = "changed";
 				                           };
 			                           } );
 
-			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           prop1 = "changed";
 				                           };
@@ -109,13 +109,13 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency async") {
-			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           prop2 = "changed";
 				                           };
 			                           } );
 
-			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           prop1 = "changed";
 				                           };
@@ -134,7 +134,7 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency async with sleep") {
-			prop1.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           std::cout << "sleeping for 1 second.." << std::endl;
 					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
@@ -142,7 +142,7 @@ SCENARIO("Properties", "[Property]") {
 				                           };
 			                           } );
 
-			prop2.connect< Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
 					                           std::cout << "sleeping for 1 second.." << std::endl;
 					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
@@ -179,7 +179,7 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Property is connected once to function") {
 			std::string value1 = "";
-			prop1.connect< Temporary >( [&value1](std::string s) {
+			prop1.connect< ConnectionType::Temporary >( [&value1](std::string s) {
 				                           value1 = s;
 			                           } );
 
@@ -198,7 +198,7 @@ SCENARIO("Properties", "[Property]") {
 
 			THEN("function is only called when connection is in scope") { {
 
-					auto conn = prop1.connect< Scoped >( [&value1](std::string s) {
+					auto conn = prop1.connect< ConnectionType::Scoped >( [&value1](std::string s) {
 						                                    value1 = s;
 					                                    } );
 					REQUIRE(value1 == "");
@@ -216,7 +216,35 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 	}
+
+	GIVEN("Simple read-only properties can be instantiated") {
+
+		WHEN("When declared in class") {
+
+			struct Test {
+				Property< std::string, Test > prop1{};
+				Property< std::string, Test > prop2{ "hello world" };
+
+				void test(std::string s) { prop1 = s; }
+			};
+
+			THEN( "Can read value" ) {
+				auto t = Test();
+				REQUIRE(t.prop1 == "");
+				std::string v = t.prop2;
+				REQUIRE(v == "hello world");
+			}
+
+			THEN("Class can change value") {
+				auto t = Test();
+				t.test("prop1");
+				REQUIRE(t.prop1 == "prop1");
+				std::string v = t.prop2;
+				REQUIRE(v == "hello world");
+			}
+
+		}
+
+	}
+
 }
-
-
-SCENARIO("Component objects properties", "[Component][Property]") {}

@@ -15,60 +15,96 @@ class RWindow;
 class Application;
 
 
-/// <summary>
-/// Component object of the whole library. 
-/// </summary>
+enum class ComponentType {
+	Base, // TODO: new name
+	Widget,
+	Window,
+	Layout
+};
+
+
+/**
+ * \brief Component object of the whole library
+ */
 class GSPLASHER_API Component {
 public:
 
-	// META
-
 	Component();
 
-	explicit Component( ComponentPtr* parent );
+	explicit Component( ComponentPtr& parent );
 
 	virtual ~Component();
 
-	// move
+	// MOVE & COPY
 
-	// not copyable
-	Component& operator=( const Component& ) = delete;
+	Component( const Component& other ) = delete;
+
+	Component& operator=( const Component& other ) = delete;
+
 
 	// PROPERTIES
 
+private:
+	Component( Component&& other ) noexcept
+		: parent( std::move( other.parent ) ),
+		  objectName( std::move( other.objectName ) ),
+		  type( std::move( other.type ) ),
+		  core_id( other.core_id ),
+		  internal_tree( std::move( other.internal_tree ) ),
+		  parent_is_deleting( other.parent_is_deleting ) {}
+
+	Component& operator=( Component&& other ) noexcept {
+		if( this == &other )
+			return *this;
+		parent = std::move( other.parent );
+		objectName = std::move( other.objectName );
+		type = std::move( other.type );
+		core_id = other.core_id;
+		internal_tree = std::move( other.internal_tree );
+		parent_is_deleting = other.parent_is_deleting;
+		return *this;
+	}
+
+public:
+
+	const Accessor< ComponentPtr&, Component > parent;
 	Property< std::string > objectName;
+	Property< ComponentType, Component > type{ ComponentType::Base };
 
 	// FUNCTIONS
-
-	ComponentPtr& getParent() const;
-
-	void setParent( ComponentPtr& );
 
 	std::vector< ComponentPtr* > children();
 
 	// DATA
 
-	bool is_widget = false;
-	bool is_window = false;
+protected:
+
+	void setType( ComponentType t ) { type = t; }
 
 private:
 	using ComponentTree = tree< ComponentPtr* >;
 
 	// FUNCTIONS
+	void setParent( ComponentPtr& );
+
+	ComponentPtr& getParent() const;
+
 
 	//log(LogLevel, std::string);
 
 	// DATA
-	ComponentPtr* parent = nullptr;
+
 	unsigned core_id;
 	static std::atomic< unsigned > id_counter;
-	static ComponentPtr nulltype;
+	static ComponentPtr nullparent;
 	ComponentTree::iterator internal_tree;
+	ComponentPtr* _parent = &nullparent;
 
-	/// <summary>
-	/// Used by parent to let us know if we should remove ourselves
-	/// from the internal tree container
-	/// </summary>
+	bool init = false; // has this Component initialized?
+
+	/**
+	 * \brief Used by _parent to let us know if we should remove ourselves from the internal tree container
+	 */
 	bool parent_is_deleting = false;
 
 	friend class Application;
@@ -80,17 +116,15 @@ private:
 #define App Application::instance()
 
 
-/// <summary>
-/// Main instance of the whole application. Manages events and widgets. Only one instance is allowed.
-/// </summary>
+/**
+ * \brief Main instance of the whole application. Only one instance is allowed.
+ */
 class GSPLASHER_API Application final : private Component {
 	using ComponentContainer = std::list< ComponentPtr >;
 	using ComponentContainerPtr = std::unique_ptr< ComponentContainer >;
 	using ComponentTreePtr = std::unique_ptr< ComponentTree >;
 
 public:
-
-	// META
 
 	Application();
 
@@ -102,7 +136,7 @@ public:
 	/// Create Component objects
 	/// </summary>
 	template< class T, typename... Args >
-	std::unique_ptr< T >& create( Args ... args );
+	std::unique_ptr< T >& create( Args&& ... args );
 
 	/// <summary>
 	/// Delete Component objects
@@ -124,7 +158,7 @@ public:
 
 	// PROPERTIES
 
-	Property< bool > isRunning; // TODO: Read-only property
+	Property< bool, Application > isRunning; // read only
 
 
 	void print_tree() const {
@@ -170,14 +204,17 @@ private:
 
 
 template< class T, typename ... Args >
-std::unique_ptr< T >& Application::create( Args ... args ) {
+std::unique_ptr< T >& Application::create( Args&& ... args ) {
 	static_assert(std::is_base_of< Component, T >::value, "Must be same or inherited of Component");
 	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
 	auto& item = component_objects->back();
 
-	if( item->getParent() ) { item->internal_tree = item->getParent()->internal_tree.push_back( &item ); }
-	else { item->internal_tree = component_tree->push_back( &item ); }
+	auto& item_parent = item->parent.get();
 
+	if (item_parent && item_parent != Component::nullparent) { item->internal_tree = item_parent->internal_tree.push_back(&item); }
+	else { item->internal_tree = component_tree->push_back(&item); }
+
+	item->init = true;
 	return item;
 }
 
