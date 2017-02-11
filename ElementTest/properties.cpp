@@ -86,16 +86,16 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Two properties dependency sync") {
 			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           prop2 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           prop2 = "changed";
+				                                           };
+			                                           } );
 
 			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           prop1 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           prop1 = "changed";
+				                                           };
+			                                           } );
 
 			THEN("function is called sync on property change") {
 				REQUIRE(prop1 == "");
@@ -110,16 +110,16 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Two properties dependency async") {
 			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           prop2 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           prop2 = "changed";
+				                                           };
+			                                           } );
 
 			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           prop1 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           prop1 = "changed";
+				                                           };
+			                                           } );
 
 			THEN("function is called async on property change") {
 				REQUIRE(prop1 == "");
@@ -135,20 +135,20 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Two properties dependency async with sleep") {
 			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
-					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
-					                           prop2 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
+					                                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+					                                           prop2 = "changed";
+				                                           };
+			                                           } );
 
 			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
-				                           if( prop2 != prop1 ) {
-					                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
-					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
-					                           prop1 = "changed";
-				                           };
-			                           } );
+				                                           if( prop2 != prop1 ) {
+					                                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
+					                                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+					                                           prop1 = "changed";
+				                                           };
+			                                           } );
 
 			THEN("function is called async on property change") {
 				REQUIRE(prop1 == "");
@@ -180,8 +180,8 @@ SCENARIO("Properties", "[Property]") {
 		WHEN("Property is connected once to function") {
 			std::string value1 = "";
 			prop1.connect< ConnectionType::Temporary >( [&value1](std::string s) {
-				                           value1 = s;
-			                           } );
+				                                           value1 = s;
+			                                           } );
 
 			THEN("function is called on only one property change") {
 				REQUIRE(value1 == "");
@@ -199,8 +199,8 @@ SCENARIO("Properties", "[Property]") {
 			THEN("function is only called when connection is in scope") { {
 
 					auto conn = prop1.connect< ConnectionType::Scoped >( [&value1](std::string s) {
-						                                    value1 = s;
-					                                    } );
+						                                                    value1 = s;
+					                                                    } );
 					REQUIRE(value1 == "");
 					prop1 = "value1";
 					REQUIRE(value1 == "value1");
@@ -225,7 +225,7 @@ SCENARIO("Properties", "[Property]") {
 				Property< std::string, Test > prop1{};
 				Property< std::string, Test > prop2{ "hello world" };
 
-				void test(std::string s) { prop1 = s; }
+				void test( std::string s ) { prop1 = s; }
 			};
 
 			THEN( "Can read value" ) {
@@ -237,7 +237,7 @@ SCENARIO("Properties", "[Property]") {
 
 			THEN("Class can change value") {
 				auto t = Test();
-				t.test("prop1");
+				t.test( "prop1" );
 				REQUIRE(t.prop1 == "prop1");
 				std::string v = t.prop2;
 				REQUIRE(v == "hello world");
@@ -247,8 +247,69 @@ SCENARIO("Properties", "[Property]") {
 
 	}
 
-	GIVEN("Simple property views can be instantiated") {
-		//Property<std::string, PropertyViewType> prop1;
+	GIVEN("Property views") {
+		struct T {
+			Property< std::string, T > third{ "!" };
+
+		};
+		Property< std::string > first{ "hello " };
+		Property< std::string > second{ "world" };
+		T t;
+
+		WHEN("A simple std::string based property view is instantiated") {
+
+			Property< std::string, PropertyViewType > view1(
+			                                                [](std::string a, std::string b, std::string c) -> std::string { return a + b + c; },
+			                                                first, second, t.third );
+
+			THEN("PropertyView has the same value as returned by function") {
+				REQUIRE(view1 == "hello world!");
+
+				first = "new ";
+				REQUIRE(view1 == "new world!");
+
+				second = "element++";
+				REQUIRE(view1 == "new element++!");
+
+				first = "hello ";
+				REQUIRE(view1 == "hello element++!");
+
+			}
+
+			THEN("PropertyView has the same value as returned by function async") {
+				// async
+
+				first << "new ";
+				first.wait();
+				REQUIRE(view1 == "new world!");
+
+				second << "element++";
+				second.wait();
+				REQUIRE(view1 == "new element++!");
+
+				first << "hello ";
+				first.wait();
+				REQUIRE(view1 == "hello element++!");
+			}
+
+			THEN("PropertyView connection can also refer to other properties") {
+
+				view1.connect([&first](std::string s) {
+						if(first != "changed ")
+							first = "changed ";
+					});
+
+				REQUIRE(view1 == "hello world!");
+				first << "async ";
+				first.wait();
+				REQUIRE(view1 == "changed world!");
+				first = "new ";
+				REQUIRE(view1 == "changed world!"); // reactive applies the value to itself before going through all connections
+				
+			}
+
+		}
+
 	}
 
 }

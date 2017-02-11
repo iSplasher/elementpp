@@ -315,7 +315,7 @@ private:
 	react::TransactionStatus status;
 
 	friend Private;
-
+	friend class Property< T, PropertyViewType >;
 	friend std::ostream& operator<<( std::ostream& os, const Property< T, Private >& obj ) {
 		os << obj.reactive.Value();
 		return os;
@@ -503,6 +503,7 @@ private:
 	Reactive reactive;
 	react::TransactionStatus status;
 
+	friend class Property< T, PropertyViewType >;
 	friend std::ostream& operator<<( std::ostream& os, const Property< T, Element >& obj ) {
 		os << obj.reactive.Value();
 		return os;
@@ -520,15 +521,20 @@ class Property< T, PropertyViewType > {
 	using func = std::function< void(T) >;
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 
-	template<typename... Conds>
-	struct and_ : std::true_type {};
-
 public:
 
-	template<typename A, typename S, typename... Args >
-	explicit Property(Args&& ... args) {
-		static_assert(and_<std::is_same<Args, Property<A, S>>>::value);
-		//reactive = react::MakeSignal( react::With( args ... ) )
+	template<typename F, typename... Args>
+	explicit Property ( F&& f, Args&&... args) {
+		// TODO: find a way to static_assert function arguments count
+		reactive = react::MakeSignal(react::With(args.reactive ...), f);
+	}
+
+	~Property() {
+		for (auto& p : continuations) {
+			if (p) {
+				p.reset();
+			}
+		}
 	}
 
 	/**
@@ -617,16 +623,7 @@ public:
 
 	bool operator<=(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() <= reactive.Value()); }
 
-
 private:
-
-	~Property() {
-		for (auto& p : continuations) {
-			if (p) {
-				p.reset();
-			}
-		}
-	}
 
 	// MOVE & COPY
 
