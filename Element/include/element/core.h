@@ -9,8 +9,8 @@
 
 
 NAMESPACE_BEGIN
-class Component;
-using ComponentPtr = std::unique_ptr< Component >;
+class Element;
+using ElementPtr = std::unique_ptr< Element >;
 class RWindow;
 class Application;
 
@@ -25,35 +25,35 @@ enum class ComponentType {
 
 /**
  * \brief Base object.
- * A Component is created with Application.create<Component>(args...);
+ * A Element is created with Application.create<Element>(args...);
  */
-class ELEMENT_API Component {
+class ELEMENT_API Element {
 public:
 
-	Component();
+	Element();
 
-	explicit Component( ComponentPtr& parent );
+	explicit Element( ElementPtr& parent );
 
-	virtual ~Component();
+	virtual ~Element();
 
 	// MOVE & COPY
 
-	Component( const Component& other ) = delete;
+	Element( const Element& other ) = delete;
 
-	Component& operator=( const Component& other ) = delete;
+	Element& operator=( const Element& other ) = delete;
 
 
 	// PROPERTIES
 
 public:
 	Property< std::string > objectName;
-	Property< ComponentType, Component > type{ ComponentType::Base };
+	Property< ComponentType, Element > type{ ComponentType::Base };
 
-	const Accessor< ComponentPtr&, Component > parent;
+	const Accessor< ElementPtr&, Element > parent;
 
 	// FUNCTIONS
 
-	std::vector< ComponentPtr* > children();
+	std::vector< ElementPtr* > children();
 
 	// DATA
 
@@ -62,10 +62,10 @@ protected:
 	void setType( ComponentType t ) { type = t; }
 
 private:
-	using ComponentTree = tree< ComponentPtr* >;
+	using ComponentTree = tree< ElementPtr* >;
 
 
-	Component(Component&& other) noexcept
+	Element(Element&& other) noexcept
 		: objectName(std::move(other.objectName)),
 		type(std::move(other.type)),
 		parent(std::move(other.parent)),
@@ -75,7 +75,7 @@ private:
 		init(other.init),
 		parent_is_deleting(other.parent_is_deleting) {}
 
-	Component& operator=(Component&& other) noexcept {
+	Element& operator=(Element&& other) noexcept {
 		if (this == &other)
 			return *this;
 		objectName = std::move(other.objectName);
@@ -90,9 +90,9 @@ private:
 	}
 
 	// FUNCTIONS
-	void setParent( ComponentPtr& );
+	void setParent( ElementPtr& );
 
-	ComponentPtr& getParent() const;
+	ElementPtr& getParent() const;
 
 
 	//log(LogLevel, std::string);
@@ -101,11 +101,11 @@ private:
 
 	unsigned core_id;
 	static std::atomic< unsigned > id_counter;
-	static ComponentPtr nullparent;
+	static ElementPtr nullparent;
 	ComponentTree::iterator internal_tree;
-	ComponentPtr* _parent = &nullparent;
+	ElementPtr* _parent = &nullparent;
 
-	bool init = false; // has this Component initialized?
+	bool init = false; // has this Element initialized?
 
 	/**
 	 * \brief Used by _parent to let us know if we should remove ourselves from the internal tree container
@@ -124,8 +124,8 @@ private:
 /**
  * \brief Main instance of the whole application. Only one instance is allowed.
  */
-class ELEMENT_API Application final : private Component {
-	using ComponentContainer = std::list< ComponentPtr >;
+class ELEMENT_API Application final : private Element {
+	using ComponentContainer = std::list< ElementPtr >;
 	using ComponentContainerPtr = std::unique_ptr< ComponentContainer >;
 	using ComponentTreePtr = std::unique_ptr< ComponentTree >;
 
@@ -138,13 +138,13 @@ public:
 	// FUNCTIONS
 
 	/// <summary>
-	/// Create Component objects
+	/// Create Element objects
 	/// </summary>
 	template< class T, typename... Args >
 	std::unique_ptr< T >& create( Args&& ... args );
 
 	/// <summary>
-	/// Delete Component objects
+	/// Delete Element objects
 	/// </summary>
 	template< class T >
 	void destroy( T& );
@@ -204,19 +204,19 @@ private:
 	ComponentTreePtr component_tree;
 
 	friend class RWindow;
-	friend class Component;
+	friend class Element;
 };
 
 
 template< class T, typename ... Args >
 std::unique_ptr< T >& Application::create( Args&& ... args ) {
-	static_assert(std::is_base_of< Component, T >::value, "Must be same or inherited of Component");
+	static_assert(std::is_base_of< Element, T >::value, "Must be same or inherited of Element");
 	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
 	auto& item = component_objects->back();
 
 	auto& item_parent = item->parent.get();
 
-	if (item_parent && item_parent != Component::nullparent) { item->internal_tree = item_parent->internal_tree.push_back(&item); }
+	if (item_parent && item_parent != Element::nullparent) { item->internal_tree = item_parent->internal_tree.push_back(&item); }
 	else { item->internal_tree = component_tree->push_back(&item); }
 
 	item->init = true;
@@ -225,7 +225,7 @@ std::unique_ptr< T >& Application::create( Args&& ... args ) {
 
 template< class T >
 void Application::destroy( T& object ) {
-	static_assert(std::is_convertible< T, ComponentPtr >::value, "Must be same or inherited of Component");
+	static_assert(std::is_convertible< T, ElementPtr >::value, "Must be same or inherited of Element");
 	if( object )
 		component_objects->remove( object );
 }

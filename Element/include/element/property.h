@@ -131,7 +131,7 @@ private:
 };
 
 
-class Component;
+class Element;
 
 
 /**
@@ -139,7 +139,7 @@ class Component;
  * \tparam T type
  * \tparam Private class allowed to access this property
  */
-template< typename T, typename Private = Component >
+template< typename T, typename Private = Element >
 class Property {
 	using Reactive = PRIV_NAMESPACE::VarSignalT< T >;
 	using func = std::function< void( T ) >;
@@ -328,7 +328,7 @@ private:
  * \tparam T 
  */
 template< typename T >
-class Property< T, Component > {
+class Property< T, Element > {
 	using Reactive = PRIV_NAMESPACE::VarSignalT< T >;
 	using func = std::function< void( T ) >;
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
@@ -451,7 +451,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, Component > >( this, status, cont, C == ConnectionType::Scoped );
+		return Connection< Property< T, Element > >( this, status, cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -476,34 +476,34 @@ public:
 
 	bool operator==( const T& rhs ) const { return ( rhs == reactive.Value() ); }
 
-	bool operator==( const Property< T, Component >& rhs ) const { return ( rhs.reactive.Value() == reactive.Value() ); }
+	bool operator==( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() == reactive.Value() ); }
 
 	bool operator!=( const T& rhs ) const { return !( rhs == reactive.Value() ); }
 
-	bool operator!=( const Property< T, Component >& rhs ) const { return !( rhs.reactive.Value() == reactive.Value() ); }
+	bool operator!=( const Property< T, Element >& rhs ) const { return !( rhs.reactive.Value() == reactive.Value() ); }
 
 	bool operator<( const T& rhs ) const { return ( rhs < reactive.Value() ); }
 
-	bool operator<( const Property< T, Component >& rhs ) const { return ( rhs.reactive.Value() < reactive.Value() ); }
+	bool operator<( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() < reactive.Value() ); }
 
 	bool operator>( const T& rhs ) const { return ( rhs > reactive.Value() ); }
 
-	bool operator>( const Property< T, Component >& rhs ) const { return ( rhs.reactive.Value() > reactive.Value() ); }
+	bool operator>( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() > reactive.Value() ); }
 
 	bool operator>=( const T& rhs ) const { return ( rhs >= reactive.Value() ); }
 
-	bool operator>=( const Property< T, Component >& rhs ) const { return ( rhs.reactive.Value() >= reactive.Value() ); }
+	bool operator>=( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() >= reactive.Value() ); }
 
 	bool operator<=( const T& rhs ) const { return ( rhs <= reactive.Value() ); }
 
-	bool operator<=( const Property< T, Component >& rhs ) const { return ( rhs.reactive.Value() <= reactive.Value() ); }
+	bool operator<=( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() <= reactive.Value() ); }
 
 private:
 	std::list< std::unique_ptr< Continuation > > continuations;
 	Reactive reactive;
 	react::TransactionStatus status;
 
-	friend std::ostream& operator<<( std::ostream& os, const Property< T, Component >& obj ) {
+	friend std::ostream& operator<<( std::ostream& os, const Property< T, Element >& obj ) {
 		os << obj.reactive.Value();
 		return os;
 	}

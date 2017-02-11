@@ -6,18 +6,18 @@
 
 USING_NAMESPACE
 
-std::atomic< unsigned > Component::id_counter;
-ComponentPtr Component::nullparent = nullptr;
+std::atomic< unsigned > Element::id_counter;
+ElementPtr Element::nullparent = nullptr;
 Application* Application::self = nullptr;
 
-Component::Component() :
-	parent(this,  std::mem_fn(&Component::getParent), std::mem_fn(&Component::setParent)),
-	objectName( "Component" + std::to_string( ++id_counter ) ), core_id( id_counter ) {
+Element::Element() :
+	objectName( "Element" + std::to_string( ++id_counter ) ),
+	parent(this,  std::mem_fn(&Element::getParent), std::mem_fn(&Element::setParent)), core_id( id_counter ) {
 }
 
-Component::Component( ComponentPtr& parent ) : Component() { this->parent = parent ? parent : nullparent; }
+Element::Element( ElementPtr& parent ) : Element() { this->parent = parent ? parent : nullparent; }
 
-Component::~Component() {
+Element::~Element() {
 	// first we traverse the tree to tell our children that
 	// they shouldn't touch their internal tree.
 	// we also delete the children
@@ -41,17 +41,17 @@ Component::~Component() {
 	}
 }
 
-std::vector< ComponentPtr* > Component::children() {
-	std::vector< ComponentPtr* > vec;
+std::vector< ElementPtr* > Element::children() {
+	std::vector< ElementPtr* > vec;
 	for( auto i = internal_tree.begin(); i != internal_tree.end(); ++i ) { vec.push_back( *i ); }
 	return vec;
 }
 
-ComponentPtr& Component::getParent() const {
+ElementPtr& Element::getParent() const {
 	return *_parent;
 }
 
-void Component::setParent(ComponentPtr& new_parent ) {
+void Element::setParent(ElementPtr& new_parent ) {
 	if( App != nullptr && init ) {
 		if( new_parent && new_parent != nullparent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
 		else { this->internal_tree = App->internal_tree.reinsert( internal_tree ); }
@@ -67,7 +67,7 @@ static void closeWindowCallback( GLFWwindow* r_window ) {
 }
 
 Application::Application() :
-	Component(),
+	Element(),
 	component_objects( std::make_unique< ComponentContainer >() ),
 	component_tree( std::make_unique< ComponentTree >() ) {
 	internal_tree = component_tree->tree_iterator();

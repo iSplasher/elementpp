@@ -13,7 +13,7 @@
 #endif
 
 NAMESPACE_BEGIN
-class Component;
+class Element;
 class EventManager;
 
 
@@ -119,10 +119,10 @@ struct ELEMENT_API Event {
 
 protected:
 	Type m_type;
-	Component* receiver = nullptr;
+	Element* receiver = nullptr;
 
 	friend class EventManager;
-	friend class Component;
+	friend class Element;
 
 private:
 	bool ignored = false;
@@ -219,7 +219,7 @@ using ResizeEventPtr = std::shared_ptr< ResizeEvent >;
 /// Manages events
 /// </summary>
 class EventManager {
-	using EventPair = std::pair< Component*, EventPtr >;
+	using EventPair = std::pair< Element*, EventPtr >;
 	using EventQueue = std::vector< EventPair >;
 
 
@@ -238,9 +238,9 @@ public:
 	/// <summary>
 	/// Dispatch event to the event loop
 	/// </summary>
-	/// <param name="receiver">a pointer to a Component object</param>
+	/// <param name="receiver">a pointer to a Element object</param>
 	/// <param name="event">a shared pointer to an Event or its deratives</param>
-	void dispatchEvent( Component*, EventPtr );
+	void dispatchEvent( Element*, EventPtr );
 
 	/// <summary>
 	/// Processes events in the event queue
