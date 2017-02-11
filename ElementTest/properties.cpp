@@ -258,8 +258,7 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("A simple std::string based property view is instantiated") {
 
-			Property< std::string, PropertyViewType > view1(
-			                                                [](std::string a, std::string b, std::string c) -> std::string { return a + b + c; },
+			PropertyView< std::string > view1( [](std::string a, std::string b, std::string c) -> std::string { return a + b + c; },
 			                                                first, second, t.third );
 
 			THEN("PropertyView has the same value as returned by function") {
@@ -308,6 +307,32 @@ SCENARIO("Properties", "[Property]") {
 				
 			}
 
+		}
+
+		WHEN("A PropertyView that differs in type is instantiated") {
+
+			first = "0";
+			second = "0";
+
+			PropertyView< int > view2(
+				[](std::string a, std::string b) -> int { return std::stoi(a) + std::stoi(b); },
+				first, second);
+
+			THEN("PropertyView has the same value as returned by function") {
+				
+				REQUIRE(view2 == 0);
+
+				first = "1";
+				REQUIRE(view2 == 1);
+
+				second = "1";
+				REQUIRE(view2 == 2);
+
+				first = "2";
+				REQUIRE(view2 == 3);
+
+			}
+			
 		}
 
 	}
