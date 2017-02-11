@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Global.h"
-#include "Utils/Primitives.h"
+#include "global.h"
+#include "core/primitives.h"
 
 #include <vector>
 #include <utility>
@@ -20,7 +20,7 @@ class EventManager;
 /// <summary>
 /// Base event. Custom events should subclass this class.
 /// </summary>
-struct GSPLASHER_API Event {
+struct ELEMENT_API Event {
 	enum class Type {
 		None,
 		MouseMove,
@@ -134,7 +134,7 @@ using EventPtr = std::shared_ptr< Event >;
 
 // Input Events
 
-struct GSPLASHER_API InputEvent : Event {
+struct ELEMENT_API InputEvent : Event {
 	InputEvent( Type t, KeyModifier m ) : Event( t ),
 	                                      modifiers( m ) {}
 
@@ -145,7 +145,7 @@ struct GSPLASHER_API InputEvent : Event {
 using InputEventPtr = std::shared_ptr< InputEvent >;
 
 
-struct GSPLASHER_API MouseEvent : InputEvent {
+struct ELEMENT_API MouseEvent : InputEvent {
 	MouseEvent( Type t, const Point local_pos, MouseButton b, MouseButton bs, KeyModifier modifiers ) :
 		InputEvent( t, modifiers ),
 		pos( local_pos ),
@@ -169,7 +169,7 @@ struct GSPLASHER_API MouseEvent : InputEvent {
 using MouseEventPtr = std::shared_ptr< MouseEvent >;
 
 
-struct GSPLASHER_API KeyEvent : InputEvent {
+struct ELEMENT_API KeyEvent : InputEvent {
 	//KeyEvent(Type t, int k, std::string txt = std::string());
 	//KeyEvent(sf::Event);
 
@@ -184,7 +184,7 @@ using KeyEventPtr = std::shared_ptr< KeyEvent >;
 
 // Widget Events
 
-struct GSPLASHER_API MoveEvent : Event {
+struct ELEMENT_API MoveEvent : Event {
 	MoveEvent( Type t, const int new_x, const int new_y, const int old_x, const int old_y ) :
 		Event( t ),
 		pos( new_x, new_y ),
@@ -202,7 +202,7 @@ struct GSPLASHER_API MoveEvent : Event {
 using MoveEventPtr = std::shared_ptr< MoveEvent >;
 
 
-struct GSPLASHER_API ResizeEvent : Event {
+struct ELEMENT_API ResizeEvent : Event {
 	ResizeEvent( Type t, const Size nsize, const Size osize ) : Event( t ),
 	                                                            size( nsize ),
 	                                                            old_size( osize ) {}

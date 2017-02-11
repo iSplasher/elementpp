@@ -1,4 +1,4 @@
-#include "gSplasher/Core.h"
+#include "element/core.h"
 //#include "gSplasher/Window.h"
 
 #include <GL/glew.h>

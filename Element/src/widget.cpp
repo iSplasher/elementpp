@@ -1,6 +1,6 @@
-#include "gSplasher/Widget.h"
-#include "gSplasher/Window.h"
-#include "gSplasher/Utils/Painter.h"
+#include "element/widget.h"
+#include "element/window.h"
+#include "element/utils/painter.h"
 
 
 USING_NAMESPACE

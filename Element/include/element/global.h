@@ -5,10 +5,10 @@
 
 // macros
 
-#define GSP_VERSION_MAJOR 0
-#define GSP_VERSION_MINOR 1
-#define GSP_VERSION_PATCH 0
-#define NAMESPACE gsp
+#define ELP_VERSION_MAJOR 0
+#define ELP_VERSION_MINOR 1
+#define ELP_VERSION_PATCH 0
+#define NAMESPACE elp
 #define PRIV_NAMESPACE priv
 #define USING_NAMESPACE using namespace NAMESPACE;
 #define USING_NAMESPACE_PRIV using namespace NAMESPACE::PRIV_NAMESPACE;
@@ -36,13 +36,13 @@
 #endif
 
 #ifndef _DEBUG
-#ifdef GSPLASHER_EXPORTS
-		#define GSPLASHER_API __declspec(dllexport)
+#ifdef ELEMENT_EXPORTS
+		#define ELEMENT_API __declspec(dllexport)
 #else
-		#define GSPLASHER_API __declspec(dllimport)
+		#define ELEMENT_API __declspec(dllimport)
 #endif
 #else
-#define GSPLASHER_API
+#define ELEMENT_API
 #endif
 
 NAMESPACE_BEGIN

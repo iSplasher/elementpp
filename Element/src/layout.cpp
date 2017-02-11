@@ -1,5 +1,5 @@
-﻿#include "gSplasher/Layout.h"
-#include "gSplasher/Widget.h"
+﻿#include "element/layout.h"
+#include "element/widget.h"
 
 #include <yoga/Yoga.h>
 

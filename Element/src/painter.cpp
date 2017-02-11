@@ -1,6 +1,6 @@
-﻿#include "gSplasher/Utils/Painter.h"
-#include "gSplasher/Window.h"
-#include "gSplasher/Utils/Primitives.h"
+﻿#include "element/utils/painter.h"
+#include "element/window.h"
+#include "element/utils/primitives.h"
 
 #include <GL/glew.h> // required for nanovg
 #include <GLFW/glfw3.h> // required for nanovg

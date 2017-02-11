@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gSplasher/Global.h"
+#include "element/global.h"
 
 #include <iostream>
 
@@ -15,7 +15,7 @@ class gBrush;
 /// Point. Defines x and y.
 /// </summary>
 template <typename T>
-struct GSPLASHER_API PointT {
+struct ELEMENT_API PointT {
 	PointT() : PointT(0, 0) {}
 	PointT(T X, T Y) : x(X), y(Y) {}
 
@@ -162,7 +162,7 @@ using PointU = PointT<unsigned>;
 /// Size. Defines width and height.
 /// </summary>
 template <typename T>
-struct GSPLASHER_API SizeT {
+struct ELEMENT_API SizeT {
 	SizeT() : SizeT(0, 0) {}
 	SizeT(T W, T H) : width(W), height(H) {}
 
@@ -308,7 +308,7 @@ using SizeD = SizeT<double>;
 /// Rect. Defines x, y, width and height.
 /// </summary>
 template <typename T>
-struct GSPLASHER_API RectT {
+struct ELEMENT_API RectT {
 	RectT() : RectT(0, 0, 0, 0) {}
 	RectT(T X, T Y, T W, T H) : x(X), y(Y), width(W), height(H) {}
 	RectT(PointT<T> p, SizeT<T> s) : RectT(p.x, p.y, s.width, s.height) {}
@@ -675,7 +675,7 @@ using RectF = RectT<float>;
 using RectD = RectT<double>;
 using RectU = RectT<unsigned>;
 
-class GSPLASHER_API gColor {
+class ELEMENT_API gColor {
 public:
 	gColor() = default;
 	gColor(int r, int g, int b) : red(r), green(g), blue(b), type(RGB) {}
@@ -727,7 +727,7 @@ inline std::ostream &operator <<(std::ostream &out, const gColor &c) {
 	return out;
 }
 
-class GSPLASHER_API gFont {
+class ELEMENT_API gFont {
 public:
 	gFont() = default;
 	//gFont(std::string face);

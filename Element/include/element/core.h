@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Global.h"
-#include "Event.h"
-#include "Property.h"
-#include "Utils/Tree.h" // TODO: move this to cpp and forward declare tree class
+#include "global.h"
+#include "event.h"
+#include "property.h"
+#include "core/tree.h" // TODO: move this to cpp and forward declare tree class
 
 #include <atomic>
 
@@ -24,9 +24,10 @@ enum class ComponentType {
 
 
 /**
- * \brief Component object of the whole library
+ * \brief Base object.
+ * A Component is created with Application.create<Component>(args...);
  */
-class GSPLASHER_API Component {
+class ELEMENT_API Component {
 public:
 
 	Component();
@@ -44,32 +45,11 @@ public:
 
 	// PROPERTIES
 
-private:
-	Component( Component&& other ) noexcept
-		: parent( std::move( other.parent ) ),
-		  objectName( std::move( other.objectName ) ),
-		  type( std::move( other.type ) ),
-		  core_id( other.core_id ),
-		  internal_tree( std::move( other.internal_tree ) ),
-		  parent_is_deleting( other.parent_is_deleting ) {}
-
-	Component& operator=( Component&& other ) noexcept {
-		if( this == &other )
-			return *this;
-		parent = std::move( other.parent );
-		objectName = std::move( other.objectName );
-		type = std::move( other.type );
-		core_id = other.core_id;
-		internal_tree = std::move( other.internal_tree );
-		parent_is_deleting = other.parent_is_deleting;
-		return *this;
-	}
-
 public:
-
-	const Accessor< ComponentPtr&, Component > parent;
 	Property< std::string > objectName;
 	Property< ComponentType, Component > type{ ComponentType::Base };
+
+	const Accessor< ComponentPtr&, Component > parent;
 
 	// FUNCTIONS
 
@@ -83,6 +63,31 @@ protected:
 
 private:
 	using ComponentTree = tree< ComponentPtr* >;
+
+
+	Component(Component&& other) noexcept
+		: objectName(std::move(other.objectName)),
+		type(std::move(other.type)),
+		parent(std::move(other.parent)),
+		core_id(other.core_id),
+		internal_tree(std::move(other.internal_tree)),
+		_parent(other._parent),
+		init(other.init),
+		parent_is_deleting(other.parent_is_deleting) {}
+
+	Component& operator=(Component&& other) noexcept {
+		if (this == &other)
+			return *this;
+		objectName = std::move(other.objectName);
+		type = std::move(other.type);
+		parent = std::move(other.parent);
+		core_id = other.core_id;
+		internal_tree = std::move(other.internal_tree);
+		_parent = other._parent;
+		init = other.init;
+		parent_is_deleting = other.parent_is_deleting;
+		return *this;
+	}
 
 	// FUNCTIONS
 	void setParent( ComponentPtr& );
@@ -119,7 +124,7 @@ private:
 /**
  * \brief Main instance of the whole application. Only one instance is allowed.
  */
-class GSPLASHER_API Application final : private Component {
+class ELEMENT_API Application final : private Component {
 	using ComponentContainer = std::list< ComponentPtr >;
 	using ComponentContainerPtr = std::unique_ptr< ComponentContainer >;
 	using ComponentTreePtr = std::unique_ptr< ComponentTree >;

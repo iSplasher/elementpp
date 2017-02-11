@@ -1,5 +1,5 @@
-#include "gSplasher/Event.h"
-#include "gSplasher/Core.h"
+#include "element/event.h"
+#include "element/core.h"
 
 USING_NAMESPACE
 

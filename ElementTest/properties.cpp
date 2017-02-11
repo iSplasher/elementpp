@@ -1,5 +1,5 @@
-#include "gSplasher/Core.h"
-#include "gSplasher/Property.h"
+#include "element/core.h"
+#include "element/property.h"
 
 #include "catch.hpp"
 
@@ -136,7 +136,7 @@ SCENARIO("Properties", "[Property]") {
 		WHEN("Two properties dependency async with sleep") {
 			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
-					                           std::cout << "sleeping for 1 second.." << std::endl;
+					                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
 					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 					                           prop2 = "changed";
 				                           };
@@ -144,7 +144,7 @@ SCENARIO("Properties", "[Property]") {
 
 			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                           if( prop2 != prop1 ) {
-					                           std::cout << "sleeping for 1 second.." << std::endl;
+					                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
 					                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 					                           prop1 = "changed";
 				                           };
@@ -245,6 +245,10 @@ SCENARIO("Properties", "[Property]") {
 
 		}
 
+	}
+
+	GIVEN("Simple property views can be instantiated") {
+		//Property<std::string, PropertyViewType> prop1;
 	}
 
 }

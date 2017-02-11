@@ -7,7 +7,7 @@
 #include <react/Domain.h>
 #include <react/Signal.h>
 
-#include "gSplasher/Global.h"
+#include "global.h"
 
 NAMESPACE_BEGIN
 enum class ConnectionType {
@@ -25,6 +25,12 @@ enum class ConnectionType {
 	*/
 	Scoped
 };
+
+struct PropertyEventType {};
+/**
+* \brief Create a read-only property that acts like a view for other properties
+*/
+struct PropertyViewType {};
 
 
 PRIV_NAMESPACE_BEGIN
@@ -133,13 +139,14 @@ class Component;
  * \tparam T type
  * \tparam Private class allowed to access this property
  */
-template< typename T, class Private = Component >
+template< typename T, typename Private = Component >
 class Property {
 	using Reactive = PRIV_NAMESPACE::VarSignalT< T >;
 	using func = std::function< void( T ) >;
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 
 public:
+
 	/**
 	* \brief property->member
 	* \return
@@ -231,7 +238,9 @@ private:
 	Property() : reactive( react::MakeVar< PRIV_NAMESPACE::D >( T() ) ) { }
 
 	template< typename ... Args >
-	explicit Property( Args ... args ) : reactive( react::MakeVar< PRIV_NAMESPACE::D >( T( std::forward< Args >( args )... ) ) ) { }
+	explicit Property( Args&& ... args ) : reactive( react::MakeVar< PRIV_NAMESPACE::D >( T( std::forward< Args >( args )... ) ) ) { }
+
+	explicit Property(T&& t) : reactive(react::MakeVar< PRIV_NAMESPACE::D >(std::forward< T >(t))) { }
 
 	~Property() {
 		for( auto& p : continuations ) {
@@ -315,7 +324,7 @@ private:
 
 
 /**
- * \brief Private read-write property
+ * \brief A read-write property
  * \tparam T 
  */
 template< typename T >
@@ -414,7 +423,7 @@ public:
 	// FUNCTIONS
 
 	/**
-	 * \brief 
+	 * \brief Construct a connection to a function that will be called on every property change
 	 * \tparam C connection release policy
 	 * \param f function to connect
 	 * \return 
@@ -447,7 +456,7 @@ public:
 
 
 	/**
-	 * \brief Wait for all computations have been made
+	 * \brief Wait for all async computations have been made
 	 * \remark Equivalent to a thread.join()
 	 * \see operator<<()
 	 */
@@ -459,7 +468,8 @@ public:
 	*/
 	T get() { return reactive.Value(); }
 
-		// Boolean operators
+	// Boolean operators
+
 	bool operator!() const { return !get(); }
 
 	// Relational operators
@@ -501,13 +511,181 @@ private:
 
 
 /**
- * \brief Python/C# like syntatic sugar for class properties.
+* \brief A property view
+* \tparam T type
+*/
+template< typename T >
+class Property< T, PropertyViewType > {
+	using Reactive = PRIV_NAMESPACE::SignalT< T >;
+	using func = std::function< void(T) >;
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
+
+	template<typename... Conds>
+	struct and_ : std::true_type {};
+
+public:
+
+	template<typename A, typename S, typename... Args >
+	explicit Property(Args&& ... args) {
+		static_assert(and_<std::is_same<Args, Property<A, S>>>::value);
+		//reactive = react::MakeSignal( react::With( args ... ) )
+	}
+
+	/**
+	* \brief property->member
+	* \return
+	*/
+	T operator->() { return reactive.Value(); }
+
+
+	/**
+	* \brief typecast operator
+	*/
+	operator T() const { return reactive.Value(); }
+
+	// FUNCTIONS
+
+	/**
+	* \brief
+	* \tparam C connection release policy
+	* \param f function to connect
+	* \return
+	*/
+	template< ConnectionType C = ConnectionType::Permanent >
+	auto connect(func f) {
+		std::unique_ptr< Continuation > _cont = nullptr;
+		continuations.push_back(std::move(_cont));
+		auto& cont = continuations.back();
+
+		switch (C) {
+		case ConnectionType::Scoped:
+		case ConnectionType::Permanent:
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, f))));
+			break;
+		}
+		case ConnectionType::Temporary: // run only once
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, [=, &cont](T t) {
+				f(std::forward< T >(t));
+				if (cont)
+					cont.reset();
+			}))));
+			break;
+		}
+		}
+		return Connection< Property< T, PropertyViewType > >(this, status, cont, C == ConnectionType::Scoped);
+	}
+
+
+	/**
+	* \brief Wait for all computations have been made
+	* \remark Equivalent to a thread.join()
+	* \see operator<<()
+	*/
+	void wait() { status.Wait(); }
+
+	/**
+	* \brief Get T
+	* \return T
+	*/
+	T get() { return this; }
+
+	// Relational operators
+
+	bool operator==(const T& rhs) { return (rhs == reactive.Value()); }
+
+	bool operator==(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() == reactive.Value()); }
+
+	bool operator!=(const T& rhs) { return !(rhs == reactive.Value()); }
+
+	bool operator!=(const Property< T, PropertyViewType >& rhs) { return !(rhs.reactive.Value() == reactive.Value()); }
+
+	bool operator<(const T& rhs) { return (rhs < reactive.Value()); }
+
+	bool operator<(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() < reactive.Value()); }
+
+	bool operator>(const T& rhs) { return (rhs > reactive.Value()); }
+
+	bool operator>(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() > reactive.Value()); }
+
+	bool operator>=(const T& rhs) { return (rhs >= reactive.Value()); }
+
+	bool operator>=(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() >= reactive.Value()); }
+
+	bool operator<=(const T& rhs) { return (rhs <= reactive.Value()); }
+
+	bool operator<=(const Property< T, PropertyViewType >& rhs) { return (rhs.reactive.Value() <= reactive.Value()); }
+
+
+private:
+
+	~Property() {
+		for (auto& p : continuations) {
+			if (p) {
+				p.reset();
+			}
+		}
+	}
+
+	// MOVE & COPY
+
+	Property(const Property& other)
+		: continuations(other.continuations),
+		reactive(other.reactive),
+		status(other.status) {}
+
+	Property(Property&& other) noexcept
+		: continuations(std::move(other.continuations)),
+		reactive(std::move(other.reactive)),
+		status(std::move(other.status)) {}
+
+	Property& operator=(const Property& other) {
+		if (this == &other)
+			return *this;
+		continuations = other.continuations;
+		reactive = other.reactive;
+		status = other.status;
+		return *this;
+	}
+
+	Property& operator=(Property&& other) noexcept {
+		if (this == &other)
+			return *this;
+		continuations = std::move(other.continuations);
+		reactive = std::move(other.reactive);
+		status = std::move(other.status);
+		return *this;
+	}
+
+
+	std::list< std::unique_ptr< Continuation > > continuations;
+	Reactive reactive;
+	react::TransactionStatus status;
+
+	friend std::ostream& operator<<(std::ostream& os, const Property< T, PropertyViewType >& obj) {
+		os << obj.reactive.Value();
+		return os;
+	}
+};
+
+
+/**
+ * \brief Python/C#-like syntatic sugar for class properties.
  * You define a class property like this:
  *  ```
  *     struct MyClass {
- *		Accessor<std::string, MyClass> name = "MyClass";
+ *		MyClass() : name(this, std::mem_fn(&MyClass::getS), std::mem_fn(&MyClass::setS)) {}
+ *     
+ *		Accessor<std::string, MyClass> name;
  *		
  *		private:
+ *			std::string s = '';
+ *			
+ *			std::string getS() { return s; }
+ *			void setS(std::string new_s) { s = new_s; }
+ *			
+ *		}
  *		
  *	```
  * \tparam T Type
@@ -515,39 +693,20 @@ private:
  */
 template< typename T, class S >
 class Accessor {
-private:
-	using get_fn = std::function<T(S&)>;
-	using set_fn = std::function<void(S&, T)>;
 
-	mutable S* classptr;
-
-	mutable get_fn getter;
-
-	mutable  set_fn setter;
-
-	T default_getter() {
-		throw "Cannot read property";
-	}
-
-	void default_setter( T value ) {
-		throw "Cannot write property";
-	}
-
-	void init ( S* cls, get_fn get, set_fn set ) const {
-		classptr = cls;
-		getter = get;
-		setter = set;
-	}
+	using get_fn = std::function< T( S& ) >;
+	using set_fn = std::function< void( S&, T ) >;
 
 public:
+
 	Accessor() { }
 
-	Accessor(S* cls, get_fn get, set_fn set ) : classptr( cls ),
-	                                                           getter( get ),
-	                                                           setter( set ) { }
+	Accessor( S* cls, get_fn get, set_fn set ) : classptr( cls ),
+	                                             getter( get ),
+	                                             setter( set ) { }
 
-	Accessor(S* cls, get_fn get) { init(cls, get, std::mem_fn(&Accessor<T, S>::default_setter)); }
-	Accessor(S* cls, set_fn set) { init(cls, std::mem_fn(&Accessor<T, S>::default_getter), set); }
+	Accessor( S* cls, get_fn get ) { init( cls, get, std::mem_fn( &Accessor< T, S >::default_setter ) ); }
+	Accessor( S* cls, set_fn set ) { init( cls, std::mem_fn( &Accessor< T, S >::default_getter ), set ); }
 
 	Accessor( const Accessor& other )
 		: classptr( other.classptr ),
@@ -582,36 +741,59 @@ public:
 
 	T operator->() const { return get(); }
 
-	T get() const { return getter(*classptr); }
+	T get() const { return getter( *classptr ); }
 
 	// Boolean operators
+
 	bool operator!() const { return !get(); }
 
 	// Relational operators
 
-	bool operator==(const T& rhs) const { return (rhs == get()); }
+	bool operator==( const T& rhs ) const { return ( rhs == get() ); }
 
-	bool operator==(const Accessor< T, S >& rhs) const { return (rhs.get() == get()); }
+	bool operator==( const Accessor< T, S >& rhs ) const { return ( rhs.get() == get() ); }
 
-	bool operator!=(const T& rhs) const { return !(rhs == get()); }
+	bool operator!=( const T& rhs ) const { return !( rhs == get() ); }
 
-	bool operator!=(const Accessor< T, S >& rhs) const { return !(rhs.get() == get()); }
+	bool operator!=( const Accessor< T, S >& rhs ) const { return !( rhs.get() == get() ); }
 
-	bool operator<(const T& rhs) const { return (rhs < get()); }
+	bool operator<( const T& rhs ) const { return ( rhs < get() ); }
 
-	bool operator<(const Accessor< T, S >& rhs) const { return (rhs.get() < get()); }
+	bool operator<( const Accessor< T, S >& rhs ) const { return ( rhs.get() < get() ); }
 
-	bool operator>(const T& rhs) const { return (rhs > get()); }
+	bool operator>( const T& rhs ) const { return ( rhs > get() ); }
 
-	bool operator>(const Accessor< T, S >& rhs) const { return (rhs.get() > get()); }
+	bool operator>( const Accessor< T, S >& rhs ) const { return ( rhs.get() > get() ); }
 
-	bool operator>=(const T& rhs) const { return (rhs >= get()); }
+	bool operator>=( const T& rhs ) const { return ( rhs >= get() ); }
 
-	bool operator>=(const Accessor< T, S >& rhs) const { return (rhs.get() >= get()); }
+	bool operator>=( const Accessor< T, S >& rhs ) const { return ( rhs.get() >= get() ); }
 
-	bool operator<=(const T& rhs) const { return (rhs <= get()); }
+	bool operator<=( const T& rhs ) const { return ( rhs <= get() ); }
 
-	bool operator<=(const Accessor< T, S >& rhs) const { return (rhs.get() <= get()); }
+	bool operator<=( const Accessor< T, S >& rhs ) const { return ( rhs.get() <= get() ); }
+
+private:
+
+	mutable S* classptr;
+
+	mutable get_fn getter;
+
+	mutable set_fn setter;
+
+	T default_getter() {
+		throw "Cannot read property";
+	}
+
+	void default_setter( T value ) {
+		throw "Cannot write property";
+	}
+
+	void init( S* cls, get_fn get, set_fn set ) const {
+		classptr = cls;
+		getter = get;
+		setter = set;
+	}
 
 };
 

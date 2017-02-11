@@ -1,5 +1,5 @@
-#include "gSplasher/Window.h"
-#include "gSplasher/Event.h"
+#include "element/window.h"
+#include "element/event.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,7 +9,7 @@
 //#include <GLFW/glfw3native.h>
 //#endif
 
-#include "gSplasher/Utils/Painter.h"
+#include "element/utils/painter.h"
 
 USING_NAMESPACE
 
