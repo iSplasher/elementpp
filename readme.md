@@ -1,4 +1,4 @@
-# gSplasher
+# Element++
 
 This is a small GUI library written in modern C++. 
 It is cross-platform and was designed as a simple embeddable user interface for applications.
