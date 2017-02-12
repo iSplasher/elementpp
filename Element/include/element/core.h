@@ -15,11 +15,17 @@ class RWindow;
 class Application;
 
 
-enum class ComponentType {
+enum class ElementType {
 	Base, // TODO: new name
+	Application,
 	Widget,
 	Window,
 	Layout
+};
+
+enum class ExitCode {
+	Quit,
+	Restart
 };
 
 
@@ -45,9 +51,8 @@ public:
 
 	// PROPERTIES
 
-public:
 	Property< std::string > objectName;
-	Property< ComponentType, Element > type{ ComponentType::Base };
+	Property< ElementType, Element > type{ ElementType::Base };
 
 	const Accessor< ElementPtr&, Element > parent;
 
@@ -59,7 +64,7 @@ public:
 
 protected:
 
-	void setType( ComponentType t ) { type = t; }
+	void setType( ElementType t ) { type = t; }
 
 private:
 	using ComponentTree = tree< ElementPtr* >;
@@ -137,28 +142,41 @@ public:
 
 	// FUNCTIONS
 
-	/// <summary>
-	/// Create Element objects
-	/// </summary>
+	/**
+	 * \brief Create \ref Element or a derived objects
+	 * \tparam T \ref Element or a derived object
+	 * \tparam Args Parameter pack
+	 * \param args Arguments that will be passed to the object's constructor. Think of it like `std::make_unique<T>(args...)`
+	 * \return A reference to an unique pointer to the object
+	 * \remark The application will own the object. To pass around the object, you must *pass by reference*.
+	 * It is advised to know about `smart pointers`, specifically a `unique_pointer` and its semantics.
+	 * \warning You must use this interface to create an \ref Element or a derived object
+	 * \see destroy
+	 */
 	template< class T, typename... Args >
 	std::unique_ptr< T >& create( Args&& ... args );
 
-	/// <summary>
-	/// Delete Element objects
-	/// </summary>
+	/**
+	 * \brief Delete \ref Element objects
+	 * \tparam T \ref Element object
+	 * \warning It is important to destroy \ref Element objects through this interface and not through a `delete`
+	 * \see create
+	 */
 	template< class T >
 	void destroy( T& );
 
-	/// <summary>
-	/// Start application, blocking
-	/// </summary>
-	/// <returns></returns>
-	int exec();
 
-	/// <summary>
-	/// Get Application singleton instance
-	/// </summary>
-	/// <returns></returns>
+	/**
+	 * \brief Start the applicaion
+	 * \return A code indicating what type of exit it is
+	 * \warning This function is blocking
+	 */
+	ExitCode exec();
+
+	/**
+	 * \brief Get Application singleton instance
+	 * \return Current Application instance
+	 */
 	static Application* instance();
 
 	// PROPERTIES
@@ -210,7 +228,7 @@ private:
 
 template< class T, typename ... Args >
 std::unique_ptr< T >& Application::create( Args&& ... args ) {
-	static_assert(std::is_base_of< Element, T >::value, "Must be same or inherited of Element");
+	static_assert(std::is_base_of< Element, T >::value, "Must be same or derived from Element");
 	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
 	auto& item = component_objects->back();
 
@@ -225,7 +243,7 @@ std::unique_ptr< T >& Application::create( Args&& ... args ) {
 
 template< class T >
 void Application::destroy( T& object ) {
-	static_assert(std::is_convertible< T, ElementPtr >::value, "Must be same or inherited of Element");
+	static_assert(std::is_convertible< T, ElementPtr >::value, "Must be same or derived from Element");
 	if( object )
 		component_objects->remove( object );
 }

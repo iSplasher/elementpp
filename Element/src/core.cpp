@@ -76,10 +76,11 @@ Application::Application() :
 	self = this;
 
 	glfwSetErrorCallback( errorCallback );
-	if( !glfwInit() ) { throw std::runtime_error( "Could not init glfw" ); }
+	if( !glfwInit() ) { throw std::runtime_error( "Failed to initialize glfw" ); }
 
 	glEnable( GL_MULTISAMPLE );
 	objectName = "Application";
+	setType(ElementType::Application);
 }
 
 Application::~Application() {
@@ -87,12 +88,12 @@ Application::~Application() {
 	isRunning = false;
 }
 
-int Application::exec() {
+ExitCode Application::exec() {
 	isRunning = true;
 	glfwSwapInterval( 0 );
 	do {}
 	while( processEv() );
-	return 0;
+	return ExitCode::Quit;
 }
 
 
