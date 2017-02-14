@@ -1,13 +1,14 @@
 #pragma once
 
-#include <type_traits>
-#include <functional>
-#include <initializer_list>
+#include "global.h"
 
 #include <react/Domain.h>
 #include <react/Signal.h>
 
-#include "global.h"
+#include <type_traits>
+#include <functional>
+#include <initializer_list>
+#include <list>
 
 NAMESPACE_BEGIN
 enum class ConnectionType {
@@ -267,24 +268,15 @@ private:
 
 	// MOVE & COPY
 
-	Property( const Property& other )
-		: continuations( other.continuations ),
-		  reactive( other.reactive ),
-		  status( other.status ) {}
+	Property(const Property& other) = delete;
+	Property& operator=(const Property& other) = delete;
+
 
 	Property( Property&& other ) noexcept
 		: continuations( std::move( other.continuations ) ),
 		  reactive( std::move( other.reactive ) ),
 		  status( std::move( other.status ) ) {}
 
-	Property& operator=( const Property& other ) {
-		if( this == &other )
-			return *this;
-		continuations = other.continuations;
-		reactive = other.reactive;
-		status = other.status;
-		return *this;
-	}
 
 	Property& operator=( Property&& other ) noexcept {
 		if( this == &other )
@@ -327,7 +319,7 @@ private:
 
 	std::list< std::unique_ptr< Continuation > > continuations;
 	Reactive reactive;
-	react::TransactionStatus status;
+	react::TransactionStatus status = react::TransactionStatus();
 
 	friend Private;
 	template< typename P, typename PropertyViewType >
@@ -359,25 +351,14 @@ public:
 
 	explicit Property( T&& t ) : reactive( react::MakeVar< PRIV_NAMESPACE::D >( std::forward< T >( t ) ) ) { }
 
-	Property( const Property& other )
-		: continuations( other.continuations ),
-		  reactive( other.reactive ),
-		  status( other.status ) {}
+	Property(const Property& other) = delete;
 
 	Property( Property&& other ) noexcept
 		: continuations( std::move( other.continuations ) ),
 		  reactive( std::move( other.reactive ) ),
 		  status( std::move( other.status ) ) {}
 
-	Property& operator=( const Property& other ) {
-		if( this == &other )
-			return *this;
-		continuations = other.continuations;
-		reactive = other.reactive;
-		status = other.status;
-		return *this;
-	}
-
+	Property& operator=(const Property& other) = delete;
 	Property& operator=( Property&& other ) noexcept {
 		if( this == &other )
 			return *this;
@@ -518,7 +499,7 @@ public:
 private:
 	std::list< std::unique_ptr< Continuation > > continuations;
 	Reactive reactive;
-	react::TransactionStatus status;
+	react::TransactionStatus status = react::TransactionStatus();
 
 	template< typename P, typename PropertyViewType >
 	friend class Property;
@@ -677,7 +658,7 @@ private:
 
 	std::list< std::unique_ptr< Continuation > > continuations;
 	Reactive reactive;
-	react::TransactionStatus status;
+	react::TransactionStatus status = react::TransactionStatus();
 
 	friend std::ostream& operator<<( std::ostream& os, const PropertyView< T >& obj ) {
 		os << obj.reactive.Value();
@@ -722,7 +703,6 @@ public:
 	                                             setter( set ) { }
 
 	Accessor( S* cls, get_fn get ) { init( cls, get, std::mem_fn( &Accessor< T, S >::default_setter ) ); }
-	Accessor( S* cls, set_fn set ) { init( cls, std::mem_fn( &Accessor< T, S >::default_getter ), set ); }
 
 	Accessor( const Accessor& other )
 		: classptr( other.classptr ),

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "element/global.h"
-
-#include <iostream>
+#include "element/property.h"
 
 typedef struct NVGcolor _PColor;
 
@@ -143,8 +142,8 @@ struct ELEMENT_API PointT {
 		return x < rh || y < rh;
 	}
 
-	T x;
-	T y;
+	T x = 0;
+	T y = 0;
 };
 
 template<typename T>
@@ -290,8 +289,8 @@ struct ELEMENT_API SizeT {
 		return width < rh || height < rh;
 	}
 
-	T width;
-	T height;
+	T width = 0;
+	T height = 0;
 };
 
 template<typename T>
@@ -658,10 +657,10 @@ struct ELEMENT_API RectT {
 		return x < rh || y < rh || width < rh || height < rh;
 	}
 
-	T x;
-	T y;
-	T width;
-	T height;
+	T x = 0;
+	T y = 0;
+	T width = 0;
+	T height = 0;
 };
 
 template<typename T>
