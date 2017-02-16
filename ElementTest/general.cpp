@@ -35,15 +35,15 @@ SCENARIO("Element objects can be created and destroyed", "[Element]") {
 		}
 
 		WHEN("Children are created") {
-			auto& child1 = app->create< Element >( comp1 );
-			auto& child2 = app->create< Element >( comp2 );
+			auto& child1 = app->create< Element >( comp1.get() );
+			auto& child2 = app->create< Element >( comp2.get() );
 
 			THEN("they get appended to their parents") {
 				REQUIRE(comp1->children().size() == 1);
 				REQUIRE(comp2->children().size() == 1);
 
-				REQUIRE(child1->parent == comp1);
-				REQUIRE(child2->parent == comp2);
+				REQUIRE(child1->parent == comp1.get());
+				REQUIRE(child2->parent == comp2.get());
 			}
 
 			WHEN("One get destroyed") {

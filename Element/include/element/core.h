@@ -38,7 +38,7 @@ public:
 
 	Element();
 
-	explicit Element( ElementPtr& parent );
+	explicit Element( Element *parent );
 
 	virtual ~Element();
 
@@ -54,11 +54,11 @@ public:
 	Property< std::string > objectName;
 	Property< ElementType, Element > type{ ElementType::Base };
 
-	const Accessor< ElementPtr&, Element > parent;
+	const Accessor< Element* , Element > parent;
 
 	// FUNCTIONS
 
-	std::vector< ElementPtr* > children();
+	std::vector< Element* > children();
 
 	// DATA
 
@@ -67,7 +67,7 @@ protected:
 	void setType( ElementType t ) { type = t; }
 
 private:
-	using ComponentTree = tree< ElementPtr* >;
+	using ElementTree = tree< Element* >;
 
 
 	Element(Element&& other) noexcept
@@ -95,9 +95,9 @@ private:
 	}
 
 	// FUNCTIONS
-	void setParent( ElementPtr& );
+	void setParent( Element* );
 
-	ElementPtr& getParent() const;
+	Element* getParent() const;
 
 
 	//log(LogLevel, std::string);
@@ -106,9 +106,9 @@ private:
 
 	unsigned core_id;
 	static std::atomic< unsigned > id_counter;
-	static ElementPtr nullparent;
-	ComponentTree::iterator internal_tree;
-	ElementPtr* _parent = &nullparent;
+	ElementTree::iterator internal_tree;
+	Element* _parent = nullptr;
+	ElementPtr* object = nullptr;
 
 	bool init = false; // has this Element initialized?
 
@@ -130,9 +130,9 @@ private:
  * \brief Main instance of the whole application. Only one instance is allowed.
  */
 class ELEMENT_API Application final : private Element {
-	using ComponentContainer = std::list< ElementPtr >;
-	using ComponentContainerPtr = std::unique_ptr< ComponentContainer >;
-	using ComponentTreePtr = std::unique_ptr< ComponentTree >;
+	using ElementContainer = std::list< ElementPtr >;
+	using ElementContainerPtr = std::unique_ptr< ElementContainer >;
+	using ElementTreePtr = std::unique_ptr< ElementTree >;
 
 public:
 
@@ -188,14 +188,14 @@ public:
 
 		std::cout << objectName << std::endl;
 
-		std::function< void( const ComponentTree::const_iterator& t ) > pp = [&](const ComponentTree::const_iterator& t) {
+		std::function< void( const ElementTree::const_iterator& t ) > pp = [&](const ElementTree::const_iterator& t) {
 
-					for( ComponentTree::const_iterator i = t.begin();
+					for( ElementTree::const_iterator i = t.begin();
 					     i != t.end(); ++i ) {
 						for( int tabs = 0; tabs < i.level(); ++tabs )
 							std::cout << "\t";
 
-						std::cout << ( *i.data() )->objectName << std::endl;
+						std::cout << i.data()->objectName << std::endl;
 
 						pp( i );
 					}
@@ -218,8 +218,8 @@ private:
 	bool should_quit = false;
 	bool is_running = false;
 
-	ComponentContainerPtr component_objects;
-	ComponentTreePtr component_tree;
+	ElementContainerPtr component_objects;
+	ElementTreePtr component_tree;
 
 	friend class RWindow;
 	friend class Element;
@@ -231,11 +231,12 @@ std::unique_ptr< T >& Application::create( Args&& ... args ) {
 	static_assert(std::is_base_of< Element, T >::value, "Must be same or derived from Element");
 	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
 	auto& item = component_objects->back();
+	item->object = &item;
 
-	auto& item_parent = item->parent.get();
+	auto item_parent = item->parent.get();
 
-	if (item_parent && item_parent != Element::nullparent) { item->internal_tree = item_parent->internal_tree.push_back(&item); }
-	else { item->internal_tree = component_tree->push_back(&item); }
+	if (item_parent) { item->internal_tree = item_parent->internal_tree.push_back(item.get()); }
+	else { item->internal_tree = component_tree->push_back(item.get()); }
 
 	item->init = true;
 	return item;

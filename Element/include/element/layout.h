@@ -27,9 +27,7 @@ class ELEMENT_API LayoutElement : public Element {
 public:
 
 	// *structers
-	LayoutElement();
-
-	explicit LayoutElement( LayoutElementPtr& parent );
+	explicit LayoutElement( LayoutElement* parent = nullptr );
 
 	virtual ~LayoutElement();
 
@@ -43,7 +41,7 @@ public:
 	/// Returns the layout which handles this item
 	/// </summary>
 	/// <returns>Layout</returns>
-	const Accessor< LayoutPtr&, LayoutElement > layout;
+	const Accessor< Layout*, LayoutElement > layout;
 
 
 	virtual void update();
@@ -55,9 +53,6 @@ public:
 	//virtual Size minimumSize() const = 0;
 	//virtual Size maximumSize() const = 0;
 	//virtual bool isEmpty() const = 0;
-
-
-	static LayoutElementPtr nullparent;
 
 protected:
 
@@ -101,8 +96,8 @@ private:
 
 	bool dirty_layuot = false; // item geometry has been invalidated
 
-	LayoutPtr* playout; // containing layout
-	LayoutPtr* bound_layout; // setWidget on layout
+	Layout* playout = nullptr; // containing layout
+	Layout* bound_layout = nullptr; // setWidget on layout
 	LayoutNode node = nullptr;
 	Properties properties;
 
@@ -122,21 +117,19 @@ public:
 	// * structers
 	explicit Layout();
 
-	explicit Layout( PRIV_NAMESPACE::LayoutElementPtr& parent );
-
 	virtual ~Layout() = default;
 
 	// member methods
 	//virtual LayoutCore* parent();
-	const Accessor< WidgetPtr&, Layout > widget;
+	const Accessor< Widget* , Layout > widget;
 
-	virtual void appendItem( PRIV_NAMESPACE::LayoutElementPtr& item, Alignment align = Alignment::Default, float grow = 1 );
+	virtual void appendItem( PRIV_NAMESPACE::LayoutElement* item, Alignment align = Alignment::Default, float grow = 1 );
 
 	/// <summary>
 	/// Take item out of layout. 
 	/// </summary>
 	/// <param name="item">item to take out</param>
-	void takeItem( PRIV_NAMESPACE::LayoutElementPtr& item );
+	void takeItem( PRIV_NAMESPACE::LayoutElement* item );
 
 	//void remove(LayoutCore&);
 
@@ -154,28 +147,24 @@ public:
 	//Rect contentsRect() const;
 	virtual void invalidate();
 
-	static LayoutPtr nullparent;
-
 protected:
 
-	void beginLayoutChange() const;
+	//void beginLayoutChange() const;
 
-	void endLayoutChange() const;
+	//void endLayoutChange() const;
 
 private:
 
 	// member methods
 	void update() override {};
 
-	void applyItemProperties( PRIV_NAMESPACE::LayoutElementPtr& item, Alignment align, float grow );
-
-	void noOwnership( PRIV_NAMESPACE::LayoutElementPtr& item );
+	void applyItemProperties( PRIV_NAMESPACE::LayoutElement* item, Alignment align, float grow );
 
 	const Size fixedSize;
 
 	// data
-	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::LayoutElementPtr& > nodemap;
-	WidgetPtr* _widget;
+	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::LayoutElement* > nodemap;
+	Widget* _widget;
 
 };
 

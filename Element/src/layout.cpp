@@ -16,74 +16,45 @@ YGFlexDirection getOrientation( Orientation o, bool reverse ) {
 	}
 }
 
-LayoutElement::LayoutElement() {}
-
-LayoutElement::LayoutElement( LayoutElementPtr& parent ) : Element( parent ? parent->object : Element::nullparent ),
+LayoutElement::LayoutElement( LayoutElement* parent ) : Element( parent ),
                                                            geometry( [](int x, int y, int width, int height) -> Rect {
 	                                                                     return Rect( x, y, width, height );
-                                                                     }, position.x, position.y, size.width, size.height ),
-                                                           playout( &Layout::nullparent ),
-                                                           bound_layout(&Layout::nullparent) {
+                                                                     }, position.x, position.y, size.width, size.height )
+                                                            {
 	
 	if( parent && parent->type == ElementType::Layout ) {
-		auto &l = dynamic_cast<Layout&>(*parent);
-		l.appendItem( this );
+		auto l = dynamic_cast<Layout*>(parent);
+		l->appendItem( this );
 	}
-	this->parent = parent;
-
 }
 
-LayoutElement::LayoutElement( LayoutCore* parent ) : Component( parent ) {
-}
+LayoutElement::~LayoutElement() {}
 
-LayoutCore::~LayoutCore() {}
 
-void LayoutCore::event( EventPtr ev ) {
-	Component::event( ev );
-}
-
-void LayoutCore::update() {
+void LayoutElement::update() {
 	updateChildren();
 }
 
-Point LayoutCore::pos() {
-	updateGeometry();
-	return properties.position;
-}
+//void LayoutCore::resizeEvent( ResizeEventPtr ev ) {
+//	properties.size.width = ev->size.width;
+//	properties.size.height = ev->size.height;
+//	if( node ) {
+//		YGNodeStyleSetWidth( node, properties.size.width );
+//		YGNodeStyleSetHeight( node, properties.size.height );
+//	}
+//	if( playout ) {
+//		playout->invalidate();
+//	}
+//
+//}
 
-void LayoutCore::move( Point new_p ) {
-	// check absolute
-}
-
-void LayoutCore::resize( Size new_s ) {
-	resizeEvent( std::make_shared< ResizeEvent >( Event::Type::Resize, new_s, size() ) );
-}
-
-Size LayoutCore::size() {
-	updateGeometry();
-	return properties.size;
-}
-
-void LayoutCore::resizeEvent( ResizeEventPtr ev ) {
-	properties.size.width = ev->size.width;
-	properties.size.height = ev->size.height;
-	if( node ) {
-		YGNodeStyleSetWidth( node, properties.size.width );
-		YGNodeStyleSetHeight( node, properties.size.height );
-	}
-	if( playout ) {
-		playout->invalidate();
-	}
-
-}
-
-void LayoutCore::updateChildren() {
-	for( auto& c : children() ) {
-		static_cast< LayoutCore* >( c )->update();
+void LayoutElement::updateChildren() {
+	for( auto c : children() ) {
+		static_cast< LayoutElement* >( c )->update();
 	}
 }
 
-void LayoutCore::updateGeometry() {
+void LayoutElement::updateGeometry() {
 	if( dirty_layuot ) {
 		if( node ) {
 			auto& p = properties;
@@ -96,42 +67,33 @@ void LayoutCore::updateGeometry() {
 	}
 }
 
-Layout::Layout( LayoutCore* parent ) : LayoutCore( parent ) {
-	is_layout = true;
+Layout::Layout() : LayoutElement() {
+	setType(ElementType::Layout);
 	node = YGNodeNew();
-	if( parent && !parent->is_layout ) {
-		this->setWigdet( static_cast< WidgetCore* >( parent ) );
-	}
-
-	if( parent && parent->is_layout ) {
-		auto l = static_cast< Layout* >( parent );
-		properties = l->properties;
-	}
-
 	objectName = "Layout";
 }
 
-void Layout::setWigdet( WidgetCore* new_parent ) {
-	if( !new_parent->layout() ) {
-		new_parent->playout = this;
-		this->parent = new_parent;
-		new_parent->bound_layout = this;
-		properties.size = new_parent->properties.size;
-		playout = this;
-	}
-	else {
-		std::cout << "This wigdet is already handled by a layout\n"; // TODO: log
-	}
-}
+//void Layout::setWigdet( Widget* new_parent ) {
+//	if( !new_parent->layout() ) {
+//		new_parent->playout = this;
+//		this->parent = new_parent;
+//		new_parent->bound_layout = this;
+//		properties.size = new_parent->properties.size;
+//		playout = this;
+//	}
+//	else {
+//		std::cout << "This wigdet is already handled by a layout\n"; // TODO: log
+//	}
+//}
 
-void Layout::appendItem( LayoutCore* item, Alignment align, float grow ) {
-	if( item->layout() == this )
+void Layout::appendItem(LayoutElement* item, Alignment align, float grow ) {
+	auto l = item->layout;
+
+	if( l == this )
 		return; // TODO: maybe warn?
 
-	noOwnership( item );
-
-	if( item->layout() )
-		item->layout()->takeItem( item );
+	if( l )
+		l->takeItem( item );
 
 	if( !item->node ) {
 		item->node = YGNodeNew();
@@ -146,8 +108,8 @@ void Layout::appendItem( LayoutCore* item, Alignment align, float grow ) {
 	invalidate();
 }
 
-void Layout::takeItem( LayoutCore* item ) {
-	if( item->layout() == this ) {
+void Layout::takeItem( LayoutElement* item ) {
+	if( item->layout.get() == this ) {
 		YGNodeRemoveChild( node, item->node );
 		nodemap.erase( item->node );
 		item->playout = nullptr;
@@ -155,20 +117,19 @@ void Layout::takeItem( LayoutCore* item ) {
 }
 
 void Layout::invalidate() {
-	LayoutCore* p = nullptr;
-	Component* pa = parent;
-	if( parent )
-		p = static_cast< LayoutCore* >( pa );
 
-	if( p && p->bound_layout == this ) {
+	if( _widget ) {
 		auto& pr = properties;
-		auto r = p->contentGeometry();
+		Rect r = _widget->geometry;
 		pr.size.width = r.width;
 		pr.size.height = r.height;
 		YGNodeCalculateLayout( node, pr.size.width, pr.size.height, YGDirectionInherit );
 	}
 	else {
-		YGNodeCalculateLayout( node, YGUndefined, YGUndefined, YGDirectionInherit );
+
+		auto& pr = properties;
+
+		YGNodeCalculateLayout( node, pr.size.width, pr.size.height, YGDirectionInherit );
 	}
 
 	for( auto i : nodemap ) {
@@ -176,17 +137,7 @@ void Layout::invalidate() {
 	}
 }
 
-void Layout::event( EventPtr ev ) {
-	switch( ev->type() ) {
-		case Event::Type::Layout:
-			std::cout << "invalidate event" << std::endl;
-			invalidate();
-			break;
-	}
-	LayoutCore::event( ev );
-}
-
-void Layout::applyItemProperties( LayoutCore* item, Alignment align, float grow ) {
+void Layout::applyItemProperties( LayoutElement* item, Alignment align, float grow ) {
 	auto prop = item->properties;
 	if( grow > 0 ) {
 		prop.grow = grow;
@@ -215,6 +166,3 @@ void Layout::applyItemProperties( LayoutCore* item, Alignment align, float grow 
 	YGNodeStyleSetPadding( item->node, YGEdgeBottom, prop.padding_bottom );
 }
 
-void Layout::noOwnership( LayoutCore* item ) {
-	if( parent ) {}
-}

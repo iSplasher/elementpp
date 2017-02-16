@@ -1,22 +1,23 @@
 #include "element/widget.h"
-#include "element/window.h"
-#include "element/utils/painter.h"
+//#include "element/window.h"
+//#include "element/core/painter.h"
 
 
 USING_NAMESPACE
 
-WidgetCore::WidgetCore(WidgetCore* parent) : LayoutCore(parent) {
+Widget::Widget(Widget* parent) : PRIV_NAMESPACE::LayoutElement(parent) {
 	objectName = "Widget";
+	setType(ElementType::Widget);
 }
 
-WidgetCore::~WidgetCore() {
+Widget::~Widget() {
 	// TODO: delete paint context
 }
 
-void WidgetCore::paint(Painter& painter) {
+void Widget::paint(Painter& painter) {
 }
 
-void WidgetCore::update() {
+void Widget::update() {
 	auto &painter = *parent_window->painter;
 	painter.save();
 	painter.origin = PointF(mapToWindow(Point(0, 0)));
@@ -25,128 +26,56 @@ void WidgetCore::update() {
 	painter.restore();
 }
 
-void WidgetCore::event(EventPtr ev) {
-
-	switch (ev->type()) {
-	case Event::Type::MouseMove:
-		mouseMoveEvent(std::static_pointer_cast<MouseEvent>(ev));
-		break;
-	case Event::Type::MouseButtonPress:
-		mousePressEvent(std::static_pointer_cast<MouseEvent>(ev));
-		break;
-	case Event::Type::MouseButtonRelease:
-		mouseReleaseEvent(std::static_pointer_cast<MouseEvent>(ev));
-		break;
-	}
-
-	LayoutCore::event(ev);
+Point Widget::mapToParent(Point _p) const {
+	return _p + position;
 }
 
-Point WidgetCore::pos() {
-
-	if (is_widget && !parent_widget) {
-		return Point();
-	}
-	return LayoutCore::pos();
+Point Widget::mapFromParent(Point _p) const {
+	return _p - position;
 }
 
-void WidgetCore::setParent(WidgetCore* new_parent) {
-	parent_widget = new_parent;
-	move(0, 0);
-	if (new_parent) {
-		parent_window = new_parent->parent_window;
-	}
-	else {
-		parent_window = nullptr;
-	}
-	this->parent = new_parent;
-}
-
-void WidgetCore::setLayout(Layout& new_layout) {
-	new_layout.setWigdet(this);
-}
-
-Point WidgetCore::mapToParent(Point _p) {
-	return _p + pos();
-}
-
-Point WidgetCore::mapFromParent(Point _p) {
-	return _p - pos();
-}
-
-Point WidgetCore::mapFromGlobal(Point p) {
+Point Widget::mapFromGlobal(Point p) {
 	auto w = this;
 
 	while (w) {
-		p -= w->pos();
-		w = w->is_window ? nullptr : w->parent_widget;
+		p -= w->position;
+		w = w->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
 
-Point WidgetCore::mapToGlobal(Point p) {
+Point Widget::mapToGlobal(Point p) {
 	auto w = this;
 
 	while (w) {
-		p += w->pos();
-		w = w->is_window ? nullptr : w->parent_widget;
+		p += w->position;
+		w = w->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
 
-Point WidgetCore::mapFromWindow(Point p) {
-	if (is_window) {
+Point Widget::mapFromWindow(Point p) {
+	if (type == ElementType::Window) {
 		return p;
 	}
 	auto w = this;
 
 	while (w) {
-		p -= w->pos();
-		w = w->parent_widget && w->parent_widget->is_window ? nullptr : w->parent_widget;
+		p -= w->position;
+		w = w->parent_widget && w->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
 
-Point WidgetCore::mapToWindow(Point p) {
-	if (is_window) {
+Point Widget::mapToWindow(Point p) {
+	if (type == ElementType::Window) {
 		return p;
 	}
 	auto w = this;
 
 	while (w) {
-		p += w->pos();
-		w = w->parent_widget && w->parent_widget->is_window ? nullptr : w->parent_widget;
+		p += w->position;
+		w = w->parent_widget && w->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
-
-void WidgetCore::mousePressEvent(MouseEventPtr ev) {
-	if (drag.is_draggable && flags(ev->button & MouseButton::Left)) {
-		move_state = MoveState::Moving;
-		drag.start_mouse_pos = mapToGlobal(ev->pos);
-		drag.start_pos = pos();
-	}
-
-	ev->ignore();
-}
-
-void WidgetCore::mouseMoveEvent(MouseEventPtr ev) {
-	if (ev->pos.x >= 0 && ev->pos.x < size().width && ev->pos.y >= 0 && ev->pos.y < size().height) {
-		under_mouse = true;
-	}
-	else {
-		under_mouse = false;
-	}
-
-	if (drag.is_draggable && move_state == MoveState::Moving) {
-		move(drag.start_pos + (mapToGlobal(ev->pos) - drag.start_mouse_pos));
-	}
-
-	ev->ignore();
-}
-
-void WidgetCore::mouseReleaseEvent(MouseEventPtr ev) {
-	move_state = MoveState::Normal;
-	ev->ignore();
-}
-

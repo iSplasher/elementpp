@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Layout.h"
-#include "Event.h"
+#include "layout.h"
+#include "property.h"
 
 typedef struct NVGcontext PainterContext;
 
@@ -13,7 +13,7 @@ class RWindow;
 /// <summary>
 /// Component widget. A very basic widget. Can be used as a container for other widgets
 /// </summary>
-class GSPLASHER_API WidgetCore : public priv::LayoutCore {
+class ELEMENT_API Widget : public PRIV_NAMESPACE::LayoutElement {
 public:
 
 	enum MoveState {
@@ -27,37 +27,31 @@ public:
 	};
 
 	// *structers
-	explicit WidgetCore(WidgetCore *parent = nullptr);
-	//WidgetCore(const WidgetCore&);
-	//explicit WidgetCore(const gWidgetProperties s, WidgetCore *parent = nullptr);
-	virtual ~WidgetCore();
+	explicit Widget(Widget *parent = nullptr);
+	//Widget(const Widget&);
+	//explicit Widget(const gWidgetProperties s, Widget *parent = nullptr);
+	virtual ~Widget();
 
 	// member methods
-	RWindow* parentWindow() const { return parent_window; }
 	virtual void paint(Painter &painter);
 	void update() override;
-	virtual void event(EventPtr ev);
-	Point pos() override;
-	void setParent(WidgetCore* new_parent);
-	void setLayout(Layout& new_layout);
-	bool underMouse() const { return under_mouse; }
 
-	void setFont(gFont font) { _font = font; }
-	gFont& font() { return _font; }
+	Property<bool, Widget> underMouse;
+	Property<gFont, Widget> font;
 
 	/// <summary>
 	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in the parent widget</returns>
-	Point mapToParent(Point p);
+	Point mapToParent(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in this widget</returns>
-	Point mapFromParent(Point p);
+	Point mapFromParent(Point p) const;
 
 	/// <summary>
 	/// Translates the coordinates p from the containing window's
@@ -102,29 +96,20 @@ protected:
 		Point start_pos;
 	};
 
-	// member methods
-	virtual void mousePressEvent(MouseEventPtr ev);
-	virtual void mouseMoveEvent(MouseEventPtr ev);
-	virtual void mouseReleaseEvent(MouseEventPtr ev);
-
 	// data members
 	RWindow *parent_window = nullptr;
-	WidgetCore *parent_widget;
+	Widget *parent_widget;
 	MoveState move_state = Normal;
-	gFont _font;
 	PainterContext *this_paint = nullptr;
 	Drag drag;
 
 private:
 	//Point move_offset;
-	bool under_mouse = false;
 
 friend class Painter;
 friend class Layout;
 };
 
-using WidgetPtr = std::shared_ptr<WidgetCore>;
-using UniqueWidgetPtr = std::unique_ptr<WidgetCore>;
-
+using WidgetPtr = std::unique_ptr<Widget>;
 
 NAMESPACE_END

@@ -7,7 +7,6 @@
 USING_NAMESPACE
 
 std::atomic< unsigned > Element::id_counter;
-ElementPtr Element::nullparent = nullptr;
 Application* Application::self = nullptr;
 
 Element::Element() :
@@ -15,7 +14,7 @@ Element::Element() :
 	parent(this,  std::mem_fn(&Element::getParent), std::mem_fn(&Element::setParent)), core_id( id_counter ) {
 }
 
-Element::Element( ElementPtr& parent ) : Element() { this->parent = parent ? parent : nullparent; }
+Element::Element( Element *parent ) : Element() { this->parent = parent; }
 
 Element::~Element() {
 	// first we traverse the tree to tell our children that
@@ -26,13 +25,13 @@ Element::~Element() {
 
 	if( !parent_is_deleting ) {
 		for( auto iter = internal_tree.begin(); iter != internal_tree.end(); ++iter ) {
-			( *( *iter ) )->parent_is_deleting = true;
+			( *iter )->parent_is_deleting = true;
 
 			for( auto inner = iter.begin(); inner != iter.end(); ++inner ) {
-				( *( *inner ) )->parent_is_deleting = true;
-				( *( *inner ) ).reset();
+				( *inner )->parent_is_deleting = true;
+				(*( *inner )->object).reset();
 			}
-			( *( *iter ) ).reset();
+			( *( *iter )->object ).reset();
 		}
 
 		// then we clear our branch
@@ -41,22 +40,22 @@ Element::~Element() {
 	}
 }
 
-std::vector< ElementPtr* > Element::children() {
-	std::vector< ElementPtr* > vec;
+std::vector< Element* > Element::children() {
+	std::vector< Element* > vec;
 	for( auto i = internal_tree.begin(); i != internal_tree.end(); ++i ) { vec.push_back( *i ); }
 	return vec;
 }
 
-ElementPtr& Element::getParent() const {
-	return *_parent;
+Element* Element::getParent() const {
+	return _parent;
 }
 
-void Element::setParent(ElementPtr& new_parent ) {
+void Element::setParent(Element* new_parent ) {
 	if( App != nullptr && init ) {
-		if( new_parent && new_parent != nullparent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
+		if( new_parent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
 		else { this->internal_tree = App->internal_tree.reinsert( internal_tree ); }
 	}
-	_parent = &new_parent;
+	_parent = new_parent;
 }
 
 static void errorCallback( int err, const char* descr ) { std::cout << descr; }
@@ -68,8 +67,8 @@ static void closeWindowCallback( GLFWwindow* r_window ) {
 
 Application::Application() :
 	Element(),
-	component_objects( std::make_unique< ComponentContainer >() ),
-	component_tree( std::make_unique< ComponentTree >() ) {
+	component_objects( std::make_unique< ElementContainer >() ),
+	component_tree( std::make_unique< ElementTree >() ) {
 	internal_tree = component_tree->tree_iterator();
 
 	assert(self == nullptr);
