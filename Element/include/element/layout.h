@@ -31,9 +31,8 @@ public:
 
 	virtual ~LayoutElement();
 
-	const Point position;
-	const Size size;
-	const Size fixedSize;
+	const Property<Point> position;
+	const Property<Size> size;
 	const PropertyView< Rect > geometry;
 	//const PropertyView< Rect > contentGeometry;
 
@@ -159,8 +158,6 @@ private:
 	void update() override {};
 
 	void applyItemProperties( PRIV_NAMESPACE::LayoutElement* item, Alignment align, float grow );
-
-	const Size fixedSize;
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::LayoutElement* > nodemap;

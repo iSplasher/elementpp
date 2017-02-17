@@ -37,7 +37,7 @@ public:
 	void update() override;
 
 	Property<bool, Widget> underMouse;
-	Property<gFont, Widget> font;
+	//Property<gFont, Widget> font;
 
 	/// <summary>
 	/// Translates the coordinates p of this widget to a coordinate p in the parent widget

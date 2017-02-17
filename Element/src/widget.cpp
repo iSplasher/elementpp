@@ -18,12 +18,12 @@ void Widget::paint(Painter& painter) {
 }
 
 void Widget::update() {
-	auto &painter = *parent_window->painter;
-	painter.save();
-	painter.origin = PointF(mapToWindow(Point(0, 0)));
-	painter.current_widget = this;
-	paint(painter);
-	painter.restore();
+	//auto &painter = *parent_window->painter;
+	//painter.save();
+	//painter.origin = PointF(mapToWindow(Point(0, 0)));
+	//painter.current_widget = this;
+	//paint(painter);
+	//painter.restore();
 }
 
 Point Widget::mapToParent(Point _p) const {

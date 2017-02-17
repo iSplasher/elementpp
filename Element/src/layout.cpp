@@ -17,9 +17,9 @@ YGFlexDirection getOrientation( Orientation o, bool reverse ) {
 }
 
 LayoutElement::LayoutElement( LayoutElement* parent ) : Element( parent ),
-                                                           geometry( [](int x, int y, int width, int height) -> Rect {
-	                                                                     return Rect( x, y, width, height );
-                                                                     }, position.x, position.y, size.width, size.height )
+                                                           geometry( [](Point pos, Size size) -> Rect {
+	                                                                     return Rect( pos, size );
+                                                                     }, position, size )
                                                             {
 	
 	if( parent && parent->type == ElementType::Layout ) {
