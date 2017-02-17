@@ -68,7 +68,8 @@ static void closeWindowCallback( GLFWwindow* r_window ) {
 Application::Application() :
 	Element(),
 	component_objects( std::make_unique< ElementContainer >() ),
-	component_tree( std::make_unique< ElementTree >() ) {
+	component_tree( std::make_unique< ElementTree >() ),
+	elementCount( this, std::mem_fn( &Application::getElementCount ) ){
 	internal_tree = component_tree->tree_iterator();
 
 	assert(self == nullptr);
@@ -110,3 +111,9 @@ bool Application::processEv() const {
 
 	return should_quit ? false : true;
 }
+
+std::size_t Application::getElementCount() const {
+	return component_objects->size();
+}
+
+

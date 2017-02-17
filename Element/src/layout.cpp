@@ -17,14 +17,14 @@ YGFlexDirection getOrientation( Orientation o, bool reverse ) {
 }
 
 Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
-                                                           geometry( [](Point pos, Size size) -> Rect {
-	                                                                     return Rect( pos, size );
-                                                                     }, position, size )
-                                                            {
-	
+                                               geometry( [](Point pos, Size size) -> Rect {
+	                                                         return Rect( pos, size );
+                                                         }, position, size ),
+                                               layout( this, std::mem_fn( &Layoutable::getLayout ) ) {
+
 	if( parent && parent->type == ElementType::Layout ) {
-		auto l = dynamic_cast<Layout*>(parent);
-		l->appendItem( this );
+		auto l = dynamic_cast< Layout* >( parent );
+		l->append( this );
 	}
 }
 
@@ -55,7 +55,7 @@ void Layoutable::updateChildren() {
 }
 
 void Layoutable::updateGeometry() {
-	if( dirty_layuot ) {
+	if( dirty_layout ) {
 		if( node ) {
 			auto& p = properties;
 			p.position.x = YGNodeLayoutGetLeft( node );
@@ -63,12 +63,16 @@ void Layoutable::updateGeometry() {
 			p.size.width = YGNodeLayoutGetWidth( node );
 			p.size.height = YGNodeLayoutGetHeight( node );
 		}
-		dirty_layuot = false;
+		dirty_layout = false;
 	}
 }
 
+Layout* Layoutable::getLayout() const {
+	return playout;
+}
+
 Layout::Layout() : Layoutable() {
-	setType(ElementType::Layout);
+	setType( ElementType::Layout );
 	node = YGNodeNew();
 	objectName = "Layout";
 }
@@ -86,14 +90,16 @@ Layout::Layout() : Layoutable() {
 //	}
 //}
 
-void Layout::appendItem(Layoutable* item, Alignment align, float grow ) {
-	auto l = item->layout;
+void Layout::append( Layoutable* item, Alignment align, float grow ) {
+	auto l = item->layout.get();
 
 	if( l == this )
 		return; // TODO: maybe warn?
 
+	// take from old layout
+
 	if( l )
-		l->takeItem( item );
+		l->take( item );
 
 	if( !item->node ) {
 		item->node = YGNodeNew();
@@ -103,41 +109,62 @@ void Layout::appendItem(Layoutable* item, Alignment align, float grow ) {
 	YGNodeInsertChild( node, item->node, n );
 	nodemap.insert( { item->node, item } );
 
-	applyItemProperties( item, align, grow );
+	// take ownership of layout
+	if( item->type == ElementType::Layout )
+		item->parent = this;
 
-	invalidate();
+	apply( item, align, grow );
+
+	dirty_layout = true;
 }
 
-void Layout::takeItem( Layoutable* item ) {
+void Layout::append( std::initializer_list<priv::Layoutable*> item, Alignment align, float grow ) {
+	for (auto &i : item) {
+		append(i, align, grow);
+	}
+}
+
+void Layout::update() {
+	if( dirty_layout )
+		invalidate();
+}
+
+void Layout::take( Layoutable* item ) {
 	if( item->layout.get() == this ) {
 		YGNodeRemoveChild( node, item->node );
 		nodemap.erase( item->node );
-		item->playout = nullptr;
+		item->layout = nullptr;
+
+		// remove layout ownership
+		if( item->type == ElementType::Layout )
+			item->parent = nullptr;
+
 	}
 }
 
 void Layout::invalidate() {
 
-	if( _widget ) {
+	if( _widget ) { // if this layout is managing a widget, use the widget's properties
 		auto& pr = properties;
 		Rect r = _widget->geometry;
 		pr.size.width = r.width;
 		pr.size.height = r.height;
 		YGNodeCalculateLayout( node, pr.size.width, pr.size.height, YGDirectionInherit );
 	}
-	else {
+	else { // else, use our own properties
 
 		auto& pr = properties;
-
 		YGNodeCalculateLayout( node, pr.size.width, pr.size.height, YGDirectionInherit );
 	}
 
+	// inform all underlying layouts to recalculate
 	for( auto i : nodemap ) {
-		i.second->dirty_layuot = true;
+		if( i.second->type == ElementType::Layout )
+			i.second->dirty_layout = true;
 	}
 }
 
-void Layout::applyItemProperties( Layoutable* item, Alignment align, float grow ) {
+void Layout::apply( Layoutable* item, Alignment align, float grow ) {
 	auto prop = item->properties;
 	if( grow > 0 ) {
 		prop.grow = grow;
@@ -165,4 +192,3 @@ void Layout::applyItemProperties( Layoutable* item, Alignment align, float grow 
 	YGNodeStyleSetPadding( item->node, YGEdgeRight, prop.padding_right );
 	YGNodeStyleSetPadding( item->node, YGEdgeBottom, prop.padding_bottom );
 }
-

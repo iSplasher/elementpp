@@ -36,10 +36,10 @@ public:
 	const PropertyView< Rect > geometry;
 	//const PropertyView< Rect > contentGeometry;
 
-	/// <summary>
-	/// Returns the layout which handles this item
-	/// </summary>
-	/// <returns>Layout</returns>
+	
+	/**
+	 * \brief Returns the layout this item is contained in
+	 */
 	const Accessor< Layout*, Layoutable > layout;
 
 
@@ -91,12 +91,14 @@ private:
 
 	void updateGeometry();
 
+	Layout* getLayout() const;
+
 	// data members
 
-	bool dirty_layuot = false; // item geometry has been invalidated
+	bool dirty_layout = false; // layout has to recalculate
 
-	Layout* playout = nullptr; // containing layout
-	Layout* bound_layout = nullptr; // setWidget on layout
+	Layout* playout = nullptr; // layout this item is contained in
+	Layout* bound_layout = nullptr; // layout that manages items for this widget
 	LayoutNode node = nullptr;
 	Properties properties;
 
@@ -123,13 +125,16 @@ public:
 	//virtual LayoutCore* parent();
 	const Accessor< Widget* , Layout > widget;
 
-	virtual void appendItem( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default, float grow = 1 );
+	virtual void append( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default, float grow = 1 );
+	virtual void append( std::initializer_list<PRIV_NAMESPACE::Layoutable*> item, Alignment align = Alignment::Default, float grow = 1 );
+
+	void update() override;
 
 	/// <summary>
 	/// Take item out of layout. 
 	/// </summary>
 	/// <param name="item">item to take out</param>
-	void takeItem( PRIV_NAMESPACE::Layoutable* item );
+	void take( PRIV_NAMESPACE::Layoutable* item );
 
 	//void remove(LayoutCore&);
 
@@ -156,13 +161,12 @@ protected:
 private:
 
 	// member methods
-	void update() override {};
 
-	void applyItemProperties( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
+	static void apply( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
-	Widget* _widget;
+	Widget* _widget = nullptr;
 
 };
 

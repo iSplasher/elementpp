@@ -140,6 +140,10 @@ public:
 
 	~Application();
 
+	// PROPERTIES
+
+	const Accessor< std::size_t, Application > elementCount;
+
 	// FUNCTIONS
 
 	/**
@@ -212,6 +216,8 @@ private:
 	/// </summary>
 	/// <returns>false if application should quit else true</returns>
 	bool processEv() const;
+
+	std::size_t getElementCount() const;
 
 	// data members
 	static Application* self;

@@ -702,7 +702,7 @@ public:
 	                                             getter( get ),
 	                                             setter( set ) { }
 
-	Accessor( S* cls, get_fn get ) { init( cls, get, std::mem_fn( &Accessor< T, S >::default_setter ) ); }
+	Accessor( S* cls, get_fn get ) : Accessor(cls, get, nullptr) { }
 
 	Accessor( const Accessor& other )
 		: classptr( other.classptr ),
@@ -732,7 +732,7 @@ public:
 		return *this;
 	}
 
-	void operator=( T value ) const { setter( *classptr, value ); }
+	void operator=( T value ) const { if(setter) setter( *classptr, value ); } // maybe throw if nullptr?
 	operator T() const { return getter( *classptr ); }
 
 	T operator->() const { return get(); }
@@ -771,24 +771,14 @@ public:
 
 private:
 
-	mutable S* classptr;
+	mutable S* classptr = nullptr;
 
-	mutable get_fn getter;
+	mutable get_fn getter = nullptr;
 
-	mutable set_fn setter;
+	mutable set_fn setter = nullptr;
 
-	T default_getter() {
-		throw "Cannot read property";
-	}
-
-	void default_setter( T value ) {
-		throw "Cannot write property";
-	}
-
-	void init( S* cls, get_fn get, set_fn set ) const {
-		classptr = cls;
-		getter = get;
-		setter = set;
+	T default_getter(S& ) {
+		throw "Cannot read accessor";
 	}
 
 };
