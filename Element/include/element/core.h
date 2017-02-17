@@ -154,7 +154,7 @@ public:
 	 * \see destroy
 	 */
 	template< class T, typename... Args >
-	std::unique_ptr< T >& create( Args&& ... args );
+	T* create( Args&& ... args );
 
 	/**
 	 * \brief Delete \ref Element objects
@@ -227,7 +227,7 @@ private:
 
 
 template< class T, typename ... Args >
-std::unique_ptr< T >& Application::create( Args&& ... args ) {
+T* Application::create( Args&& ... args ) {
 	static_assert(std::is_base_of< Element, T >::value, "Must be same or derived from Element");
 	component_objects->push_back( std::make_unique< T >( std::forward< Args >( args )... ) );
 	auto& item = component_objects->back();
@@ -239,14 +239,14 @@ std::unique_ptr< T >& Application::create( Args&& ... args ) {
 	else { item->internal_tree = component_tree->push_back(item.get()); }
 
 	item->init = true;
-	return item;
+	return static_cast<T*>(item.get());
 }
 
 template< class T >
 void Application::destroy( T& object ) {
-	static_assert(std::is_convertible< T, ElementPtr >::value, "Must be same or derived from Element");
+	static_assert(std::is_convertible< T, Element* >::value, "Must be same or derived from Element");
 	if( object )
-		component_objects->remove( object );
+		component_objects->remove( *object->object );
 }
 
 NAMESPACE_END

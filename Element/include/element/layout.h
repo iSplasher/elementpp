@@ -3,7 +3,7 @@
 #include "global.h"
 #include "property.h"
 #include "core.h"
-#include "core/primitives.h"
+#include "core/primitive.h"
 
 #include <unordered_map>
 
@@ -17,19 +17,19 @@ using LayoutPtr = std::unique_ptr< Layout >;
 PRIV_NAMESPACE_BEGIN
 #include <yoga/Yoga.h>
 
-class LayoutElement;
+class Layoutable;
 
 using LayoutNode = YGNodeRef;
-using LayoutElementPtr = std::unique_ptr< LayoutElement >;
+using LayoutablePtr = std::unique_ptr< Layoutable >;
 
 
-class ELEMENT_API LayoutElement : public Element {
+class ELEMENT_API Layoutable : public Element {
 public:
 
 	// *structers
-	explicit LayoutElement( LayoutElement* parent = nullptr );
+	explicit Layoutable( Layoutable* parent = nullptr );
 
-	virtual ~LayoutElement();
+	virtual ~Layoutable();
 
 	const Property<Point> position;
 	const Property<Size> size;
@@ -40,7 +40,7 @@ public:
 	/// Returns the layout which handles this item
 	/// </summary>
 	/// <returns>Layout</returns>
-	const Accessor< Layout*, LayoutElement > layout;
+	const Accessor< Layout*, Layoutable > layout;
 
 
 	virtual void update();
@@ -110,7 +110,7 @@ NAMESPACE_END
 /**
  * \brief Layout class. Derive this class to make a custom layout. 
  */
-class ELEMENT_API Layout : public PRIV_NAMESPACE::LayoutElement {
+class ELEMENT_API Layout : public PRIV_NAMESPACE::Layoutable {
 	friend class Widget;
 public:
 	// * structers
@@ -119,16 +119,17 @@ public:
 	virtual ~Layout() = default;
 
 	// member methods
+
 	//virtual LayoutCore* parent();
 	const Accessor< Widget* , Layout > widget;
 
-	virtual void appendItem( PRIV_NAMESPACE::LayoutElement* item, Alignment align = Alignment::Default, float grow = 1 );
+	virtual void appendItem( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default, float grow = 1 );
 
 	/// <summary>
 	/// Take item out of layout. 
 	/// </summary>
 	/// <param name="item">item to take out</param>
-	void takeItem( PRIV_NAMESPACE::LayoutElement* item );
+	void takeItem( PRIV_NAMESPACE::Layoutable* item );
 
 	//void remove(LayoutCore&);
 
@@ -157,10 +158,10 @@ private:
 	// member methods
 	void update() override {};
 
-	void applyItemProperties( PRIV_NAMESPACE::LayoutElement* item, Alignment align, float grow );
+	void applyItemProperties( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
 
 	// data
-	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::LayoutElement* > nodemap;
+	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
 	Widget* _widget;
 
 };

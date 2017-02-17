@@ -13,7 +13,7 @@ class RWindow;
 /// <summary>
 /// Component widget. A very basic widget. Can be used as a container for other widgets
 /// </summary>
-class ELEMENT_API Widget : public PRIV_NAMESPACE::LayoutElement {
+class ELEMENT_API Widget : public PRIV_NAMESPACE::Layoutable {
 public:
 
 	enum MoveState {

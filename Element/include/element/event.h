@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global.h"
-#include "core/primitives.h"
+#include "core/primitive.h"
 
 #include <vector>
 #include <utility>

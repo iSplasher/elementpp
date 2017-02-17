@@ -5,7 +5,7 @@
 
 USING_NAMESPACE
 
-Widget::Widget(Widget* parent) : PRIV_NAMESPACE::LayoutElement(parent) {
+Widget::Widget(Widget* parent) : PRIV_NAMESPACE::Layoutable(parent) {
 	objectName = "Widget";
 	setType(ElementType::Widget);
 }

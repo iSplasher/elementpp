@@ -16,7 +16,7 @@ YGFlexDirection getOrientation( Orientation o, bool reverse ) {
 	}
 }
 
-LayoutElement::LayoutElement( LayoutElement* parent ) : Element( parent ),
+Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
                                                            geometry( [](Point pos, Size size) -> Rect {
 	                                                                     return Rect( pos, size );
                                                                      }, position, size )
@@ -28,10 +28,10 @@ LayoutElement::LayoutElement( LayoutElement* parent ) : Element( parent ),
 	}
 }
 
-LayoutElement::~LayoutElement() {}
+Layoutable::~Layoutable() {}
 
 
-void LayoutElement::update() {
+void Layoutable::update() {
 	updateChildren();
 }
 
@@ -48,13 +48,13 @@ void LayoutElement::update() {
 //
 //}
 
-void LayoutElement::updateChildren() {
+void Layoutable::updateChildren() {
 	for( auto c : children() ) {
-		static_cast< LayoutElement* >( c )->update();
+		static_cast< Layoutable* >( c )->update();
 	}
 }
 
-void LayoutElement::updateGeometry() {
+void Layoutable::updateGeometry() {
 	if( dirty_layuot ) {
 		if( node ) {
 			auto& p = properties;
@@ -67,7 +67,7 @@ void LayoutElement::updateGeometry() {
 	}
 }
 
-Layout::Layout() : LayoutElement() {
+Layout::Layout() : Layoutable() {
 	setType(ElementType::Layout);
 	node = YGNodeNew();
 	objectName = "Layout";
@@ -86,7 +86,7 @@ Layout::Layout() : LayoutElement() {
 //	}
 //}
 
-void Layout::appendItem(LayoutElement* item, Alignment align, float grow ) {
+void Layout::appendItem(Layoutable* item, Alignment align, float grow ) {
 	auto l = item->layout;
 
 	if( l == this )
@@ -108,7 +108,7 @@ void Layout::appendItem(LayoutElement* item, Alignment align, float grow ) {
 	invalidate();
 }
 
-void Layout::takeItem( LayoutElement* item ) {
+void Layout::takeItem( Layoutable* item ) {
 	if( item->layout.get() == this ) {
 		YGNodeRemoveChild( node, item->node );
 		nodemap.erase( item->node );
@@ -137,7 +137,7 @@ void Layout::invalidate() {
 	}
 }
 
-void Layout::applyItemProperties( LayoutElement* item, Alignment align, float grow ) {
+void Layout::applyItemProperties( Layoutable* item, Alignment align, float grow ) {
 	auto prop = item->properties;
 	if( grow > 0 ) {
 		prop.grow = grow;
