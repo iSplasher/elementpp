@@ -69,6 +69,8 @@ enum class Direction {
 	Top,
 	Right,
 	Bottom,
+	Reverse,
+	Default
 };
 
 
@@ -77,7 +79,9 @@ DEFINE_ENUM_FLAGS(Orientation)
 
 enum class Orientation {
 	Vertical,
-	Horizontal
+	Horizontal,
+	Reverse,
+	Default
 };
 
 

@@ -44,14 +44,14 @@ public:
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in the parent widget</returns>
-	Point mapToParent(Point p) const;
+	PointF mapToParent(PointF p) const;
 
 	/// <summary>
 	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
 	/// </summary>
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in this widget</returns>
-	Point mapFromParent(Point p) const;
+	PointF mapFromParent(PointF p) const;
 
 	/// <summary>
 	/// Translates the coordinates p from the containing window's
@@ -61,7 +61,7 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate from containing window</returns>
-	Point mapFromWindow(Point p);
+	PointF mapFromWindow(PointF p);
 
 	/// <summary>
 	/// Translates the coordinates p to the containing window's
@@ -71,21 +71,21 @@ public:
 	/// </remarks>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate in containing window</returns>
-	Point mapToWindow(Point p);
+	PointF mapToWindow(PointF p);
 
 	/// <summary>
 	/// Translates the coordinates p from the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine from desktop</returns>
-	Point mapFromGlobal(Point p);
+	PointF mapFromGlobal(PointF p);
 
 	/// <summary>
 	/// Translates the coordinates p to the desktop coordinates
 	/// </summary>
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine in desktop</returns>
-	Point mapToGlobal(Point p);
+	PointF mapToGlobal(PointF p);
 
 
 protected:

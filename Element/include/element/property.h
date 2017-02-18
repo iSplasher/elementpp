@@ -180,11 +180,11 @@ public:
 	/**
 	* \brief
 	* \tparam C connection release policy
-	* \param f function to connect
+	* \param f function to changed
 	* \return
 	*/
 	template< ConnectionType C = ConnectionType::Permanent >
-	auto connect( func f ) {
+	auto changed( func f ) {
 		std::unique_ptr< Continuation > _cont = nullptr;
 		continuations.push_back( std::move( _cont ) );
 		auto& cont = continuations.back();
@@ -423,11 +423,11 @@ public:
 	/**
 	 * \brief Construct a connection to a function that will be called on every property change
 	 * \tparam C connection release policy
-	 * \param f function to connect
+	 * \param f function to changed
 	 * \return 
 	 */
 	template< ConnectionType C = ConnectionType::Permanent >
-	auto connect( func f ) {
+	auto changed( func f ) {
 		std::unique_ptr< Continuation > _cont = nullptr;
 		continuations.push_back( std::move( _cont ) );
 		auto& cont = continuations.back();
@@ -554,11 +554,11 @@ public:
 	/**
 	* \brief
 	* \tparam C connection release policy
-	* \param f function to connect
+	* \param f function to changed
 	* \return
 	*/
 	template< ConnectionType C = ConnectionType::Permanent >
-	auto connect( func f ) {
+	auto changed( func f ) {
 		std::unique_ptr< Continuation > _cont = nullptr;
 		continuations.push_back( std::move( _cont ) );
 		auto& cont = continuations.back();

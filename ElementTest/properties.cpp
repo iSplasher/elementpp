@@ -75,7 +75,7 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Property connection is made") {
 			std::string value1 = "";
-			prop1.connect( [&value1](std::string s) { value1 = s; } );
+			prop1.changed( [&value1](std::string s) { value1 = s; } );
 
 			THEN("connection is called on property change") {
 				REQUIRE(value1 == "");
@@ -85,13 +85,13 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency sync") {
-			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           prop2 = "changed";
 				                                           };
 			                                           } );
 
-			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           prop1 = "changed";
 				                                           };
@@ -109,13 +109,13 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency async") {
-			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           prop2 = "changed";
 				                                           };
 			                                           } );
 
-			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           prop1 = "changed";
 				                                           };
@@ -134,7 +134,7 @@ SCENARIO("Properties", "[Property]") {
 		}
 
 		WHEN("Two properties dependency async with sleep") {
-			prop1.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop1.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
 					                                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
@@ -142,7 +142,7 @@ SCENARIO("Properties", "[Property]") {
 				                                           };
 			                                           } );
 
-			prop2.connect< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
+			prop2.changed< ConnectionType::Temporary >( [&prop1, &prop2](std::string s) {
 				                                           if( prop2 != prop1 ) {
 					                                           std::cout << "testing async properties.. sleeping for 1 second.." << std::endl;
 					                                           std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
@@ -165,7 +165,7 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Property is connected forever to function") {
 			std::string value1 = "";
-			prop1.connect( [&value1](std::string s) { value1 = s; } );
+			prop1.changed( [&value1](std::string s) { value1 = s; } );
 
 			THEN("function is called on every property change") {
 				REQUIRE(value1 == "");
@@ -179,7 +179,7 @@ SCENARIO("Properties", "[Property]") {
 
 		WHEN("Property is connected once to function") {
 			std::string value1 = "";
-			prop1.connect< ConnectionType::Temporary >( [&value1](std::string s) {
+			prop1.changed< ConnectionType::Temporary >( [&value1](std::string s) {
 				                                           value1 = s;
 			                                           } );
 
@@ -198,7 +198,7 @@ SCENARIO("Properties", "[Property]") {
 
 			THEN("function is only called when connection is in scope") { {
 
-					auto conn = prop1.connect< ConnectionType::Scoped >( [&value1](std::string s) {
+					auto conn = prop1.changed< ConnectionType::Scoped >( [&value1](std::string s) {
 						                                                    value1 = s;
 					                                                    } );
 					REQUIRE(value1 == "");
@@ -293,7 +293,7 @@ SCENARIO("Properties", "[Property]") {
 
 			THEN("PropertyView connection can also refer to other properties") {
 
-				view1.connect([&first](std::string s) {
+				view1.changed([&first](std::string s) {
 						if(first != "changed ")
 							first = "changed ";
 					});

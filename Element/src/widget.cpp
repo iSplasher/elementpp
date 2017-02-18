@@ -26,15 +26,15 @@ void Widget::update() {
 	//painter.restore();
 }
 
-Point Widget::mapToParent(Point _p) const {
+PointF Widget::mapToParent(PointF _p) const {
 	return _p + position;
 }
 
-Point Widget::mapFromParent(Point _p) const {
+PointF Widget::mapFromParent(PointF _p) const {
 	return _p - position;
 }
 
-Point Widget::mapFromGlobal(Point p) {
+PointF Widget::mapFromGlobal(PointF p) {
 	auto w = this;
 
 	while (w) {
@@ -44,7 +44,7 @@ Point Widget::mapFromGlobal(Point p) {
 	return p;
 }
 
-Point Widget::mapToGlobal(Point p) {
+PointF Widget::mapToGlobal(PointF p) {
 	auto w = this;
 
 	while (w) {
@@ -54,7 +54,7 @@ Point Widget::mapToGlobal(Point p) {
 	return p;
 }
 
-Point Widget::mapFromWindow(Point p) {
+PointF Widget::mapFromWindow(PointF p) {
 	if (type == ElementType::Window) {
 		return p;
 	}
@@ -67,7 +67,7 @@ Point Widget::mapFromWindow(Point p) {
 	return p;
 }
 
-Point Widget::mapToWindow(Point p) {
+PointF Widget::mapToWindow(PointF p) {
 	if (type == ElementType::Window) {
 		return p;
 	}

@@ -31,10 +31,43 @@ public:
 
 	virtual ~Layoutable();
 
-	const Property<Point> position;
-	const Property<Size> size;
-	const PropertyView< Rect > geometry;
+	// POSITION & SIZE 
+
+	Property<PointF> position;
+	Property<SizeF> size;
+	Property<SizeF> minSize;
+	Property<SizeF> maxSize;
+	PropertyView< RectF > geometry;
 	//const PropertyView< Rect > contentGeometry;
+
+	// Margin
+
+	Property<float> marginLeft;
+	Property<float> marginTop;
+	Property<float> marginRight;
+	Property<float> marginBottom;
+	//PropertyView< RectF > margin;
+
+	// BORDER
+
+	Property<float> borderLeft;
+	Property<float> borderTop;
+	Property<float> borderRight;
+	Property<float> borderBottom;
+	//PropertyView< RectF > border;
+
+	// PADDING
+	Property<float> paddingLeft;
+	Property<float> paddingTop;
+	Property<float> paddingRight;
+	Property<float> paddingBottom;
+	//PropertyView< RectF > padding;
+
+	// STYLE
+
+	Property<Alignment> alignment;
+	Property<float> growth;
+	Property<bool> absolutePosition;
 
 	
 	/**
@@ -45,51 +78,11 @@ public:
 
 	virtual void update();
 
-	//virtual Rect contentsRect();
-	//virtual Rect contentsMargin();
-	//int margin() const;
-
-	//virtual Size minimumSize() const = 0;
-	//virtual Size maximumSize() const = 0;
-	//virtual bool isEmpty() const = 0;
-
-protected:
-
-	struct Properties {
-		Point position;
-		Size size;
-		Size min_size;
-		Size max_size;
-		Orientation orientation = Orientation::Horizontal;
-
-		float margin_left = 1;
-		float margin_top = 1;
-		float margin_right = 1;
-		float margin_bottom = 1;
-
-		float padding_left = 1;
-		float padding_top = 1;
-		float padding_right = 1;
-		float padding_bottom = 1;
-
-		float border_left = 0;
-		float border_top = 0;
-		float border_right = 0;
-		float border_bottom = 0;
-
-		float grow = 1;
-		float shrink = 0;
-		bool reverse = false;
-	};
-
-
-	// members methods
-
 private:
 
 	virtual void updateChildren();
 
-	void updateGeometry();
+	virtual void invalidated();
 
 	Layout* getLayout() const;
 
@@ -100,7 +93,6 @@ private:
 	Layout* playout = nullptr; // layout this item is contained in
 	Layout* bound_layout = nullptr; // layout that manages items for this widget
 	LayoutNode node = nullptr;
-	Properties properties;
 
 	friend class Layout;
 };
@@ -120,10 +112,20 @@ public:
 
 	virtual ~Layout() = default;
 
-	// member methods
+	// POSITION & SIZE 
 
-	//virtual LayoutCore* parent();
+	PropertyView<PointF> position;
+	PropertyView<SizeF> size;
+
+	// STYLE
+
+	Property<Orientation> orientation;
+	Property<bool> wrap;
+
 	const Accessor< Widget* , Layout > widget;
+
+
+	// member methods
 
 	virtual void append( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default, float grow = 1 );
 	virtual void append( std::initializer_list<PRIV_NAMESPACE::Layoutable*> item, Alignment align = Alignment::Default, float grow = 1 );
@@ -138,18 +140,9 @@ public:
 
 	//void remove(LayoutCore&);
 
-	//int spacing() const { return _spacing; }
-	//void setMargin();
-	//void setSpacing(int s) { _spacing = s; invalidate(); }
-
 	//virtual int count() const;
 	//bool isEmpty() const;
 
-	//Size minimumSize() const override { return Size(0, 0); };
-	//Size maximumSize() const override { return Size(UINT32_MAX, UINT32_MAX); };
-	//Size prefferedSize() const;
-
-	//Rect contentsRect() const;
 	virtual void invalidate();
 
 protected:
@@ -162,7 +155,10 @@ private:
 
 	// member methods
 
-	static void apply( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
+	void invalidated() override;
+
+	static void applySet( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
+	static void applyGet( PRIV_NAMESPACE::Layoutable* item);
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
