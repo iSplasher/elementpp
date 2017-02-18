@@ -61,9 +61,9 @@ SCENARIO("Layouts", "[Layout]") {
 
 						THEN("Layout sizes has been recalculated") {
 							REQUIRE(layout1->size == SizeF(200, 200));
-							REQUIRE(layout2->size != SizeF(200, 200));
-							REQUIRE(layout3->size != SizeF(200, 200));
-							REQUIRE(layout4->size != SizeF(200, 200));
+							REQUIRE(layout2->size == SizeF(200, 200));
+							REQUIRE(layout3->size == SizeF(200, 200));
+							REQUIRE(layout4->size == SizeF(200, 200));
 						}
 
 					}

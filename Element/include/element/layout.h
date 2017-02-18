@@ -84,11 +84,15 @@ private:
 
 	virtual void invalidated();
 
+	virtual void applyStyle();
+
 	Layout* getLayout() const;
 
 	// data members
 
 	bool dirty_layout = false; // layout has to recalculate
+	bool calculating = false; // layout is calculating
+	bool parent_has_calculated = false; // used to avoid an uncalculated node retrieving itself
 
 	Layout* playout = nullptr; // layout this item is contained in
 	Layout* bound_layout = nullptr; // layout that manages items for this widget
@@ -156,9 +160,6 @@ private:
 	// member methods
 
 	void invalidated() override;
-
-	static void applySet( PRIV_NAMESPACE::Layoutable* item, Alignment align, float grow );
-	static void applyGet( PRIV_NAMESPACE::Layoutable* item);
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;

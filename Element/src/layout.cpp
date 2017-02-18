@@ -3,6 +3,8 @@
 
 #include <yoga/Yoga.h>
 
+#include <cstdlib>
+
 
 USING_NAMESPACE
 USING_NAMESPACE_PRIV
@@ -42,14 +44,159 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 		l->append( this );
 	}
 
+	// connect properties
+	position.changed( [&](PointF n) {
+		                 if( node ) {
+			                 YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
+			                 YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
+			                 if( !calculating )
+				                 dirty_layout = true;
+		                 }
+	                 } );
+	size.changed( [&](SizeF n) {
+		             if( node ) {
+			             YGNodeStyleSetWidth( node, n.width );
+			             YGNodeStyleSetHeight( node, n.height );
+			             if( !calculating )
+				             dirty_layout = true;
+		             }
+	             } );
+	minSize.changed( [&](SizeF n) {
+		                if( node ) {
+			                YGNodeStyleSetMinWidth( node, n.width );
+			                YGNodeStyleSetMinHeight( node, n.height );
+			                if( !calculating )
+				                dirty_layout = true;
+		                }
+	                } );
+	maxSize.changed( [&](SizeF n) {
+		                if( node ) {
+			                YGNodeStyleSetMaxWidth( node, n.width );
+			                YGNodeStyleSetMaxHeight( node, n.height );
+			                if( !calculating )
+				                dirty_layout = true;
+		                }
+	                } );
+
+	marginLeft.changed( [&](float n) {
+		                   if( node ) {
+			                   YGNodeStyleSetMargin( node, YGEdgeLeft, n );
+			                   if( !calculating )
+				                   dirty_layout = true;
+		                   }
+	                   } );
+	marginTop.changed( [&](float n) {
+		                  if( node ) {
+			                  YGNodeStyleSetMargin( node, YGEdgeTop, n );
+			                  if( !calculating )
+				                  dirty_layout = true;
+		                  }
+	                  } );
+	marginRight.changed( [&](float n) {
+		                    if( node ) {
+			                    YGNodeStyleSetMargin( node, YGEdgeRight, n );
+			                    if( !calculating )
+				                    dirty_layout = true;
+		                    }
+	                    } );
+	marginBottom.changed( [&](float n) {
+		                     if( node ) {
+			                     YGNodeStyleSetMargin( node, YGEdgeBottom, n );
+			                     if( !calculating )
+				                     dirty_layout = true;
+		                     }
+	                     } );
+
+	borderLeft.changed( [&](float n) {
+		                   if( node ) {
+			                   YGNodeStyleSetBorder( node, YGEdgeLeft, n );
+			                   if( !calculating )
+				                   dirty_layout = true;
+		                   }
+	                   } );
+	borderTop.changed( [&](float n) {
+		                  if( node ) {
+			                  YGNodeStyleSetBorder( node, YGEdgeTop, n );
+			                  if( !calculating )
+				                  dirty_layout = true;
+		                  }
+	                  } );
+	borderRight.changed( [&](float n) {
+		                    if( node ) {
+			                    YGNodeStyleSetBorder( node, YGEdgeRight, n );
+			                    if( !calculating )
+				                    dirty_layout = true;
+		                    }
+	                    } );
+	borderBottom.changed( [&](float n) {
+		                     if( node ) {
+			                     YGNodeStyleSetBorder( node, YGEdgeBottom, n );
+			                     if( !calculating )
+				                     dirty_layout = true;
+		                     }
+	                     } );
+
+	paddingLeft.changed( [&](float n) {
+		                    if( node ) {
+			                    YGNodeStyleSetPadding( node, YGEdgeLeft, n );
+			                    if( !calculating )
+				                    dirty_layout = true;
+		                    }
+	                    } );
+	paddingTop.changed( [&](float n) {
+		                   if( node ) {
+			                   YGNodeStyleSetPadding( node, YGEdgeTop, n );
+			                   if( !calculating )
+				                   dirty_layout = true;
+		                   }
+	                   } );
+	paddingRight.changed( [&](float n) {
+		                     if( node ) {
+			                     YGNodeStyleSetPadding( node, YGEdgeRight, n );
+			                     if( !calculating )
+				                     dirty_layout = true;
+		                     }
+	                     } );
+	paddingBottom.changed( [&](float n) {
+		                      if( node ) {
+			                      YGNodeStyleSetPadding( node, YGEdgeBottom, n );
+			                      if( !calculating )
+				                      dirty_layout = true;
+		                      }
+	                      } );
+
+	growth.changed( [&](float n) {
+		               if( node ) {
+
+			               float g = 0, s = 0;
+			               if( n > 0 )
+				               g = n;
+			               else if( n < 0 )
+				               s = std::abs( n );
+			               YGNodeStyleSetFlexGrow( node, g );
+			               YGNodeStyleSetFlexShrink( node, s );
+			               if( !calculating )
+				               dirty_layout = true;
+		               }
+	               } );
+	absolutePosition.changed( [&](bool n) {
+		                         if( node ) {
+			                         auto x = n ? YGPositionTypeAbsolute : YGPositionTypeRelative;
+			                         YGNodeStyleSetPositionType( node, x );
+			                         if( !calculating )
+				                         dirty_layout = true;
+		                         }
+	                         } );
+
 	// set default values
 	size = SizeF( 200, 200 );
 
-	// connect properties
-
 }
 
-Layoutable::~Layoutable() {}
+Layoutable::~Layoutable() {
+	if (node)
+		YGNodeFree(node);
+}
 
 
 void Layoutable::update() {
@@ -63,10 +210,81 @@ void Layoutable::updateChildren() {
 }
 
 void Layoutable::invalidated() {
-	if( node ) {
-		position = PointF( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
-		size = SizeF( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
+	if( node && parent_has_calculated ) {
+		position = PointF( YGNodeStyleGetPosition( node, YGEdgeLeft ).value, YGNodeStyleGetPosition( node, YGEdgeTop ).value );
+		size = SizeF( YGNodeStyleGetWidth( node ).value, YGNodeStyleGetHeight( node ).value );
+		minSize = SizeF( YGNodeStyleGetMinWidth( node ).value, YGNodeStyleGetMinHeight( node ).value );
+		maxSize = SizeF( YGNodeStyleGetMaxWidth( node ).value, YGNodeStyleGetMaxHeight( node ).value );
+
+		marginLeft = YGNodeStyleGetMargin( node, YGEdgeLeft ).value;
+		marginTop = YGNodeStyleGetMargin( node, YGEdgeTop ).value;
+		marginRight = YGNodeStyleGetMargin( node, YGEdgeRight ).value;
+		marginBottom = YGNodeStyleGetMargin( node, YGEdgeBottom ).value;
+
+		borderLeft = YGNodeStyleGetBorder( node, YGEdgeLeft );
+		borderTop = YGNodeStyleGetBorder( node, YGEdgeTop );
+		borderRight = YGNodeStyleGetBorder( node, YGEdgeRight );
+		borderBottom = YGNodeStyleGetBorder( node, YGEdgeBottom );
+
+		paddingLeft = YGNodeStyleGetPadding( node, YGEdgeLeft ).value;
+		paddingTop = YGNodeStyleGetPadding( node, YGEdgeTop ).value;
+		paddingRight = YGNodeStyleGetPadding( node, YGEdgeRight ).value;
+		paddingBottom = YGNodeStyleGetPadding( node, YGEdgeBottom ).value;
+
+		float g = YGNodeStyleGetFlexGrow( node ), s = YGNodeStyleGetFlexShrink( node );
+		if( g && !s )
+			growth = g;
+		else if( s && !g )
+			growth = -s;
+		else {
+			growth = 0; // TODO: find middle value og g and s
+		}
+
 	}
+	dirty_layout = false;
+}
+
+void Layoutable::applyStyle() {
+	// connect properties
+			YGNodeStyleSetPosition(node, YGEdgeLeft, position.get().x);
+			YGNodeStyleSetPosition(node, YGEdgeTop, position.get().y);
+
+			YGNodeStyleSetWidth(node, size.get().width);
+			YGNodeStyleSetHeight(node, size.get().height);
+
+			YGNodeStyleSetMinWidth(node, minSize.get().width);
+			YGNodeStyleSetMinHeight(node, minSize.get().height);
+
+			YGNodeStyleSetMaxWidth(node, maxSize.get().width);
+			YGNodeStyleSetMaxHeight(node, maxSize.get().height);
+
+			YGNodeStyleSetMargin(node, YGEdgeLeft, marginLeft);
+			YGNodeStyleSetMargin(node, YGEdgeTop, marginTop);
+			YGNodeStyleSetMargin(node, YGEdgeRight, marginRight);
+			YGNodeStyleSetMargin(node, YGEdgeBottom, marginBottom);
+
+			YGNodeStyleSetBorder(node, YGEdgeLeft, borderLeft);
+			YGNodeStyleSetBorder(node, YGEdgeTop, borderTop);
+			YGNodeStyleSetBorder(node, YGEdgeRight, borderRight);
+			YGNodeStyleSetBorder(node, YGEdgeBottom, borderBottom);
+
+			YGNodeStyleSetPadding(node, YGEdgeLeft, paddingLeft);
+			YGNodeStyleSetPadding(node, YGEdgeTop, paddingTop);
+			YGNodeStyleSetPadding(node, YGEdgeRight, paddingRight);
+			YGNodeStyleSetPadding(node, YGEdgeBottom, paddingBottom);
+
+			float g = 0, s = 0;
+			if (growth.get() > 0)
+				g = growth;
+			else if (growth.get() < 0)
+				s = std::abs(growth);
+			YGNodeStyleSetFlexGrow(node, g);
+			YGNodeStyleSetFlexShrink(node, s);
+
+			auto x = absolutePosition ? YGPositionTypeAbsolute : YGPositionTypeRelative;
+			YGNodeStyleSetPositionType(node, x);
+			if (!calculating)
+				dirty_layout = true;
 }
 
 Layout* Layoutable::getLayout() const {
@@ -120,7 +338,7 @@ void Layout::append( Layoutable* item, Alignment align, float grow ) {
 	if( item->type == ElementType::Layout )
 		item->parent = this;
 
-	applySet( item, align, grow );
+	item->applyStyle();
 
 	dirty_layout = true;
 }
@@ -132,8 +350,12 @@ void Layout::append( std::initializer_list< priv::Layoutable* > item, Alignment 
 }
 
 void Layout::update() {
-	if( dirty_layout )
+	if( dirty_layout ) {
+		calculating = true;
 		invalidate();
+		calculating = false;
+	}
+	Layoutable::update();
 }
 
 void Layout::take( Layoutable* item ) {
@@ -159,16 +381,17 @@ void Layout::invalidate() {
 	else { // else, use our own properties
 		r = geometry;
 	}
-
-	YGNodeCalculateLayout( node, r.width, r.height, YGDirectionInherit );
-
 	// apply new calculations
 	invalidated();
 
+	YGNodeCalculateLayout( node, r.width, r.height, YGDirectionLTR );
+
+
 	// inform all underlying layouts to recalculate
 	for( auto i : nodemap ) {
-		if (i.second->type == ElementType::Layout)
-			static_cast<Layout*>(i.second)->invalidate();
+		i.second->parent_has_calculated = true;
+		if( i.second->type == ElementType::Layout )
+			static_cast< Layout* >( i.second )->invalidate();
 		else
 			i.second->invalidated();
 	}
@@ -177,37 +400,6 @@ void Layout::invalidate() {
 void Layout::invalidated() {
 	Layoutable::invalidated();
 
-	if (node) {
-	}
+	if( node && parent_has_calculated ) { }
 }
 
-void Layout::applySet( Layoutable* item, Alignment align, float grow ) {
-
-	//if( grow > 0 ) {
-	//	prop.grow = grow;
-	//	prop.shrink = 0;
-	//}
-	//else if( grow < 0 ) {
-	//	prop.grow = 0;
-	//	prop.shrink = grow;
-	//}
-	//YGNodeStyleSetFlexGrow( item->node,  );
-	//YGNodeStyleSetFlexShrink( item->node, prop.shrink );
-
-	//YGNodeStyleSetMargin( item->node, YGEdgeLeft, prop.margin_left );
-	//YGNodeStyleSetMargin( item->node, YGEdgeTop, prop.margin_top );
-	//YGNodeStyleSetMargin( item->node, YGEdgeRight, prop.margin_right );
-	//YGNodeStyleSetMargin( item->node, YGEdgeBottom, prop.margin_bottom );
-
-	//YGNodeStyleSetBorder( item->node, YGEdgeLeft, prop.border_left );
-	//YGNodeStyleSetBorder( item->node, YGEdgeTop, prop.border_top );
-	//YGNodeStyleSetBorder( item->node, YGEdgeRight, prop.border_right );
-	//YGNodeStyleSetBorder( item->node, YGEdgeBottom, prop.border_bottom );
-
-	//YGNodeStyleSetPadding( item->node, YGEdgeLeft, prop.padding_left );
-	//YGNodeStyleSetPadding( item->node, YGEdgeTop, prop.padding_top );
-	//YGNodeStyleSetPadding( item->node, YGEdgeRight, prop.padding_right );
-	//YGNodeStyleSetPadding( item->node, YGEdgeBottom, prop.padding_bottom );
-}
-
-void Layout::applyGet( priv::Layoutable* item ) { }
