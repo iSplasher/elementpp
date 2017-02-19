@@ -67,6 +67,8 @@ class Connection {
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 public:
 
+	Connection(){}
+
 	Connection( const Connection& other )
 		: scoped( other.scoped ),
 		  prop( other.prop ),
@@ -108,8 +110,8 @@ public:
 	 * \brief Disconnect from property
 	 */
 	void release() const {
-		if( cont ) {
-			cont.reset();
+		if( cont && *cont ) {
+			cont->reset();
 		}
 	};
 
@@ -117,19 +119,19 @@ public:
 	 * \brief Check if connection is linked to property
 	 * \return 
 	 */
-	bool isReleased() const { return cont ? false : true; }; // TODO: maybe property?
+	bool isReleased() const { return cont && *cont ? false : true; }; // TODO: maybe property?
 
 private:
 
-	Connection( T* t, react::TransactionStatus& s, std::unique_ptr< Continuation >& o, bool scope = false ) : scoped( scope ),
+	Connection( T* t, react::TransactionStatus* s, std::unique_ptr< Continuation >* o, bool scope = false ) : scoped( scope ),
 	                                                                                                          prop( t ),
 	                                                                                                          status( s ),
 	                                                                                                          cont( o ) {}
 
-	bool scoped;
-	T* prop;
-	react::TransactionStatus& status;
-	std::unique_ptr< Continuation >& cont;
+	bool scoped = false;
+	T* prop = nullptr;
+	react::TransactionStatus* status = nullptr;
+	std::unique_ptr< Continuation >* cont = nullptr;
 
 	friend T;
 };
@@ -206,7 +208,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, Private > >( this, status, cont, C == ConnectionType::Scoped );
+		return Connection< Property< T, Private > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -449,7 +451,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, Element > >( this, status, cont, C == ConnectionType::Scoped );
+		return Connection< Property< T, Element > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -580,7 +582,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, PropertyViewType > >( this, status, cont, C == ConnectionType::Scoped );
+		return Connection< Property< T, PropertyViewType > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 

@@ -120,6 +120,8 @@ public:
 
 	PropertyView<PointF> position;
 	PropertyView<SizeF> size;
+	PropertyView<SizeF> minSize;
+	PropertyView<SizeF> maxSize;
 
 	// STYLE
 
@@ -158,13 +160,14 @@ protected:
 private:
 
 	// member methods
+	Widget* getWidget() const { return _widget; }
+	void setWidget(Widget*);
 
 	void invalidated() override;
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
 	Widget* _widget = nullptr;
-
 };
 
 
