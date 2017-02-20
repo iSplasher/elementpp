@@ -1,6 +1,6 @@
 #include "element/widget.h"
-//#include "element/window.h"
-//#include "element/core/painter.h"
+#include "element/window.h"
+#include "element/core/painter.h"
 
 
 USING_NAMESPACE
@@ -15,15 +15,21 @@ Widget::~Widget() {
 }
 
 void Widget::paint(Painter& painter) {
+	Brush b(painter);
+	b.setColor(Color(250, 0, 0, 200));
+
+	painter.drawRect(RectF(PointF(0, 0), size));
 }
 
 void Widget::update() {
-	//auto &painter = *parent_window->painter;
-	//painter.save();
-	//painter.origin = PointF(mapToWindow(Point(0, 0)));
-	//painter.current_widget = this;
-	//paint(painter);
-	//painter.restore();
+	if (parent_window) {
+		auto &painter = *parent_window->painter;
+		painter.save();
+		painter.origin = PointF(mapToWindow(PointF(0, 0)));
+		painter.current_widget = this;
+		paint(painter);
+		painter.restore();
+	}
 }
 
 PointF Widget::mapToParent(PointF _p) const {
@@ -52,6 +58,12 @@ PointF Widget::mapToGlobal(PointF p) {
 		w = w->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
+}
+
+void Widget::setParent( Element* e ) {
+	Layoutable::setParent(e);
+	if (e && e->type == ElementType::Window)
+		parent_window = static_cast<Window*>(e);
 }
 
 PointF Widget::mapFromWindow(PointF p) {

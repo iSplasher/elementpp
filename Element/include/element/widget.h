@@ -8,7 +8,7 @@ typedef struct NVGcontext PainterContext;
 NAMESPACE_BEGIN
 
 class Painter;
-class RWindow;
+class Window;
 
 /// <summary>
 /// Component widget. A very basic widget. Can be used as a container for other widgets
@@ -37,7 +37,7 @@ public:
 	void update() override;
 
 	Property<bool, Widget> underMouse;
-	//Property<gFont, Widget> font;
+	//Property<Font, Widget> font;
 
 	/// <summary>
 	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
@@ -97,14 +97,15 @@ protected:
 	};
 
 	// data members
-	RWindow *parent_window = nullptr;
+	Window *parent_window = nullptr;
 	Widget *parent_widget;
 	MoveState move_state = Normal;
 	PainterContext *this_paint = nullptr;
 	Drag drag;
 
 private:
-	//Point move_offset;
+
+	void setParent(Element*) override;
 
 friend class Painter;
 friend class Layout;

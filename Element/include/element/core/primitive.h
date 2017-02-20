@@ -6,8 +6,8 @@
 typedef struct NVGcolor _PColor;
 
 NAMESPACE_BEGIN
-class gPen;
-class gBrush;
+class Pen;
+class Brush;
 
 
 /// <summary>
@@ -694,27 +694,27 @@ using RectD = RectT< double >;
 using RectU = RectT< unsigned >;
 
 
-class ELEMENT_API gColor {
+class ELEMENT_API Color {
 public:
-	gColor() = default;
+	Color() = default;
 
-	gColor( int r, int g, int b ) : red( r ),
+	Color( int r, int g, int b ) : red( r ),
 	                                green( g ),
 	                                blue( b ),
 	                                type( RGB ) {}
 
-	gColor( int r, int g, int b, float a ) : red( r ),
+	Color( int r, int g, int b, float a ) : red( r ),
 	                                         green( g ),
 	                                         blue( b ),
 	                                         alpha( a ),
 	                                         type( RGBA ) {}
 
-	gColor( float h, float s, float l ) : hue( h ),
+	Color( float h, float s, float l ) : hue( h ),
 	                                      sat( s ),
 	                                      light( l ),
 	                                      type( HSL ) {}
 
-	gColor( float h, float s, float l, float a ) : hue( h ),
+	Color( float h, float s, float l, float a ) : hue( h ),
 	                                               sat( s ),
 	                                               light( l ),
 	                                               alpha( a ),
@@ -742,38 +742,38 @@ private:
 
 	Type type = RGB;
 
-	friend class gPen;
-	friend class gBrush;
+	friend class Pen;
+	friend class Brush;
 
-	friend std::ostream& operator <<( std::ostream& out, const gColor& c );
+	friend std::ostream& operator <<( std::ostream& out, const Color& c );
 };
 
 
-inline std::ostream& operator <<( std::ostream& out, const gColor& c ) {
+inline std::ostream& operator <<( std::ostream& out, const Color& c ) {
 	switch( c.type ) {
-		case gColor::RGB:
-			out << "gColor(RGB" << "(" << c.red << ", " << c.green << ", " << c.blue << "))";
+		case Color::RGB:
+			out << "Color(RGB" << "(" << c.red << ", " << c.green << ", " << c.blue << "))";
 			break;
-		case gColor::RGBA:
-			out << "gColor(RGBA" << "(" << c.red << ", " << c.green << ", " << c.blue << ", " << c.alpha << "))";
+		case Color::RGBA:
+			out << "Color(RGBA" << "(" << c.red << ", " << c.green << ", " << c.blue << ", " << c.alpha << "))";
 			break;
-		case gColor::HSL:
-			out << "gColor(HSL" << "(" << c.hue << ", " << c.sat << ", " << c.light << "))";
+		case Color::HSL:
+			out << "Color(HSL" << "(" << c.hue << ", " << c.sat << ", " << c.light << "))";
 			break;
-		case gColor::HSLA:
-			out << "gColor(HSLA" << "(" << c.hue << ", " << c.sat << ", " << c.light << ", " << c.alpha << "))";
+		case Color::HSLA:
+			out << "Color(HSLA" << "(" << c.hue << ", " << c.sat << ", " << c.light << ", " << c.alpha << "))";
 			break;
 	}
 	return out;
 }
 
 
-class ELEMENT_API gFont {
+class ELEMENT_API Font {
 public:
-	gFont() = default;
+	Font() = default;
 
-	//gFont(std::string face);
-	//gFont(const gFont &other);
+	//Font(std::string face);
+	//Font(const Font &other);
 
 	//void setPixelSize(float pixel_size);
 	//void setPointSize(float point_size);

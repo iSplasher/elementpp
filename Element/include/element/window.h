@@ -1,33 +1,20 @@
 #pragma once
 
-#include "gSplasher/Widgets/TopBar.h"
-#include "Utils/Painter.h"
+#include "element/widget.h"
+#include "element/core/painter.h"
 
 typedef struct GLFWwindow _privRWindow;
 
 NAMESPACE_BEGIN
 
-/// <summary>
-/// A window. 
-/// </summary>
-class GSPLASHER_API RWindow : public WidgetCore {
+class ELEMENT_API Window : public Widget {
 public:
-	using TopBarPtr = std::unique_ptr<TopBar>;
-	explicit RWindow(RWindow* parent = nullptr) : RWindow(Size(500, 300), parent) {}
-	explicit RWindow(Size size, RWindow* parent = nullptr);
-	virtual ~RWindow();
-
-	// methods
-	TopBarPtr& topBar() { return top_bar; }
-	//Point pos() override;
-	void move(Point new_p) override;
-
-	Rect contentGeometry() override;
+	explicit Window(Window* parent = nullptr) : Window(SizeF(500, 300), parent) {}
+	explicit Window(SizeF size, Window* parent = nullptr);
+	virtual ~Window();
 
 protected:
 	// methods
-	virtual void resizeEvent(ResizeEventPtr ev);
-
 
 private:
 	//methods
@@ -47,15 +34,12 @@ private:
 	bool _inited = false;
 
 	UniquePainter painter;
-	// Top bar of RWindow
-	TopBarPtr top_bar;
 	// render window
 	_privRWindow *r_window;
 
 	friend class Painter;
+	friend class Widget;
 	friend class Application;
-	friend class WidgetCore;
-	friend class TopBar;
 };
 
 NAMESPACE_END

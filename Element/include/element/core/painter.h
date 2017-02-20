@@ -1,25 +1,25 @@
 ﻿#pragma once
 
-#include "gSplasher/Widget.h"
+#include "element/widget.h"
 
 NAMESPACE_BEGIN
 
 class Painter;
 
-class GSPLASHER_API gPen {
+class ELEMENT_API Pen {
 public:
 	enum class Cap;
 	enum class Join;
 
-	gPen() = default;
-	explicit gPen(Painter &painter);
+	Pen() = default;
+	explicit Pen(Painter &painter);
 
 	/// <summary>
 	/// Set a new color to this pen
 	/// </summary>
-	void setColor(gColor color);
+	void setColor(Color color);
 
-	gColor color() const { return c_color; }
+	Color color() const { return c_color; }
 
 	/// <summary>
 	/// Set a new line width to this pen
@@ -50,22 +50,22 @@ private:
 
 	PainterContext* pc = nullptr;
 	float c_width = 0.1f;
-	gColor c_color;
+	Color c_color;
 
 	friend class Painter;
 };
 
-class GSPLASHER_API gBrush {
+class ELEMENT_API Brush {
 public:
-	gBrush() = default;
-	explicit gBrush(Painter &painter);
+	Brush() = default;
+	explicit Brush(Painter &painter);
 
 	/// <summary>
 	/// Set a new color to this brush
 	/// </summary>
-	void setColor(gColor color);
+	void setColor(Color color);
 
-	gColor color() const { return c_color; }
+	Color color() const { return c_color; }
 
 	//void setGradient();
 	//void setPattern();
@@ -77,16 +77,16 @@ private:
 	void apply() const;
 
 	PainterContext* pc = nullptr;
-	gColor c_color;
+	Color c_color;
 
 	friend class Painter;
 };
 
 class TopBar;
 
-class GSPLASHER_API Painter {
+class ELEMENT_API Painter {
 public:
-	Painter(RWindow*);
+	Painter(Window*);
 	~Painter();
 
 	/// <summary>
@@ -103,13 +103,13 @@ public:
 	/// Set new pen
 	/// </summary>
 	/// <param name="pen">New pen</param>
-	void setPen(gPen &pen);
+	void setPen(Pen &pen);
 
 	/// <summary>
 	/// Retrieve current pen
 	/// </summary>
-	/// <returns>Current gPen</returns>
-	gPen &pen() const { return *p; }
+	/// <returns>Current Pen</returns>
+	Pen &pen() const { return *p; }
 
 	/// <summary>
 	/// Saves the current state
@@ -140,13 +140,13 @@ public:
 	/// Set new brush
 	/// </summary>
 	/// <param name="brush">New brush</param>
-	void setBrush(gBrush &brush);
+	void setBrush(Brush &brush);
 
 	/// <summary>
 	/// Retrieve current brush
 	/// </summary>
-	/// <returns>Current gBrush</returns>
-	gBrush &brush() const { return *b; }
+	/// <returns>Current Brush</returns>
+	Brush &brush() const { return *b; }
 
 	/// <summary>
 	/// Draw a rectangle shape
@@ -194,22 +194,21 @@ private:
 
 	// TODO: Create a save-stack struct to store old objects instead!
 
-	WidgetCore *w = nullptr;
+	Widget *w = nullptr;
 	// Coordinates will be translated to this widget's parent
 	PointF origin;
 	PointF o_origin;
-	WidgetCore *current_widget = nullptr;
+	Widget *current_widget = nullptr;
 	PainterContext* context = nullptr;
-	gPen *p = nullptr;
-	gPen *o_p = nullptr;
-	gBrush *b = nullptr;
-	gBrush *o_b = nullptr;
+	Pen *p = nullptr;
+	Pen *o_p = nullptr;
+	Brush *b = nullptr;
+	Brush *o_b = nullptr;
 	bool begun = false;
 	// TODO: maybe extend this to a gMargins? and do all sides?
 	int top_margin = 0; // for window TopBar.. 
 
-	friend class WidgetCore;
-	friend class TopBar;
+	friend class Widget;
 };
 
 using UniquePainter = std::unique_ptr<Painter>;

@@ -223,7 +223,7 @@ public:
 	 * \brief Get T
 	 * \return T
 	 */
-	T get() { return this; }
+	T get() { return reactive.Value();; }
 
 	// Relational operators
 
@@ -597,7 +597,7 @@ public:
 	* \brief Get T
 	* \return T
 	*/
-	T get() { return this; }
+	T get() { return reactive.Value();; }
 
 	// Relational operators
 

@@ -1,5 +1,5 @@
 #include "element/layout.h"
-#include "element/widget.h"
+#include "element/window.h"
 
 #include "catch.hpp"
 
@@ -20,11 +20,11 @@ SCENARIO("Layouts", "[Layout]") {
 	priv::YGNodeStyleSetFlexDirection( root, priv::YGFlexDirectionRow );
 	priv::YGNodeStyleSetFlexGrow( root, 1 );
 	priv::YGNodeStyleSetFlexGrow( child1, 1 );
-	priv::YGNodeStyleSetFlexGrow( child2, 2 );
+	priv::YGNodeStyleSetFlexGrow( child2, 1 );
 	//priv::YGNodeStyleSetWidth(root, 300);
 	//priv::YGNodeStyleSetHeight(root, 300);
-	priv::YGNodeStyleSetWidth( child1, 500 );
-	priv::YGNodeStyleSetHeight( child1, 500 );
+	priv::YGNodeStyleSetWidth( child1, 50 );
+	priv::YGNodeStyleSetHeight( child1, 50 );
 	priv::YGNodeCalculateLayout( root, 300, 300, priv::YGDirectionLTR );
 
 	priv::YGNodeStyleGetHeight( root );
@@ -41,6 +41,9 @@ SCENARIO("Layouts", "[Layout]") {
 	priv::YGNodeLayoutGetLeft( child1 );
 	priv::YGNodeLayoutGetTop( child2 );
 	priv::YGNodeLayoutGetLeft( child2 );
+
+	auto window = app->create<Window>();
+	app->exec();
 
 	GIVEN("Layouts are instatiated") {
 		auto widget = app->create< Widget >();

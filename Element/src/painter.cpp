@@ -1,6 +1,6 @@
-﻿#include "element/utils/painter.h"
+﻿#include "element/core/painter.h"
 #include "element/window.h"
-#include "element/utils/primitives.h"
+#include "element/core/primitive.h"
 
 #include <GL/glew.h> // required for nanovg
 #include <GLFW/glfw3.h> // required for nanovg
@@ -11,7 +11,7 @@
 
 USING_NAMESPACE
 
-_PColor gColor::toPColor() const {
+_PColor Color::toPColor() const {
 	NVGcolor c;
 	switch (type) {
 	case RGB:
@@ -30,77 +30,77 @@ _PColor gColor::toPColor() const {
 	return c;
 }
 
-enum class gPen::Cap {
+enum class Pen::Cap {
 	Butt = NVG_BUTT,
 	Round = NVG_ROUND,
 	Square = NVG_SQUARE
 };
 
-enum class gPen::Join {
+enum class Pen::Join {
 	Miter = NVG_MITER,
 	Round = NVG_ROUND,
 	Bevel = NVG_BEVEL
 };
 
-gPen::gPen(Painter& painter) {
+Pen::Pen(Painter& painter) {
 	painter.setPen(*this);
 	setJoin(Join::Bevel);
 	setCap(Cap::Round);
-	setColor(gColor(0, 0, 0));
+	setColor(Color(0, 0, 0));
 	setWidth(1);
 }
 
-void gPen::setColor(gColor color) {
+void Pen::setColor(Color color) {
 	if (pc) {
 		nvgStrokeColor(pc, color.toPColor());
 		c_color = color;
 	}
 }
 
-void gPen::setWidth(float width) {
+void Pen::setWidth(float width) {
 	if (pc) {
 		nvgStrokeWidth(pc, width);
 		c_width = width;
 	}
 }
 
-void gPen::setCap(Cap cap) {
+void Pen::setCap(Cap cap) {
 	if (pc) {
 		nvgLineCap(pc, static_cast<int>(cap));
 	}
 }
 
-void gPen::setJoin(Join join) {
+void Pen::setJoin(Join join) {
 	if (pc) {
 		nvgLineJoin(pc, static_cast<int>(join));
 	}
 }
 
-void gPen::apply() const {
+void Pen::apply() const {
 	if (pc) {
 		nvgStroke(pc);
 	}
 }
 
-gBrush::gBrush(Painter& painter) {
+Brush::Brush(Painter& painter) {
 	painter.setBrush(*this);
-	setColor(gColor(0, 0, 0));
+	setColor(Color(0, 0, 0));
 }
 
-void gBrush::setColor(gColor color) {
+void Brush::setColor(Color color) {
 	if (pc) {
 		nvgFillColor(pc, color.toPColor());
 		c_color = color;
 	}
 }
 
-void gBrush::apply() const {
+void Brush::apply() const {
 	if (pc) {
 		nvgFill(pc);
 	}
 }
 
-gsp::Painter::Painter(RWindow* window) {
+Painter::Painter(Window* window) {
 	w = window;
 	if (!w->this_paint) {
 		w->this_paint = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
@@ -121,10 +121,7 @@ void Painter::begin(float pixel_ratio) {
 	}
 	begun = true;
 	w->parent_window->setActive();
-	if (w->parent_window->top_bar) {
-		top_margin = w->parent_window->top_bar->size().height;
-	}
-	auto s = w->size();
+	SizeF s = w->size;
 	nvgBeginFrame(context, s.width, s.height, pixel_ratio);
 }
 
@@ -136,7 +133,7 @@ void Painter::end() {
 	nvgEndFrame(context);
 }
 
-void Painter::setPen(gPen& pen) {
+void Painter::setPen(Pen& pen) {
 	pen.pc = context;
 	p = &pen;
 }
@@ -169,7 +166,7 @@ void Painter::setGlobalAlpha(float alpha) const {
 	nvgGlobalAlpha(context, alpha);
 }
 
-void Painter::setBrush(gBrush& brush) {
+void Painter::setBrush(Brush& brush) {
 	brush.pc = context;
 	b = &brush;
 }
@@ -212,14 +209,14 @@ void Painter::drawLine(PointF start, PointF end) const {
 }
 
 void Painter::translate(RectF& r) const {
-	if (!current_widget->is_window) {
+	if (!(current_widget->type == ElementType::Window)) {
 		r += origin;
 		r.y += top_margin;
 	}
 }
 
 void Painter::translate(PointF& p) const {
-	if (!current_widget->is_window) {
+	if (!(current_widget->type == ElementType::Window)) {
 		p += origin;
 		p.y += top_margin;
 	}

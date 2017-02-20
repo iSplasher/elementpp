@@ -1,5 +1,5 @@
 #include "element/core.h"
-//#include "gSplasher/Window.h"
+#include "element/window.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -61,7 +61,7 @@ void Element::setParent(Element* new_parent ) {
 static void errorCallback( int err, const char* descr ) { std::cout << descr; }
 
 static void closeWindowCallback( GLFWwindow* r_window ) {
-	// TODO: delete RWindow object
+	// TODO: delete Window object
 	glfwDestroyWindow( r_window );
 }
 
@@ -101,12 +101,12 @@ Application* Application::instance() { return self; }
 
 bool Application::processEv() const {
 	// TODO: optimize this so it doesn't check all
-	//for (auto &core : *component_tree) {
+	for (auto &core : *component_tree) {
 
-	//	if (core->is_window) {
-	//		static_cast<RWindow*>(core)->update();
-	//	}
-	//}
+		if (core->type == ElementType::Window) {
+			static_cast<Window*>(core)->update();
+		}
+	}
 	glfwWaitEvents();
 
 	return should_quit ? false : true;

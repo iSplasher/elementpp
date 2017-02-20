@@ -11,7 +11,8 @@
 NAMESPACE_BEGIN
 class Element;
 using ElementPtr = std::unique_ptr< Element >;
-class RWindow;
+class Window;
+class Wigdet;
 class Application;
 
 
@@ -95,7 +96,7 @@ private:
 	}
 
 	// FUNCTIONS
-	void setParent( Element* );
+	virtual void setParent( Element* );
 
 	Element* getParent() const;
 
@@ -118,7 +119,7 @@ private:
 	bool parent_is_deleting = false;
 
 	friend class Application;
-
+	friend class Widget;
 };
 
 
@@ -227,7 +228,7 @@ private:
 	ElementContainerPtr component_objects;
 	ElementTreePtr component_tree;
 
-	friend class RWindow;
+	friend class Window;
 	friend class Element;
 };
 
