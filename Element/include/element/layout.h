@@ -86,6 +86,11 @@ private:
 
 	virtual void applyStyle();
 
+	void setGrowth(float);
+	void setMaxSize(SizeF);
+	void setMinSize(SizeF);
+	void setSize(SizeF);
+
 	Layout* getLayout() const;
 
 	// data members
@@ -163,7 +168,11 @@ private:
 	Widget* getWidget() const { return _widget; }
 	void setWidget(Widget*);
 
+	void setOrientation(Orientation);
+
 	void invalidated() override;
+
+	void applyStyle() override;
 
 	// data
 	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;

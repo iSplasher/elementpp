@@ -5,44 +5,63 @@
 
 USING_NAMESPACE
 
+void printWidget(Widget* e) {
+	std::cout << e->objectName << ": " << e->geometry << std::endl;
+}
+
 SCENARIO("Layouts", "[Layout]") {
 	Application* app = Application::instance();
 	if( !app )
 		app = new Application();
 
-	auto root = priv::YGNodeNew();
-	auto child1 = priv::YGNodeNew();
-	auto child2 = priv::YGNodeNew();
-	YGNodeStyleSetPadding( root, priv::YGEdgeAll, 10 );
-	priv::YGNodeInsertChild( root, child1, 0 );
-	priv::YGNodeInsertChild( root, child2, 1 );
-	priv::YGNodeStyleSetAlignItems( root, priv::YGAlignStretch );
-	priv::YGNodeStyleSetFlexDirection( root, priv::YGFlexDirectionRow );
-	priv::YGNodeStyleSetFlexGrow( root, 1 );
-	priv::YGNodeStyleSetFlexGrow( child1, 1 );
-	priv::YGNodeStyleSetFlexGrow( child2, 1 );
-	//priv::YGNodeStyleSetWidth(root, 300);
-	//priv::YGNodeStyleSetHeight(root, 300);
-	priv::YGNodeStyleSetWidth( child1, 50 );
-	priv::YGNodeStyleSetHeight( child1, 50 );
-	priv::YGNodeCalculateLayout( root, 300, 300, priv::YGDirectionLTR );
+	//auto root = priv::YGNodeNew();
+	//auto child1 = priv::YGNodeNew();
+	//auto child2 = priv::YGNodeNew();
+	//YGNodeStyleSetPadding( root, priv::YGEdgeAll, 10 );
+	//priv::YGNodeInsertChild( root, child1, 0 );
+	//priv::YGNodeInsertChild( root, child2, 1 );
+	////priv::YGNodeStyleSetAlignItems( root, priv::YGAlignStretch );
+	//priv::YGNodeStyleSetFlexDirection( root, priv::YGFlexDirectionRow );
+	//priv::YGNodeStyleSetFlexGrow( root, 1 );
+	//priv::YGNodeStyleSetFlexGrow( child1, 1 );
+	//priv::YGNodeStyleSetFlexGrow( child2, 1 );
+	////priv::YGNodeStyleSetWidth(root, 300);
+	////priv::YGNodeStyleSetHeight(root, 300);
+	//priv::YGNodeStyleSetWidth( child1, 50 );
+	//priv::YGNodeStyleSetHeight( child1, 50 );
+	//priv::YGNodeCalculateLayout( root, 300, 300, priv::YGDirectionLTR );
 
-	priv::YGNodeStyleGetHeight( root );
-	priv::YGNodeStyleGetWidth( root );
-	priv::YGNodeStyleGetHeight( child1 );
-	priv::YGNodeStyleGetWidth( child1 );
-	priv::YGNodeLayoutGetHeight( root );
-	priv::YGNodeLayoutGetWidth( root );
-	priv::YGNodeLayoutGetHeight( child1 );
-	priv::YGNodeLayoutGetWidth( child1 );
-	priv::YGNodeLayoutGetHeight( child2 );
-	priv::YGNodeLayoutGetWidth( child2 );
-	priv::YGNodeLayoutGetTop( child1 );
-	priv::YGNodeLayoutGetLeft( child1 );
-	priv::YGNodeLayoutGetTop( child2 );
-	priv::YGNodeLayoutGetLeft( child2 );
+	//priv::YGNodeStyleGetHeight( root );
+	//priv::YGNodeStyleGetWidth( root );
+	//priv::YGNodeStyleGetHeight( child1 );
+	//priv::YGNodeStyleGetWidth( child1 );
+	//priv::YGNodeLayoutGetHeight( root );
+	//priv::YGNodeLayoutGetWidth( root );
+	//priv::YGNodeLayoutGetHeight( child1 );
+	//priv::YGNodeLayoutGetWidth( child1 );
+	//priv::YGNodeLayoutGetHeight( child2 );
+	//priv::YGNodeLayoutGetWidth( child2 );
+	//priv::YGNodeLayoutGetTop( child1 );
+	//priv::YGNodeLayoutGetLeft( child1 );
+	//priv::YGNodeLayoutGetTop( child2 );
+	//priv::YGNodeLayoutGetLeft( child2 );
 
 	auto window = app->create<Window>();
+	auto layout = app->create< Layout >();
+	layout->widget = window;
+	auto widget1 = app->create< Widget >();
+	//widget1->size = SizeF(50, 50);
+	widget1->marginLeft = 2;
+	widget1->marginRight = 2;
+	widget1->marginTop = 2;
+	widget1->marginBottom = 2;
+	auto widget2 = app->create< Widget >();
+	layout->append({ widget1, widget2 });
+	layout->update();
+	printWidget(window);
+	printWidget(widget1);
+	printWidget(widget2);
+
 	app->exec();
 
 	GIVEN("Layouts are instatiated") {

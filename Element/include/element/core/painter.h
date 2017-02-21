@@ -60,6 +60,12 @@ public:
 	Brush() = default;
 	explicit Brush(Painter &painter);
 
+	bool operator==(const Brush& rhs ) const {
+		return c_color == rhs.c_color;
+	}
+
+	bool operator!=(const Brush& rhs ) const { return !( *this == rhs ); }
+
 	/// <summary>
 	/// Set a new color to this brush
 	/// </summary>
@@ -187,6 +193,7 @@ public:
 private:
 
 	// helper methods
+	void paintWidget(Widget* w);
 	void translate(RectF &r) const;
 	void translate(PointF &p) const;
 	void beginPath() const;

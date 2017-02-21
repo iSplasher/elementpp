@@ -208,6 +208,12 @@ void Painter::drawLine(PointF start, PointF end) const {
 	applyPB();
 }
 
+void Painter::paintWidget( Widget* w ) {
+	if (w && w->type == ElementType::Widget) {
+		
+	}
+}
+
 void Painter::translate(RectF& r) const {
 	if (!(current_widget->type == ElementType::Window)) {
 		r += origin;

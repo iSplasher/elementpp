@@ -8,6 +8,11 @@ USING_NAMESPACE
 Widget::Widget(Widget *parent) : PRIV_NAMESPACE::Layoutable(parent) {
 	objectName = "Widget";
 	setType(ElementType::Widget);
+
+	marginLeft = marginTop = marginRight = marginBottom = 0.5;
+	borderLeft = borderTop = borderRight = borderBottom = 0.5;
+	borderColor = Color(27, 27, 27);
+
 }
 
 Widget::~Widget() {
@@ -30,6 +35,7 @@ void Widget::update() {
 		paint(painter);
 		painter.restore();
 	}
+	Layoutable::update();
 }
 
 PointF Widget::mapToParent(PointF _p) const {
@@ -62,8 +68,11 @@ PointF Widget::mapToGlobal(PointF p) {
 
 void Widget::setParent( Element* e ) {
 	Layoutable::setParent(e);
+	parent_widget = static_cast<Widget*>(e);
 	if (e && e->type == ElementType::Window)
-		parent_window = static_cast<Window*>(e);
+		parent_window = static_cast<Window*>(parent_widget);
+	else if (e)
+		parent_window = parent_widget->parent_window;
 }
 
 PointF Widget::mapFromWindow(PointF p) {

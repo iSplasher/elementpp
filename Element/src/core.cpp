@@ -103,8 +103,8 @@ bool Application::processEv() const {
 	// TODO: optimize this so it doesn't check all
 	for (auto &core : *component_tree) {
 
-		if (core->type == ElementType::Window) {
-			static_cast<Window*>(core)->update();
+		if (core->type == ElementType::Window || core->type == ElementType::Layout) {
+			static_cast<Layout*>(core)->update();
 		}
 	}
 	glfwWaitEvents();

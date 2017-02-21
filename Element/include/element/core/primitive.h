@@ -720,6 +720,19 @@ public:
 	                                               alpha( a ),
 	                                               type( HSLA ) {}
 
+	bool operator==(const Color& rhs ) const {
+		return red == rhs.red
+				&& green == rhs.green
+				&& blue == rhs.blue
+				&& hue == rhs.hue
+				&& sat == rhs.sat
+				&& light == rhs.light
+				&& alpha == rhs.alpha
+				&& type == rhs.type;
+	}
+
+	bool operator!=(const Color& rhs ) const { return !( *this == rhs ); }
+
 	// TODO: make private and return int/float array?
 	int red = 0;
 	int green = 0;
@@ -771,6 +784,16 @@ inline std::ostream& operator <<( std::ostream& out, const Color& c ) {
 class ELEMENT_API Font {
 public:
 	Font() = default;
+	bool operator==(const Font& rhs ) const {
+		return f_face == rhs.f_face
+				&& f_pixel_size == rhs.f_pixel_size
+				&& f_point_size == rhs.f_point_size
+				&& l_height == rhs.l_height
+				&& f_align == rhs.f_align
+				&& f_spacing == rhs.f_spacing;
+	}
+
+	bool operator!=(const Font& rhs ) const { return !( *this == rhs ); }
 
 	//Font(std::string face);
 	//Font(const Font &other);

@@ -165,6 +165,10 @@ class Property {
 
 public:
 
+	Property& operator=(const Property& other) {
+		reactive <<= other.reactive.Value();
+		return *this;
+	}
 	/**
 	* \brief property->member
 	* \return
@@ -271,8 +275,6 @@ private:
 	// MOVE & COPY
 
 	Property(const Property& other) = delete;
-	Property& operator=(const Property& other) = delete;
-
 
 	Property( Property&& other ) noexcept
 		: continuations( std::move( other.continuations ) ),
@@ -360,7 +362,11 @@ public:
 		  reactive( std::move( other.reactive ) ),
 		  status( std::move( other.status ) ) {}
 
-	Property& operator=(const Property& other) = delete;
+	Property& operator=(const Property& other) {
+		reactive <<= other.reactive.Value();
+		return *this;
+	}
+
 	Property& operator=( Property&& other ) noexcept {
 		if( this == &other )
 			return *this;
