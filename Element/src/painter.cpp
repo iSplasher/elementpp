@@ -209,9 +209,11 @@ void Painter::drawLine(PointF start, PointF end) const {
 }
 
 void Painter::paintWidget( Widget* w ) {
-	if (w && w->type == ElementType::Widget) {
-		
-	}
+	Brush b(*this);
+	Pen p(*this);
+	b.setColor(w->backgroundColor);
+	p.setColor(w->foregroundColor);
+	drawRect(RectF(PointF(0, 0), w->size));
 }
 
 void Painter::translate(RectF& r) const {

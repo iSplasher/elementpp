@@ -5,7 +5,7 @@
 
 USING_NAMESPACE
 
-void printWidget(Widget* e) {
+void printWidget(PRIV_NAMESPACE::Layoutable* e) {
 	std::cout << e->objectName << ": " << e->geometry << std::endl;
 }
 
@@ -50,15 +50,13 @@ SCENARIO("Layouts", "[Layout]") {
 	auto layout = app->create< Layout >();
 	layout->widget = window;
 	auto widget1 = app->create< Widget >();
-	//widget1->size = SizeF(50, 50);
-	widget1->marginLeft = 2;
-	widget1->marginRight = 2;
-	widget1->marginTop = 2;
-	widget1->marginBottom = 2;
+	widget1->size = SizeF(0, 0);
 	auto widget2 = app->create< Widget >();
+	widget2->size = SizeF(0, 0);
 	layout->append({ widget1, widget2 });
 	layout->update();
 	printWidget(window);
+	printWidget(layout);
 	printWidget(widget1);
 	printWidget(widget2);
 

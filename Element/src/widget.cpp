@@ -20,10 +20,6 @@ Widget::~Widget() {
 }
 
 void Widget::paint(Painter& painter) {
-	Brush b(painter);
-	b.setColor(Color(250, 0, 0, 200));
-
-	painter.drawRect(RectF(PointF(0, 0), size));
 }
 
 void Widget::update() {

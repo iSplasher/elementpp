@@ -35,7 +35,8 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
                                                paddingRight( 0 ),
                                                paddingBottom( 0 ),
                                                alignment( Alignment::Default ),
-                                               growth( 0 ),
+                                               grow( 1 ),
+                                               shrink( 0 ),
                                                absolutePosition( false ),
                                                layout( this, std::mem_fn( &Layoutable::getLayout ) ) {
 
@@ -152,9 +153,9 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 		                      }
 	                      } );
 
-	growth.changed( [&](float n) {
-		               setGrowth( n );
-	               } );
+	grow.changed( [&](float n) { setGrow( n ); } );
+	shrink.changed( [&](float n) { setShrink( n ); } );
+
 	absolutePosition.changed( [&](bool n) {
 		                         if( node ) {
 			                         auto x = n ? YGPositionTypeAbsolute : YGPositionTypeRelative;
@@ -163,8 +164,7 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 				                         dirty_layout = true;
 		                         }
 	                         } );
-
-	growth = 1;
+	alignment.changed( [&](Alignment n) { setAlignment( n ); } );
 
 }
 
@@ -186,7 +186,7 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
-		position = PointF( YGNodeLayoutGetTop( node ), YGNodeLayoutGetLeft( node ) );
+		position = PointF( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
 		size = SizeF( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
 		minSize = SizeF( YGNodeStyleGetMinWidth( node ).value, YGNodeStyleGetMinHeight( node ).value );
 		maxSize = SizeF( YGNodeStyleGetMaxWidth( node ).value, YGNodeStyleGetMaxHeight( node ).value );
@@ -206,14 +206,8 @@ void Layoutable::invalidated() {
 		paddingRight = YGNodeStyleGetPadding( node, YGEdgeRight ).value;
 		paddingBottom = YGNodeStyleGetPadding( node, YGEdgeBottom ).value;
 
-		float g = YGNodeStyleGetFlexGrow( node ), s = YGNodeStyleGetFlexShrink( node );
-		if( g && !s )
-			growth = g;
-		else if( s && !g )
-			growth = -s;
-		else {
-			growth = 0; // TODO: find middle value og g and s
-		}
+		grow = YGNodeStyleGetFlexGrow( node );
+		shrink = YGNodeStyleGetFlexShrink( node );
 
 	}
 	dirty_layout = false;
@@ -223,15 +217,8 @@ void Layoutable::applyStyle() {
 	if( !node )
 		return;
 
-	if( type != ElementType::Layout ) {
-		if( position.get().x )
-			YGNodeStyleSetPosition( node, YGEdgeLeft, position.get().x );
-		if( position.get().y )
-			YGNodeStyleSetPosition( node, YGEdgeTop, position.get().y );
-
-		setSize( size );
-	}
-
+	setPosition( position );
+	setSize( size );
 	setMaxSize( maxSize );
 	setMinSize( minSize );
 
@@ -250,7 +237,10 @@ void Layoutable::applyStyle() {
 	YGNodeStyleSetPadding( node, YGEdgeRight, paddingRight );
 	YGNodeStyleSetPadding( node, YGEdgeBottom, paddingBottom );
 
-	setGrowth( growth );
+	YGNodeStyleSetAlignSelf( node, YGAlignStretch );
+
+	setGrow( grow );
+	setShrink( shrink );
 
 	auto x = absolutePosition ? YGPositionTypeAbsolute : YGPositionTypeRelative;
 	YGNodeStyleSetPositionType( node, x );
@@ -258,15 +248,19 @@ void Layoutable::applyStyle() {
 		dirty_layout = true;
 }
 
-void Layoutable::setGrowth( float n ) {
+void Layoutable::setGrow( float n ) {
 	if( node ) {
-		float g = 0, s = 0;
-		if( n > 0 )
-			g = n;
-		else if( n < 0 )
-			s = std::abs( n );
-		YGNodeStyleSetFlexGrow( node, g );
-		YGNodeStyleSetFlexShrink( node, s );
+		if( n >= 0 )
+			YGNodeStyleSetFlexGrow( node, n );
+	}
+	if( !calculating )
+		dirty_layout = true;
+}
+
+void Layoutable::setShrink( float n ) {
+	if( node ) {
+		if( n >= 0 )
+			YGNodeStyleSetFlexShrink( node, n );
 	}
 	if( !calculating )
 		dirty_layout = true;
@@ -310,12 +304,12 @@ void Layoutable::setMinSize( SizeF n ) {
 void Layoutable::setSize( SizeF n ) {
 	if( node ) {
 
-		if( n.width )
+		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetWidth( node, n.width );
 		else
 			YGNodeStyleSetWidth( node, YGUndefined );
 
-		if( n.height )
+		if( n.height && type != ElementType::Layout )
 			YGNodeStyleSetHeight( node, n.height );
 		else
 			YGNodeStyleSetHeight( node, YGUndefined );
@@ -324,8 +318,59 @@ void Layoutable::setSize( SizeF n ) {
 		dirty_layout = true;
 }
 
+void Layoutable::setPosition( PointF n ) {
+	if( node ) {
+
+		if( n.x && type != ElementType::Layout )
+			YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
+		else
+			YGNodeStyleSetPosition( node, YGEdgeLeft, YGUndefined );
+
+		if( n.y && type != ElementType::Layout )
+			YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
+		else
+			YGNodeStyleSetPosition( node, YGEdgeTop, YGUndefined );
+	}
+	if( !calculating )
+		dirty_layout = true;
+}
+
+void Layoutable::setAlignment( Alignment n ) {
+	if( node ) {
+		if( type == ElementType::Layout ) {
+			switch( n ) {
+
+				case Alignment::Left:
+					break;
+				case Alignment::Top: break;
+				case Alignment::Right: break;
+				case Alignment::Bottom: break;
+				case Alignment::HCenter: break;
+				case Alignment::VCenter: break;
+				case Alignment::Default: break;
+				default: ;
+			}
+		}
+		else {
+			switch( n ) {
+
+				case Alignment::Left: break;
+				case Alignment::Top: break;
+				case Alignment::Right: break;
+				case Alignment::Bottom: break;
+				case Alignment::HCenter: break;
+				case Alignment::VCenter: break;
+				case Alignment::Default: break;
+				default: ;
+			}
+		}
+	}
+	if( !calculating )
+		dirty_layout = true;
+}
+
 Layout* Layoutable::getLayout() const {
-	return playout;
+	return in_layout;
 }
 
 Layout::Layout() : Layoutable(),
@@ -348,24 +393,11 @@ Layout::Layout() : Layoutable(),
 	Layout::applyStyle();
 }
 
-//void Layout::setWigdet( Widget* new_parent ) {
-//	if( !new_parent->layout() ) {
-//		new_parent->playout = this;
-//		this->parent = new_parent;
-//		new_parent->bound_layout = this;
-//		properties.size = new_parent->properties.size;
-//		playout = this;
-//	}
-//	else {
-//		std::cout << "This wigdet is already handled by a layout\n"; // TODO: log
-//	}
-//}
-
-void Layout::append( Layoutable* item, Alignment align, float grow ) {
+void Layout::append( Layoutable* item, Alignment align ) {
 	if( !item )
 		return;
 
-	auto l = item->layout.get();
+	auto l = item->in_layout;
 
 	if( l == this )
 		return; // TODO: maybe warn?
@@ -373,6 +405,8 @@ void Layout::append( Layoutable* item, Alignment align, float grow ) {
 	// take from old layout
 	if( l )
 		l->take( item );
+
+	item->in_layout = this;
 
 	if( !item->node ) {
 		item->node = YGNodeNew();
@@ -393,9 +427,9 @@ void Layout::append( Layoutable* item, Alignment align, float grow ) {
 	dirty_layout = true;
 }
 
-void Layout::append( std::initializer_list< priv::Layoutable* > item, Alignment align, float grow ) {
+void Layout::append( std::initializer_list< priv::Layoutable* > item, Alignment align ) {
 	for( auto& i : item ) {
-		append( i, align, grow );
+		append( i, align );
 	}
 }
 
@@ -446,22 +480,32 @@ void Layout::invalidate() {
 }
 
 void Layout::setWidget( Widget* w ) {
+	if (w && w->bound_layout) // this wigdet is already handled by a layout
+		return; // TODO: Maybe inform user?
+
+	if (w->bound_layout == this)
+		return;
+
 	_widget = w;
 	for( auto i : nodemap ) {
 		if( i.second->type == ElementType::Widget )
 			i.second->parent = _widget;
+	}
+
+	if (w) {
+		w->bound_layout = this;
 	}
 }
 
 void Layout::setOrientation( Orientation n ) {
 	if( node ) {
 		switch( n ) {
-			case Orientation::Horizontal:
-				YGNodeStyleSetFlexDirection( node, YGFlexDirectionColumn );
-				break;
 			case Orientation::Default:
-			case Orientation::Vertical:
+			case Orientation::Horizontal:
 				YGNodeStyleSetFlexDirection( node, YGFlexDirectionRow );
+				break;
+			case Orientation::Vertical:
+				YGNodeStyleSetFlexDirection( node, YGFlexDirectionColumn );
 				break;
 		}
 	}
@@ -478,6 +522,6 @@ void Layout::invalidated() {
 void Layout::applyStyle() {
 	Layoutable::applyStyle();
 
-	setOrientation(orientation);
+	setOrientation( orientation );
 
 }

@@ -66,7 +66,8 @@ public:
 	// STYLE
 
 	Property<Alignment> alignment;
-	Property<float> growth;
+	Property<float> grow;
+	Property<float> shrink;
 	Property<bool> absolutePosition;
 
 	
@@ -86,10 +87,13 @@ private:
 
 	virtual void applyStyle();
 
-	void setGrowth(float);
+	void setGrow(float);
+	void setShrink(float);
 	void setMaxSize(SizeF);
 	void setMinSize(SizeF);
 	void setSize(SizeF);
+	void setPosition(PointF);
+	void setAlignment(Alignment);
 
 	Layout* getLayout() const;
 
@@ -99,7 +103,7 @@ private:
 	bool calculating = false; // layout is calculating
 	bool parent_has_calculated = false; // used to avoid an uncalculated node retrieving itself
 
-	Layout* playout = nullptr; // layout this item is contained in
+	Layout* in_layout = nullptr; // layout this item is contained in
 	Layout* bound_layout = nullptr; // layout that manages items for this widget
 	LayoutNode node = nullptr;
 
@@ -138,8 +142,8 @@ public:
 
 	// member methods
 
-	virtual void append( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default, float grow = 1 );
-	virtual void append( std::initializer_list<PRIV_NAMESPACE::Layoutable*> item, Alignment align = Alignment::Default, float grow = 1 );
+	virtual void append( PRIV_NAMESPACE::Layoutable* item, Alignment align = Alignment::Default );
+	virtual void append( std::initializer_list<PRIV_NAMESPACE::Layoutable*> item, Alignment align = Alignment::Default );
 
 	void update() override;
 
