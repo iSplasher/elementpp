@@ -172,6 +172,7 @@ private:
 	void setWidget(Widget*);
 
 	void setOrientation(Orientation);
+	void setWrap(bool);
 
 	void invalidated() override;
 

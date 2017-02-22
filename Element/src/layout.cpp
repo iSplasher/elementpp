@@ -237,7 +237,7 @@ void Layoutable::applyStyle() {
 	YGNodeStyleSetPadding( node, YGEdgeRight, paddingRight );
 	YGNodeStyleSetPadding( node, YGEdgeBottom, paddingBottom );
 
-	setAlignment(alignment);
+	setAlignment( alignment );
 	setGrow( grow );
 	setShrink( shrink );
 
@@ -267,12 +267,12 @@ void Layoutable::setShrink( float n ) {
 
 void Layoutable::setMaxSize( SizeF n ) {
 	if( node ) {
-		if( n.width && type != ElementType::Layout)
+		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetMaxWidth( node, n.width );
 		else
 			YGNodeStyleSetMaxWidth( node, YGUndefined );
 
-		if( n.height && type != ElementType::Layout)
+		if( n.height && type != ElementType::Layout )
 			YGNodeStyleSetMaxHeight( node, n.height );
 		else
 			YGNodeStyleSetMaxHeight( node, YGUndefined );
@@ -283,12 +283,12 @@ void Layoutable::setMaxSize( SizeF n ) {
 
 void Layoutable::setMinSize( SizeF n ) {
 	if( node ) {
-		if( n.width && type != ElementType::Layout)
+		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetMinWidth( node, n.width );
 		else
 			YGNodeStyleSetMinWidth( node, YGUndefined );
 
-		if( n.height && type != ElementType::Layout)
+		if( n.height && type != ElementType::Layout )
 			YGNodeStyleSetMinHeight( node, n.height );
 		else
 			YGNodeStyleSetMinHeight( node, YGUndefined );
@@ -337,47 +337,55 @@ void Layoutable::setPosition( PointF n ) {
 void Layoutable::setAlignment( Alignment n ) {
 	if( node ) {
 		if( type == ElementType::Layout ) {
-			auto row = YGNodeStyleGetFlexDirection(node) == YGFlexDirectionRow ||
-				YGNodeStyleGetFlexDirection(node) == YGFlexDirectionRowReverse;
+			auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
+					YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
 
-			if (flags(n & Alignment::Center)) {
-				YGNodeStyleSetAlignItems(node, YGAlignCenter);
-				YGNodeStyleSetJustifyContent(node, YGJustifyCenter);
+			if( flags( n & Alignment::Center ) ) {
+				YGNodeStyleSetAlignItems( node, YGAlignCenter );
+				YGNodeStyleSetJustifyContent( node, YGJustifyCenter );
 			}
 
-			if (flags(n & Alignment::Default)) {
-				YGNodeStyleSetAlignItems(node, YGAlignStretch);
-				YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+			if( flags( n & Alignment::Default ) ) {
+				YGNodeStyleSetAlignItems( node, YGAlignStretch );
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
 			}
 
-			if (flags(n & Alignment::Left)) {
+			if( flags( n & Alignment::Left ) ) {
 
-				if (row)
-					YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+				if( row )
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
 				else
-					YGNodeStyleSetAlignItems(node, YGAlignFlexStart);
+					YGNodeStyleSetAlignItems( node, YGAlignFlexStart );
 			}
 
-			if (flags(n & Alignment::Top)) {
-				if (row)
-					YGNodeStyleSetAlignItems(node, YGAlignFlexStart);
+			if( flags( n & Alignment::Top ) ) {
+				if( row )
+					YGNodeStyleSetAlignItems( node, YGAlignFlexStart );
 				else
-					YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
 			}
 
-			if (flags(n & Alignment::Right)) {
-				if (row)
-					YGNodeStyleSetJustifyContent(node, YGJustifyFlexEnd);
+			if( flags( n & Alignment::Right ) ) {
+				if( row )
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
 				else
-					YGNodeStyleSetAlignItems(node, YGAlignFlexEnd);
+					YGNodeStyleSetAlignItems( node, YGAlignFlexEnd );
 			}
 
-			if (flags(n & Alignment::Bottom)) {
+			if( flags( n & Alignment::Bottom ) ) {
 
-				if (row)
-					YGNodeStyleSetAlignItems(node, YGAlignFlexEnd);
+				if( row )
+					YGNodeStyleSetAlignItems( node, YGAlignFlexEnd );
 				else
-					YGNodeStyleSetJustifyContent(node, YGJustifyFlexEnd);
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
+			}
+
+			if( flags( n & Alignment::Start ) ) {
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
+			}
+
+			if( flags( n & Alignment::End ) ) {
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
 			}
 		}
 		else {
@@ -416,6 +424,9 @@ Layout::Layout() : Layoutable(),
 	orientation.changed( [&](Orientation n) {
 		                    setOrientation( n );
 	                    } );
+	wrap.changed([&](bool n) {
+		setWrap(n);
+	});
 
 	Layout::applyStyle();
 }
@@ -507,10 +518,10 @@ void Layout::invalidate() {
 }
 
 void Layout::setWidget( Widget* w ) {
-	if (w && w->bound_layout) // this wigdet is already handled by a layout
+	if( w && w->bound_layout ) // this wigdet is already handled by a layout
 		return; // TODO: Maybe inform user?
 
-	if (w->bound_layout == this)
+	if( w->bound_layout == this )
 		return;
 
 	_widget = w;
@@ -519,24 +530,42 @@ void Layout::setWidget( Widget* w ) {
 			i.second->parent = _widget;
 	}
 
-	if (w) {
+	if( w ) {
 		w->bound_layout = this;
 	}
 }
 
 void Layout::setOrientation( Orientation n ) {
 	if( node ) {
-		switch( n ) {
-			case Orientation::Default:
-			case Orientation::Horizontal:
-				YGNodeStyleSetFlexDirection( node, YGFlexDirectionRow );
-				break;
-			case Orientation::Vertical:
-				YGNodeStyleSetFlexDirection( node, YGFlexDirectionColumn );
-				break;
+
+		if( flags( n & Orientation::Default ) || flags( n & Orientation::Horizontal ) ) {
+			YGNodeStyleSetFlexDirection( node, YGFlexDirectionRow );
+		}
+
+		if( flags( n & Orientation::Vertical ) ) {
+			YGNodeStyleSetFlexDirection( node, YGFlexDirectionColumn );
+		}
+
+		if( flags( n & Orientation::Reverse ) ) {
+			switch( YGNodeStyleGetFlexDirection( node ) ) { // only need to cover these two
+				case YGFlexDirectionRow:
+					YGNodeStyleSetFlexDirection( node, YGFlexDirectionRowReverse );
+					break;
+				case YGFlexDirectionColumn:
+					YGNodeStyleSetFlexDirection( node, YGFlexDirectionColumnReverse );
+					break;
+			}
 		}
 	}
 	if( !calculating )
+		dirty_layout = true;
+}
+
+void Layout::setWrap( bool n ) {
+	if (node) {
+		YGNodeStyleSetFlexWrap(node, n ? YGWrapWrap : YGWrapNoWrap);
+	}
+	if (!calculating)
 		dirty_layout = true;
 }
 
@@ -550,5 +579,6 @@ void Layout::applyStyle() {
 	Layoutable::applyStyle();
 
 	setOrientation( orientation );
+	setWrap(wrap);
 
 }
