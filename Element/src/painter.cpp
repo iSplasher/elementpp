@@ -115,7 +115,7 @@ Painter::Painter(Window* window) {
 Painter::~Painter() {
 }
 
-void Painter::begin(float pixel_ratio) {
+const Painter& Painter::begin(float pixel_ratio) {
 	if (begun) {
 		throw std::runtime_error("Inconsistent Painter::begin call");
 	}
@@ -123,36 +123,41 @@ void Painter::begin(float pixel_ratio) {
 	w->parent_window->setActive();
 	SizeF s = w->size;
 	nvgBeginFrame(context, s.width, s.height, pixel_ratio);
+	return *this;
 }
 
-void Painter::end() {
+const Painter& Painter::end() {
 	if (!begun) {
 		throw std::runtime_error("Inconsistent Painter::end call");
 	}
 	begun = false;
 	nvgEndFrame(context);
+	return *this;
 }
 
-void Painter::setPen(Pen& pen) {
+const Painter& Painter::setPen(Pen& pen) {
 	pen.pc = context;
 	p = &pen;
+	return *this;
 }
 
-void Painter::save() {
+const Painter& Painter::save() {
 	nvgSave(context);
 	o_origin = origin;
 	o_p = p;
 	o_b = b;
+	return *this;
 }
 
-void Painter::restore() {
+const Painter& Painter::restore() {
 	nvgRestore(context);
 	origin = o_origin;
 	p = o_p;
 	b = o_b;
+	return *this;
 }
 
-void Painter::reset() {
+const Painter& Painter::reset() {
 	nvgReset(context);
 	o_origin = PointF();
 	origin = PointF();
@@ -160,52 +165,69 @@ void Painter::reset() {
 	b = nullptr;
 	o_p = nullptr;
 	p = nullptr;
+	return *this;
 }
 
-void Painter::setGlobalAlpha(float alpha) const {
+const Painter& Painter::setGlobalAlpha(float alpha) const {
 	nvgGlobalAlpha(context, alpha);
+	return *this;
 }
 
-void Painter::setBrush(Brush& brush) {
+const Painter& Painter::setBrush(Brush& brush) {
 	brush.pc = context;
 	b = &brush;
+	return *this;
 }
 
-void Painter::drawRect(RectF rect) const {
+const Painter& Painter::drawRect(RectF rect) const {
 	beginPath();
 	translate(rect);
 	nvgRect(context, rect.x, rect.y, rect.width, rect.height);
 	applyPB();
+	return *this;
 }
 
-void Painter::drawRoundedRect(RectF rect, float radius) const {
+const Painter& Painter::drawRoundedRect(RectF rect, float radius) const {
 	beginPath();
 	translate(rect);
 	nvgRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
 	applyPB();
+	return *this;
 }
 
-void Painter::drawEllipse(PointF center, SizeF size) const {
+const Painter& Painter::drawRoundedRect( RectF rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left ) const {
+	beginPath();
+	translate(rect);
+	nvgRoundedRectVarying(context, rect.x, rect.y, rect.width, rect.height, rad_top_left, rad_top_right,  rad_bottom_right, rad_bottom_left);
+	applyPB();
+	return *this;
+}
+
+const Painter& Painter::drawEllipse(PointF center, SizeF size) const {
 	beginPath();
 	translate(center);
 	nvgEllipse(context, center.x, center.y, size.width, size.height);
 	applyPB();
+	return *this;
 }
 
-void Painter::drawCircle(PointF center, float radius) const {
+const Painter& Painter::drawCircle(PointF center, float radius) const {
 	beginPath();
 	translate(center);
 	nvgCircle(context, center.x, center.y, radius);
 	applyPB();
+	return *this;
 }
 
-void Painter::drawLine(PointF start, PointF end) const {
+const Painter& Painter::drawLine(PointF start, PointF end) const {
 	beginPath();
 	translate(start);
 	translate(end);
 	nvgMoveTo(context, start.x, start.y);
 	nvgLineTo(context, end.x, end.y);
 	applyPB();
+
+	return *this;
 }
 
 void Painter::paintWidget( Widget* w ) {
@@ -213,7 +235,12 @@ void Painter::paintWidget( Widget* w ) {
 	Pen p(*this);
 	b.setColor(w->backgroundColor);
 	p.setColor(w->foregroundColor);
-	drawRect(RectF(PointF(0, 0), w->size));
+	RectF geometry = w->geometry;
+	// draw border
+	auto borderGeometry = RectF(geometry.x-w->borderLeft, geometry.y-w->borderTop, geometry.width+w->borderRight, geometry.height+w->borderBottom);
+
+	// content
+		drawRect(RectF(PointF(0, 0), w->size));
 }
 
 void Painter::translate(RectF& r) const {

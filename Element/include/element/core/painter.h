@@ -98,18 +98,18 @@ public:
 	/// <summary>
 	/// Begin painting
 	/// </summary>
-	void begin(float pixel_ratio=1);
+	const Painter& begin(float pixel_ratio=1);
 
 	/// <summary>
 	/// End painting
 	/// </summary>
-	void end();
+	const Painter& end();
 
 	/// <summary>
 	/// Set new pen
 	/// </summary>
 	/// <param name="pen">New pen</param>
-	void setPen(Pen &pen);
+	const Painter& setPen(Pen &pen);
 
 	/// <summary>
 	/// Retrieve current pen
@@ -121,32 +121,32 @@ public:
 	/// Saves the current state
 	/// </summary>
 	/// <remarks>A matching restore() call must be used</remarks>
-	void save();
+	const Painter& save();
 
 	/// <summary>
 	/// Restores saved state
 	/// </summary>
 	/// <remarks>A save() must have been called before calling this method</remarks>
-	void restore();
+	const Painter& restore();
 
 	/// <summary>
 	/// Resets to default state
 	/// </summary>
 	/// <remarks>This does not affect the state stack</remarks>
-	void reset();
+	const Painter& reset();
 
 	/// <summary>
 	/// Sets the transparency applied to all rendered shapes.
 	/// Already transparent paths will get proportionally more transparent as well.
 	/// </summary>
 	/// <param name="alpha">new alpha value between 0 and 1</param>
-	void setGlobalAlpha(float alpha) const;
+	const Painter& setGlobalAlpha(float alpha) const;
 
 	/// <summary>
 	/// Set new brush
 	/// </summary>
 	/// <param name="brush">New brush</param>
-	void setBrush(Brush &brush);
+	const Painter& setBrush(Brush &brush);
 
 	/// <summary>
 	/// Retrieve current brush
@@ -158,37 +158,42 @@ public:
 	/// Draw a rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
-	void drawRect(RectF rect) const;
-	void drawRect(Rect rect) const { drawRect(RectF(rect)); }
+	const Painter& drawRect(RectF rect) const;
+	const Painter& drawRect(Rect rect) const { drawRect(RectF(rect)); }
 
 	/// <summary>
 	/// Draw a rounded rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
 	/// <param name="radius">Radius of the rect corners</param>
-	void drawRoundedRect(RectF rect, float radius) const;
-	void drawRoundedRect(Rect rect, int radius) const { drawRoundedRect(RectF(rect), radius); }
+	const Painter& drawRoundedRect(RectF rect, float radius) const;
+	const Painter& drawRoundedRect(Rect rect, int radius) const { return drawRoundedRect(RectF(rect), radius); }
+
+	const Painter& drawRoundedRect(RectF rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left) const;
+	const Painter& drawRoundedRect(Rect rect, int rad_top_left, int rad_top_right, int rad_bottom_right, int rad_bottom_left) const {
+		return drawRoundedRect(RectF(rect), rad_top_left, rad_top_right, rad_bottom_right, rad_bottom_left);
+	}
 
 	/// <summary>
 	/// Draw an ellipse shape
 	/// </summary>
 	/// <param name="center">Center of ellipse</param>
 	/// <param name="size">Width and height of ellipse</param>
-	void drawEllipse(PointF center, SizeF size) const;
+	const Painter& drawEllipse(PointF center, SizeF size) const;
 
 	/// <summary>
 	/// Draw a circle shape
 	/// </summary>
 	/// <param name="center">Center of circle</param>
 	/// <param name="radius">Circle radius</param>
-	void drawCircle(PointF center, float radius) const;
+	const Painter& drawCircle(PointF center, float radius) const;
 
 	/// <summary>
 	/// Draw a line
 	/// </summary>
 	/// <param name="start">Start point of line</param>
 	/// <param name="end">End point of line</param>
-	void drawLine(PointF start, PointF end) const;
+	const Painter& drawLine(PointF start, PointF end) const;
 
 private:
 
