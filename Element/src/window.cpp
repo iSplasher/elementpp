@@ -169,15 +169,17 @@ Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
 		_inited = true;
 	}
 
+	objectName = "Window";
 	painter = std::make_unique< Painter >( this );
-
 	position.changed( [&](PointF p) {
 		                 glfwSetWindowPos( r_window, p.x, p.y );
 	                 } );
 	size = win_size;
 	size.changed( [&](SizeF s) { glfwSetWindowSize( r_window, s.width, s.height ); } ); // TODO: confirm size
-
-	objectName = "Window";
+	backgroundColor = Color(250, 250, 250, 200);
+	borderLeft = borderTop = borderRight = borderBottom = 0;
+	marginLeft = marginTop = marginRight = marginBottom = 0;
+	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
 	glfwSetWindowPos( r_window, 700, 450 );
 }
 
@@ -210,16 +212,7 @@ void Window::update() {
 	}
 }
 
-//Point Window::pos() {
-//	return r_window->getPosition();
-//}
-
-void Window::paint( Painter& painter ) {
-	Brush b( painter );
-	b.setColor( Color( 250, 250, 250, 200 ) );
-
-	painter.drawRect( RectF( PointF( 0, 0 ), size ) );
-}
+void Window::paint( Painter& painter ) {}
 
 void Window::setActive() const {
 	glfwMakeContextCurrent( r_window );

@@ -12,7 +12,9 @@ public:
 	enum class Join;
 
 	Pen() = default;
-	explicit Pen(Painter &painter);
+	explicit Pen(Painter &painter) : Pen(painter, Color(0, 0, 0)) {}
+	explicit Pen(Painter &painter, Color color);
+	~Pen();
 
 	/// <summary>
 	/// Set a new color to this pen
@@ -48,6 +50,7 @@ private:
 	/// </summary>
 	void apply() const;
 
+	Painter *painter = nullptr;
 	PainterContext* pc = nullptr;
 	float c_width = 0.1f;
 	Color c_color;
@@ -58,7 +61,10 @@ private:
 class ELEMENT_API Brush {
 public:
 	Brush() = default;
-	explicit Brush(Painter &painter);
+	explicit Brush(Painter &painter) : Brush(painter, Color(0, 0, 0)){}
+	explicit Brush(Painter &painter, Color color);
+
+	~Brush();
 
 	bool operator==(const Brush& rhs ) const {
 		return c_color == rhs.c_color;
@@ -82,6 +88,7 @@ private:
 	/// </summary>
 	void apply() const;
 
+	Painter* painter = nullptr;
 	PainterContext* pc = nullptr;
 	Color c_color;
 
@@ -135,6 +142,9 @@ public:
 	/// <remarks>This does not affect the state stack</remarks>
 	const Painter& reset();
 
+	const Painter& resetPen();
+	const Painter& resetBrush();
+
 	/// <summary>
 	/// Sets the transparency applied to all rendered shapes.
 	/// Already transparent paths will get proportionally more transparent as well.
@@ -154,12 +164,28 @@ public:
 	/// <returns>Current Brush</returns>
 	Brush &brush() const { return *b; }
 
+	
+	/**
+	 * \brief Clipping allows you to clip the painting into a rectangle.
+	 * \param rect rectangle
+	 * \return painter
+	 */
+	const Painter& clip(RectF rect) const;
+	const Painter& clip(Rect rect) const { return clip(RectF(rect)); };
+
+
+	/**
+	 * \brief Reset previously set clipping.
+	 * \return painter
+	 */
+	const Painter& resetClip() const;
+
 	/// <summary>
 	/// Draw a rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
 	const Painter& drawRect(RectF rect) const;
-	const Painter& drawRect(Rect rect) const { drawRect(RectF(rect)); }
+	const Painter& drawRect(Rect rect) const { return drawRect(RectF(rect)); }
 
 	/// <summary>
 	/// Draw a rounded rectangle shape
@@ -216,6 +242,9 @@ private:
 	Pen *o_p = nullptr;
 	Brush *b = nullptr;
 	Brush *o_b = nullptr;
+	bool clipped = false;
+	std::unique_ptr<Pen> def_pen;
+	std::unique_ptr<Brush> def_brush;
 	bool begun = false;
 	// TODO: maybe extend this to a gMargins? and do all sides?
 	int top_margin = 0; // for window TopBar.. 

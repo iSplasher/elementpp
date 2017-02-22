@@ -1,7 +1,7 @@
 #pragma once
 
-#include "element/widget.h"
-#include "element/core/painter.h"
+#include "widget.h"
+#include "core/painter.h"
 
 typedef struct GLFWwindow _privRWindow;
 
@@ -23,7 +23,7 @@ private:
 	/// </summary>
 	void setActive() const;
 
-	void update();
+	virtual void update();
 	void paint(Painter &painter) override;
 
 	//abitrary data members

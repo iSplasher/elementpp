@@ -43,8 +43,8 @@
 #include "element/global.h"
 
 NAMESPACE_BEGIN
+PRIV_NAMESPACE_BEGIN
 
-/////////////////////////////////////////////////////////////////////////////
 // tree_iterator forward declaration
 /////////////////////////////////////////////////////////////////////////////
 template <typename T> class tree_iterator;
@@ -1139,6 +1139,7 @@ public:
 template <typename T>
 tree_iterator<T> tree_iterator<T>::end_of_iterator;
 
+NAMESPACE_END
 NAMESPACE_END
 
 #if WIN32

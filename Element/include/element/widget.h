@@ -41,6 +41,15 @@ public:
 	Property<Color> borderColor;
 	Property<Color> backgroundColor;
 	Property<Color> foregroundColor;
+	PropertyView< RectF > contentGeometry;
+	PropertyView< SizeF > contentSize;
+
+	Property<float> borderRadiusTopLeft;
+	Property<float> borderRadiusTopRight;
+	Property<float> borderRadiusBottomLeft;
+	Property<float> borderRadiusBottomRight;
+
+	bool paintWidget = true;
 
 	/// <summary>
 	/// Translates the coordinates p of this widget to a coordinate p in the parent widget
@@ -48,6 +57,7 @@ public:
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in the parent widget</returns>
 	PointF mapToParent(PointF p) const;
+	RectF mapToParent(RectF p) const { return RectF(mapToParent(p.pos()), p.size()); }
 
 	/// <summary>
 	/// Translates the coordinates p of the parent widget to a coordinate p in this widget
@@ -55,6 +65,7 @@ public:
 	/// <param name="p">Coordinates to translate</param>
 	/// <returns>The translated coordinate in this widget</returns>
 	PointF mapFromParent(PointF p) const;
+	RectF mapFromParent(RectF p) const { return RectF(mapFromParent(p.pos()), p.size()); }
 
 	/// <summary>
 	/// Translates the coordinates p from the containing window's
@@ -65,6 +76,7 @@ public:
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate from containing window</returns>
 	PointF mapFromWindow(PointF p);
+	RectF mapFromWindow(RectF p) { return RectF(mapFromWindow(p.pos()), p.size()); }
 
 	/// <summary>
 	/// Translates the coordinates p to the containing window's
@@ -75,6 +87,7 @@ public:
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordinate in containing window</returns>
 	PointF mapToWindow(PointF p);
+	RectF mapToWindow(RectF p) { return RectF(mapToWindow(p.pos()), p.size()); }
 
 	/// <summary>
 	/// Translates the coordinates p from the desktop coordinates
@@ -82,6 +95,7 @@ public:
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine from desktop</returns>
 	PointF mapFromGlobal(PointF p);
+	RectF mapFromGlobal(RectF p) { return RectF(mapFromGlobal(p.pos()), p.size()); }
 
 	/// <summary>
 	/// Translates the coordinates p to the desktop coordinates
@@ -89,6 +103,7 @@ public:
 	/// <param name="p">Coordinate to translate</param>
 	/// <returns>The translated coordine in desktop</returns>
 	PointF mapToGlobal(PointF p);
+	RectF mapToGlobal(RectF p) { return RectF(mapToGlobal(p.pos()), p.size()); }
 
 
 protected:

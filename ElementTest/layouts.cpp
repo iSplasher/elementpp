@@ -6,7 +6,12 @@
 USING_NAMESPACE
 
 void printWidget(PRIV_NAMESPACE::Layoutable* e) {
-	std::cout << e->objectName << ": " << e->geometry << std::endl;
+	std::cout << e->objectName << ": \n\t"
+	<< "Geometry: " << e->geometry << "\n\t"
+	<< "Margin: (" << e->marginLeft << ", " << e->marginTop << ", " << e->marginRight << ", " << e->marginBottom << ")" << "\n\t"
+	<< "Border: (" << e->borderLeft << ", " << e->borderTop << ", " << e->borderRight << ", " << e->borderBottom << ")" << "\n\t"
+	<< "Padding: (" << e->paddingLeft << ", " << e->paddingTop << ", " << e->paddingRight << ", " << e->paddingBottom << ")" << "\n\t"
+	<< std::endl;
 }
 
 SCENARIO("Layouts", "[Layout]") {

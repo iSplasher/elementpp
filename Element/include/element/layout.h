@@ -38,7 +38,6 @@ public:
 	Property<SizeF> minSize;
 	Property<SizeF> maxSize;
 	PropertyView< RectF > geometry;
-	//const PropertyView< Rect > contentGeometry;
 
 	// Margin
 

@@ -3,10 +3,9 @@
 #include "global.h"
 #include "event.h"
 #include "property.h"
-#include "core/tree.h" // TODO: move this to cpp and forward declare tree class
+#include "core/tree.h"
 
 #include <atomic>
-
 
 NAMESPACE_BEGIN
 class Element;
@@ -68,7 +67,7 @@ protected:
 	void setType( ElementType t ) { type = t; }
 
 private:
-	using ElementTree = tree< Element* >;
+	using ElementTree = PRIV_NAMESPACE::tree< Element* >;
 
 
 	Element(Element&& other) noexcept
