@@ -237,8 +237,7 @@ void Layoutable::applyStyle() {
 	YGNodeStyleSetPadding( node, YGEdgeRight, paddingRight );
 	YGNodeStyleSetPadding( node, YGEdgeBottom, paddingBottom );
 
-	YGNodeStyleSetAlignSelf( node, YGAlignStretch );
-
+	setAlignment(alignment);
 	setGrow( grow );
 	setShrink( shrink );
 
@@ -268,12 +267,12 @@ void Layoutable::setShrink( float n ) {
 
 void Layoutable::setMaxSize( SizeF n ) {
 	if( node ) {
-		if( n.width )
+		if( n.width && type != ElementType::Layout)
 			YGNodeStyleSetMaxWidth( node, n.width );
 		else
 			YGNodeStyleSetMaxWidth( node, YGUndefined );
 
-		if( n.height )
+		if( n.height && type != ElementType::Layout)
 			YGNodeStyleSetMaxHeight( node, n.height );
 		else
 			YGNodeStyleSetMaxHeight( node, YGUndefined );
@@ -284,12 +283,12 @@ void Layoutable::setMaxSize( SizeF n ) {
 
 void Layoutable::setMinSize( SizeF n ) {
 	if( node ) {
-		if( n.width )
+		if( n.width && type != ElementType::Layout)
 			YGNodeStyleSetMinWidth( node, n.width );
 		else
 			YGNodeStyleSetMinWidth( node, YGUndefined );
 
-		if( n.height )
+		if( n.height && type != ElementType::Layout)
 			YGNodeStyleSetMinHeight( node, n.height );
 		else
 			YGNodeStyleSetMinHeight( node, YGUndefined );
@@ -338,17 +337,47 @@ void Layoutable::setPosition( PointF n ) {
 void Layoutable::setAlignment( Alignment n ) {
 	if( node ) {
 		if( type == ElementType::Layout ) {
-			switch( n ) {
+			auto row = YGNodeStyleGetFlexDirection(node) == YGFlexDirectionRow ||
+				YGNodeStyleGetFlexDirection(node) == YGFlexDirectionRowReverse;
 
-				case Alignment::Left:
-					break;
-				case Alignment::Top: break;
-				case Alignment::Right: break;
-				case Alignment::Bottom: break;
-				case Alignment::HCenter: break;
-				case Alignment::VCenter: break;
-				case Alignment::Default: break;
-				default: ;
+			if (flags(n & Alignment::Center)) {
+				YGNodeStyleSetAlignItems(node, YGAlignCenter);
+				YGNodeStyleSetJustifyContent(node, YGJustifyCenter);
+			}
+
+			if (flags(n & Alignment::Default)) {
+				YGNodeStyleSetAlignItems(node, YGAlignStretch);
+				YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+			}
+
+			if (flags(n & Alignment::Left)) {
+
+				if (row)
+					YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+				else
+					YGNodeStyleSetAlignItems(node, YGAlignFlexStart);
+			}
+
+			if (flags(n & Alignment::Top)) {
+				if (row)
+					YGNodeStyleSetAlignItems(node, YGAlignFlexStart);
+				else
+					YGNodeStyleSetJustifyContent(node, YGJustifyFlexStart);
+			}
+
+			if (flags(n & Alignment::Right)) {
+				if (row)
+					YGNodeStyleSetJustifyContent(node, YGJustifyFlexEnd);
+				else
+					YGNodeStyleSetAlignItems(node, YGAlignFlexEnd);
+			}
+
+			if (flags(n & Alignment::Bottom)) {
+
+				if (row)
+					YGNodeStyleSetAlignItems(node, YGAlignFlexEnd);
+				else
+					YGNodeStyleSetJustifyContent(node, YGJustifyFlexEnd);
 			}
 		}
 		else {
@@ -358,8 +387,6 @@ void Layoutable::setAlignment( Alignment n ) {
 				case Alignment::Top: break;
 				case Alignment::Right: break;
 				case Alignment::Bottom: break;
-				case Alignment::HCenter: break;
-				case Alignment::VCenter: break;
 				case Alignment::Default: break;
 				default: ;
 			}

@@ -65,12 +65,12 @@ DEFINE_ENUM_FLAGS(Direction)
 
 
 enum class Direction {
-	Left,
-	Top,
-	Right,
-	Bottom,
-	Reverse,
-	Default
+	Left = 1,
+	Top = 1 << 1,
+	Right = 1 << 2,
+	Bottom = 1 << 3,
+	Reverse = 1 << 4,
+	Default = 1 << 5
 };
 
 
@@ -78,10 +78,10 @@ DEFINE_ENUM_FLAGS(Orientation)
 
 
 enum class Orientation {
-	Vertical,
-	Horizontal,
-	Reverse,
-	Default
+	Vertical = 1,
+	Horizontal = 1 << 1,
+	Reverse = 1 << 2,
+	Default = 1 << 3
 };
 
 
@@ -89,13 +89,14 @@ DEFINE_ENUM_FLAGS(Alignment)
 
 
 enum class Alignment {
-	Left,
-	Top,
-	Right,
-	Bottom,
-	HCenter,
-	VCenter,
-	Default
+	Start = 1,
+	End = 1 << 1,
+	Left = 1 << 2,
+	Top = 1 << 3,
+	Right = 1 << 4,
+	Bottom = 1 << 5,
+	Center = 1 << 6,
+	Default = 1 << 7
 };
 
 
@@ -105,9 +106,9 @@ DEFINE_ENUM_FLAGS(MouseButton)
 enum class MouseButton {
 	All = 0xF, // 28bits = 0xFFFFFFFF,
 	None = 0x0,
-	Left = 0x1,
-	Right = 0x2,
-	Middle = 0x4
+	Left = 1,
+	Right = 1 << 2,
+	Middle = 1 << 3
 };
 
 
@@ -116,10 +117,10 @@ DEFINE_ENUM_FLAGS(KeyModifier)
 
 enum class KeyModifier {
 	None = 0x0,
-	Shift = 0x1,
-	Control = 0x2,
-	Alt = 0x4,
-	Meta = 0x8
+	Shift = 1,
+	Control = 1 << 2,
+	Alt = 1 << 3,
+	Meta = 1 << 4
 };
 
 

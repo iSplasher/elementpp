@@ -55,9 +55,10 @@ SCENARIO("Layouts", "[Layout]") {
 	auto layout = app->create< Layout >();
 	layout->widget = window;
 	auto widget1 = app->create< Widget >();
-	widget1->size = SizeF(0, 0);
+	widget1->size = SizeF(50, 0);
 	auto widget2 = app->create< Widget >();
-	widget2->size = SizeF(0, 0);
+	widget2->size = SizeF(50, 0);
+	layout->alignment = Alignment::Center | Alignment::Default;
 	layout->append({ widget1, widget2 });
 	layout->update();
 	printWidget(window);
