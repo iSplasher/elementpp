@@ -2,23 +2,33 @@
 
 >Currently under heavy development
 
-This is a small GUI library written in modern C++. 
-It is cross-platform and was designed as a simple embeddable user interface for applications.
-The code pattern imitiates Qt's which means that you'll feel right at home if you're familiar with Qt.
+This is a GUI library written in modern C++. 
+It is cross-platform and was designed as a simple embeddable user interface library for applications. It can also be used for fullblown UI applications.
+Element++ emits a **declarative** functional reactive code pattern making it very easy to quickly write up some nice user interfaces.
 
 ## Features
 
-- Aesthetically pleasing
+- Declarative syntax
 - Modern C++
 - Easy to learn and use
-- Fulle skinnable and customizable
-- UTF-8 support
+- Fully skinnable
+- Custom widgets
+- Unicode support
+- Easy to embed into applications with an already established *main loop*
 
 ## Screenshots
 
 Coming soon...
 
 ## Example
+
+Coming soon...
+
+## Docs
+
+Coming soon...
+
+## Acknowledgements
 
 Coming soon...
 
