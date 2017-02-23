@@ -3,20 +3,8 @@
 
 #include <yoga/Yoga.h>
 
-#include <cstdlib>
-
-
 USING_NAMESPACE
 USING_NAMESPACE_PRIV
-
-YGFlexDirection getOrientation( Orientation o, bool reverse ) {
-	switch( o ) {
-		case Orientation::Horizontal:
-			return reverse ? YGFlexDirectionRowReverse : YGFlexDirectionRow;
-		case Orientation::Vertical:
-			return reverse ? YGFlexDirectionColumnReverse : YGFlexDirectionColumn;
-	}
-}
 
 Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
                                                geometry( [](PointF pos, SizeF size) -> RectF {
@@ -68,28 +56,28 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 
 	marginLeft.changed( [&](float n) {
 		                   if( node ) {
-			                   YGNodeStyleSetMargin( node, YGEdgeLeft, n );
+			                   setMargin( n, Direction::Left );
 			                   if( !calculating )
 				                   dirty_layout = true;
 		                   }
 	                   } );
 	marginTop.changed( [&](float n) {
 		                  if( node ) {
-			                  YGNodeStyleSetMargin( node, YGEdgeTop, n );
+			                  setMargin( n, Direction::Top );
 			                  if( !calculating )
 				                  dirty_layout = true;
 		                  }
 	                  } );
 	marginRight.changed( [&](float n) {
 		                    if( node ) {
-			                    YGNodeStyleSetMargin( node, YGEdgeRight, n );
+			                    setMargin( n, Direction::Right );
 			                    if( !calculating )
 				                    dirty_layout = true;
 		                    }
 	                    } );
 	marginBottom.changed( [&](float n) {
 		                     if( node ) {
-			                     YGNodeStyleSetMargin( node, YGEdgeBottom, n );
+			                     setMargin( n, Direction::Bottom );
 			                     if( !calculating )
 				                     dirty_layout = true;
 		                     }
@@ -222,10 +210,10 @@ void Layoutable::applyStyle() {
 	setMaxSize( maxSize );
 	setMinSize( minSize );
 
-	YGNodeStyleSetMargin( node, YGEdgeLeft, marginLeft );
-	YGNodeStyleSetMargin( node, YGEdgeTop, marginTop );
-	YGNodeStyleSetMargin( node, YGEdgeRight, marginRight );
-	YGNodeStyleSetMargin( node, YGEdgeBottom, marginBottom );
+	setMargin( marginLeft, Direction::Left );
+	setMargin( marginTop, Direction::Top );
+	setMargin( marginRight, Direction::Right );
+	setMargin( marginBottom, Direction::Bottom );
 
 	YGNodeStyleSetBorder( node, YGEdgeLeft, borderLeft );
 	YGNodeStyleSetBorder( node, YGEdgeTop, borderTop );
@@ -302,6 +290,26 @@ void Layoutable::setMinSize( SizeF n ) {
 
 void Layoutable::setSize( SizeF n ) {
 	if( node ) {
+		auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
+				YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
+
+		if( type != ElementType::Layout )
+			if( row ) {
+				if( n.width <= 0 )
+					grow = old_grow;
+				else {
+					old_grow = grow;
+					grow = 0;
+				}
+			}
+			else {
+				if( n.height <= 0 )
+					grow = old_grow;
+				else {
+					old_grow = grow;
+					grow = 0;
+				}
+			}
 
 		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetWidth( node, n.width );
@@ -336,9 +344,9 @@ void Layoutable::setPosition( PointF n ) {
 
 void Layoutable::setAlignment( Alignment n ) {
 	if( node ) {
+		auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
+				YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
 		if( type == ElementType::Layout ) {
-			auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
-					YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
 
 			if( flags( n & Alignment::Center ) ) {
 				YGNodeStyleSetAlignItems( node, YGAlignCenter );
@@ -389,16 +397,79 @@ void Layoutable::setAlignment( Alignment n ) {
 			}
 		}
 		else {
-			switch( n ) {
 
-				case Alignment::Left: break;
-				case Alignment::Top: break;
-				case Alignment::Right: break;
-				case Alignment::Bottom: break;
-				case Alignment::Default: break;
-				default: ;
+			if( flags( n & Alignment::Center ) ) {
+				YGNodeStyleSetAlignSelf( node, YGAlignCenter );
+				YGNodeStyleSetJustifyContent( node, YGJustifyCenter );
+			}
+
+			if( flags( n & Alignment::Default ) ) {
+				YGNodeStyleSetAlignItems( node, YGAlignStretch );
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
+			}
+
+			if( flags( n & Alignment::Left ) ) {
+
+				if( row )
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
+				else
+					YGNodeStyleSetAlignItems( node, YGAlignFlexStart );
+			}
+
+			if( flags( n & Alignment::Top ) ) {
+				if( row )
+					YGNodeStyleSetAlignItems( node, YGAlignFlexStart );
+				else
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
+			}
+
+			if( flags( n & Alignment::Right ) ) {
+				if( row )
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
+				else
+					YGNodeStyleSetAlignItems( node, YGAlignFlexEnd );
+			}
+
+			if( flags( n & Alignment::Bottom ) ) {
+
+				if( row )
+					YGNodeStyleSetAlignItems( node, YGAlignFlexEnd );
+				else
+					YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
+			}
+
+			if( flags( n & Alignment::Start ) ) {
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexStart );
+			}
+
+			if( flags( n & Alignment::End ) ) {
+				YGNodeStyleSetJustifyContent( node, YGJustifyFlexEnd );
 			}
 		}
+	}
+	if( !calculating )
+		dirty_layout = true;
+}
+
+void Layoutable::setMargin( float n, Direction d ) {
+	if( node ) {
+
+		if( flags( d & Direction::Left ) ) {
+			YGNodeStyleSetMargin( node, YGEdgeLeft, n );
+		}
+
+		if( flags( d & Direction::Top ) ) {
+			YGNodeStyleSetMargin( node, YGEdgeTop, n );
+		}
+
+		if( flags( d & Direction::Right ) ) {
+			YGNodeStyleSetMargin( node, YGEdgeRight, n );
+		}
+
+		if( flags( d & Direction::Bottom ) ) {
+			YGNodeStyleSetMargin( node, YGEdgeBottom, n );
+		}
+
 	}
 	if( !calculating )
 		dirty_layout = true;
@@ -424,9 +495,9 @@ Layout::Layout() : Layoutable(),
 	orientation.changed( [&](Orientation n) {
 		                    setOrientation( n );
 	                    } );
-	wrap.changed([&](bool n) {
-		setWrap(n);
-	});
+	wrap.changed( [&](bool n) {
+		             setWrap( n );
+	             } );
 
 	Layout::applyStyle();
 }
@@ -562,10 +633,10 @@ void Layout::setOrientation( Orientation n ) {
 }
 
 void Layout::setWrap( bool n ) {
-	if (node) {
-		YGNodeStyleSetFlexWrap(node, n ? YGWrapWrap : YGWrapNoWrap);
+	if( node ) {
+		YGNodeStyleSetFlexWrap( node, n ? YGWrapWrap : YGWrapNoWrap );
 	}
-	if (!calculating)
+	if( !calculating )
 		dirty_layout = true;
 }
 
@@ -579,6 +650,6 @@ void Layout::applyStyle() {
 	Layoutable::applyStyle();
 
 	setOrientation( orientation );
-	setWrap(wrap);
+	setWrap( wrap );
 
 }

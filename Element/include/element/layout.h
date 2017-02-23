@@ -93,10 +93,15 @@ private:
 	void setSize(SizeF);
 	void setPosition(PointF);
 	void setAlignment(Alignment);
+	void setMargin(float, Direction);
+	void setBorder(float, Direction);
+	void setpadding(float, Direction);
 
 	Layout* getLayout() const;
 
 	// data members
+
+	float old_grow = 1; // used by setSize to set fixed size
 
 	bool dirty_layout = false; // layout has to recalculate
 	bool calculating = false; // layout is calculating
