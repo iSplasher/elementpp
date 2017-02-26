@@ -4,6 +4,7 @@
 
 #include <react/Domain.h>
 #include <react/Signal.h>
+#include <react/Event.h>
 
 #include <type_traits>
 #include <functional>
@@ -28,13 +29,16 @@ enum class ConnectionType {
 };
 
 
-struct PropertyEventType {};
+/**
+ * \brief Create an event stream
+ */
+using PropertyEventType = struct PropertyEventType;
 
 
 /**
 * \brief Create a read-only property that acts like a view for other properties
 */
-struct PropertyViewType {};
+using PropertyViewType = struct PropertyViewType;
 
 
 PRIV_NAMESPACE_BEGIN
@@ -149,7 +153,13 @@ template< typename T >
 class Property< T, PropertyViewType >;
 
 template< typename T >
+class Property< T, PropertyEventType >;
+
+template< typename T >
 using PropertyView = Property< T, PropertyViewType >;
+
+template< typename T >
+using PropertyEvent = Property< T, PropertyEventType >;
 
 
 /**
@@ -227,7 +237,7 @@ public:
 	 * \brief Get T
 	 * \return T
 	 */
-	T get() { return reactive.Value();; }
+	T get() { return reactive.Value(); }
 
 	// Relational operators
 
@@ -391,6 +401,18 @@ public:
 	 */
 	auto& operator=( T value ) {
 		reactive <<= std::forward< T >( value );
+		return *this;
+	}
+
+	/**
+	* \brief Property = {value, value, ...}
+	* \param value initializer list
+	* \return
+	*/
+	auto& operator=(std::initializer_list< T > value) {
+		for (auto& x : value) {
+			this = x;
+		}
 		return *this;
 	}
 
@@ -672,6 +694,162 @@ private:
 		os << obj.reactive.Value();
 		return os;
 	}
+};
+
+/**
+* \brief A property event stream
+* \tparam T
+*/
+template< typename T >
+class Property< T, PropertyEventType > {
+	using Reactive = PRIV_NAMESPACE::EventSourceT< T >;
+	using func = std::function< void(T) >;
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
+
+public:
+
+	Property() : reactive(react::MakeEventSource< PRIV_NAMESPACE::D, T>()) { }
+
+	Property(const Property& other) = delete;
+
+	Property(Property&& other) noexcept
+		: continuations(std::move(other.continuations)),
+		reactive(std::move(other.reactive)),
+		status(std::move(other.status)) {}
+
+	Property& operator=(Property&& other) noexcept {
+		if (this == &other)
+			return *this;
+		continuations = std::move(other.continuations);
+		reactive = std::move(other.reactive);
+		status = std::move(other.status);
+		return *this;
+	}
+
+	~Property() {
+		for (auto& p : continuations) {
+			if (p) {
+				p.reset();
+			}
+		}
+	}
+
+	/**
+	* \brief property = value
+	* \param value T
+	* \return
+	*/
+	auto& operator=(T value) {
+		reactive << std::forward< T >(value);
+		return *this;
+	}
+
+	/**
+	 * \brief Property = {value, value, ...}
+	 * \param value initializer list
+	 * \return 
+	 */
+	auto& operator=(std::initializer_list< T > value) {
+		for (auto& x : value) {
+			this = x;
+		}
+		return *this;
+	}
+
+	/**
+	* \brief Property << value. This operator will propogate the value asynchronously
+	* \param value T
+	* \see wait()
+	*/
+	void operator<<(T value) { react::AsyncTransaction< PRIV_NAMESPACE::D >(status, [=] { reactive << value; }); }
+
+	/**
+	* \brief Property << {value, value, ...}. This operator will propogate the value asynchronously
+	* \param value initializer list
+	* \see wait()
+	*/
+	void operator<<(std::initializer_list< T > value) {
+		react::AsyncTransaction< PRIV_NAMESPACE::D >(status, [=] {
+			for (auto& x : value) {
+				reactive << x;
+			}
+		});
+	}
+
+	/**
+	 * \brief Property( value )
+	 * \param value T
+	 * \param async propogate this value asynchronously
+	 */
+	void operator()(T value, bool async=false){
+		if (async)
+			*this << std::forward<T>(value);
+		else
+			*this = std::forward<T>(value);
+	}
+
+	/**
+	 * \brief Property( {value, value, ...} )
+	 * \param value initializer list
+	 */
+	void operator()(std::initializer_list< T > value) {
+		this << std::forward<std::initializer_list< T >>(value);
+	}
+
+	// FUNCTIONS
+
+	/**
+	* \brief Construct a connection to a function that will be called on every property change
+	* \tparam C connection release policy
+	* \param f function to changed
+	* \return
+	*/
+	template< ConnectionType C = ConnectionType::Permanent >
+	auto changed(func f) {
+		std::unique_ptr< Continuation > _cont = nullptr;
+		continuations.push_back(std::move(_cont));
+		auto& cont = continuations.back();
+
+		switch (C) {
+		case ConnectionType::Scoped:
+		case ConnectionType::Permanent:
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, f))));
+			break;
+		}
+		case ConnectionType::Temporary: // run only once
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, [=, &cont](T t) {
+				f(std::forward< T >(t));
+				if (cont)
+					cont.reset();
+			}))));
+			break;
+		}
+		}
+		return Connection< Property< T, PropertyEventType > >(this, &status, &cont, C == ConnectionType::Scoped);
+	}
+
+	/**
+	* \brief Wait for all async computations have been made
+	* \remark Equivalent to a thread.join()
+	* \see operator<<()
+	*/
+	void wait() { status.Wait(); }
+
+	// Relational operators
+
+	bool operator==(const Property< T, PropertyEventType >& rhs) const { return (rhs.reactive == reactive ); }
+
+	bool operator!=(const Property< T, PropertyEventType >& rhs) const { return !(rhs.reactive == reactive ); }
+
+private:
+	std::list< std::unique_ptr< Continuation > > continuations;
+	Reactive reactive;
+	react::TransactionStatus status = react::TransactionStatus();
+
+	template< typename P, typename PropertyViewType >
+	friend class Property;
 };
 
 

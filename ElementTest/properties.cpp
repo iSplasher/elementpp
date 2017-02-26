@@ -8,7 +8,7 @@
 
 USING_NAMESPACE
 
-SCENARIO("Properties", "[Property]") {
+SCENARIO("Regular properties", "[Property]") {
 	Application* app = Application::instance();
 	if( !app )
 		app = new Application();
@@ -338,3 +338,77 @@ SCENARIO("Properties", "[Property]") {
 	}
 
 }
+
+SCENARIO("Event streams", "[Property]") {
+
+	Application* app = Application::instance();
+	if (!app)
+		app = new Application();
+
+	GIVEN("Simple event streams can be instantiated") {
+		std::string eventv1{ "" }, eventv2{ "" };
+		PropertyEvent< std::string > event1;
+		event1.changed([&](std::string v) {eventv1 = v; });
+		PropertyEvent< std::string > event2;
+		event2.changed([&](std::string v) {eventv2 = v; });
+
+		WHEN("Event is pushed") {
+
+			event1 = "hello";
+			event2 = "world";
+
+			THEN("Same object is returned") {
+				REQUIRE(eventv1 == "hello");
+				REQUIRE(eventv2 == "world");
+			}
+
+		}
+
+		WHEN("Event is pushed async") {
+
+			event1 << "hello";
+			REQUIRE(eventv1 == "");
+			event2 << "world";
+			REQUIRE(eventv2 == "");
+
+			THEN("Same object is returned") {
+				event1.wait();
+				event2.wait();
+				REQUIRE(eventv1 == "hello");
+				REQUIRE(eventv2 == "world");
+			}
+
+		}
+
+		WHEN("Event is pushed function call") {
+
+			event1("hello");
+			event2("world");
+
+			THEN("Same object is returned") {
+				REQUIRE(eventv1 == "hello");
+				REQUIRE(eventv2 == "world");
+			}
+
+		}
+
+		WHEN("Event is pushed function call async") {
+
+			event1("hello", true);
+			REQUIRE(eventv1 == "");
+			event2("world", true);
+			REQUIRE(eventv2 == "");
+
+			THEN("Same object is returned") {
+				event1.wait();
+				event2.wait();
+				REQUIRE(eventv1 == "hello");
+				REQUIRE(eventv2 == "world");
+			}
+
+		}
+
+	}
+	
+}
+
