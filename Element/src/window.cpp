@@ -73,63 +73,6 @@ static KeyModifier getKeyModifiers( GLFWwindow* r_window ) {
 	return modifiers;
 }
 
-static void mouseMoveCallback( GLFWwindow* r_window, double xpos, double ypos ) {
-	auto ev = std::make_shared< MouseEvent >(
-	                                         Event::Type::MouseMove,
-	                                         Point( xpos, ypos ), MouseButton::None,
-	                                         getMouseButtons( r_window ),
-	                                         getKeyModifiers( r_window ) );
-
-	Widget* widget = getWindow( r_window );
-	auto found = false;
-
-	while( !found ) {
-		if( widget->geometry.get().contains( ev->pos ) ) { }
-	}
-}
-
-static void mousePressCallback( GLFWwindow* r_window, int button, int action, int mods ) {
-	auto ev_type = action == GLFW_PRESS ? Event::Type::MouseButtonPress : Event::Type::MouseButtonRelease;
-	auto m_button = MouseButton::None;
-	auto modifiers = KeyModifier::None;
-
-	switch( button ) {
-		case GLFW_MOUSE_BUTTON_LEFT:
-			m_button = MouseButton::Left;
-			break;
-		case GLFW_MOUSE_BUTTON_RIGHT:
-			m_button = MouseButton::Right;
-			break;
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			m_button = MouseButton::Middle;
-			break;
-		default:
-			return;
-	}
-
-	if( mods & GLFW_MOD_SHIFT ) {
-		modifiers |= KeyModifier::Shift;
-	}
-
-	if( mods & GLFW_MOD_CONTROL ) {
-		modifiers |= KeyModifier::Control;
-	}
-
-	if( mods & GLFW_MOD_ALT ) {
-		modifiers |= KeyModifier::Alt;
-	}
-
-	if( mods & GLFW_MOD_SUPER ) {
-		modifiers |= KeyModifier::Meta;
-	}
-
-	auto window = getWindow( r_window );
-	PointD m_pos;
-	glfwGetCursorPos( r_window, &m_pos.x, &m_pos.y );
-}
-
-// Callbacks end
-
 Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -149,8 +92,8 @@ Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
 	}
 
 	glfwSetWindowUserPointer( r_window, this );
-	glfwSetCursorPosCallback( r_window, mouseMoveCallback );
-	glfwSetMouseButtonCallback( r_window, mousePressCallback );
+	glfwSetCursorPosCallback( r_window, mouseMovedCb );
+	glfwSetMouseButtonCallback( r_window, mousePressCb );
 
 	setType( ElementType::Window );
 	parent_window = this;
@@ -176,7 +119,7 @@ Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
 	                 } );
 	size = win_size;
 	size.changed( [&](SizeF s) { glfwSetWindowSize( r_window, s.width, s.height ); } ); // TODO: confirm size
-	backgroundColor = Color(250, 250, 250, 200);
+	backgroundColor = Color( 250, 250, 250, 200 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
 	marginLeft = marginTop = marginRight = marginBottom = 0;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
@@ -212,8 +155,79 @@ void Window::update() {
 	}
 }
 
-void Window::paint( Painter& painter ) {}
-
 void Window::setActive() const {
 	glfwMakeContextCurrent( r_window );
+}
+
+void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
+	PointF p = PointF( xpos, ypos );
+	auto buttons = getMouseButtons( r_window );
+
+	auto contains = [](Widget* a, PointF b) { a->geometry.get().contains(b) && !a->blockEvents; };
+
+	// wigdets that contains point receives
+	Widget* w_p = getWindow(r_window);
+	while(w_p) {
+		for( auto x : w->children() ) {
+			if( x->type == ElementType::Widget ) {
+				auto w = static_cast< Widget* >( x );
+				if( w->geometry.get().contains( p ) && !w->blockEvents ) {
+					w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
+				}
+			}
+		}
+	}
+
+}
+
+void Window::mousePressCb( _privRWindow* r_window, int button, int action, int mods ) {
+	auto btn_press = action == GLFW_PRESS ? true : false;
+	auto m_button = MouseButton::None;
+	auto modifiers = KeyModifier::None;
+
+	switch( button ) {
+		case GLFW_MOUSE_BUTTON_LEFT:
+			m_button = MouseButton::Left;
+			break;
+		case GLFW_MOUSE_BUTTON_RIGHT:
+			m_button = MouseButton::Right;
+			break;
+		case GLFW_MOUSE_BUTTON_MIDDLE:
+			m_button = MouseButton::Middle;
+			break;
+		default:
+			return;
+	}
+
+	if( mods & GLFW_MOD_SHIFT ) {
+		modifiers |= KeyModifier::Shift;
+	}
+
+	if( mods & GLFW_MOD_CONTROL ) {
+		modifiers |= KeyModifier::Control;
+	}
+
+	if( mods & GLFW_MOD_ALT ) {
+		modifiers |= KeyModifier::Alt;
+	}
+
+	if( mods & GLFW_MOD_SUPER ) {
+		modifiers |= KeyModifier::Meta;
+	}
+
+	PointD m_pos;
+	glfwGetCursorPos( r_window, &m_pos.x, &m_pos.y );
+
+	// window receives
+	auto window = getWindow( r_window );
+
+	// wigdets that contains point receives
+	for (auto x : window->children()) {
+		if (x->type == ElementType::Widget) {
+			auto w = static_cast< Widget* >(x);
+			if (w->geometry.get().contains(m_pos) && !w->blockEvents) {
+			}
+		}
+	}
+
 }

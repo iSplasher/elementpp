@@ -56,6 +56,9 @@ public:
 
 	const Accessor< Element* , Element > parent;
 
+	bool blockEvents = false;
+
+
 	// FUNCTIONS
 
 	std::vector< Element* > children();
@@ -119,6 +122,7 @@ private:
 
 	friend class Application;
 	friend class Widget;
+	friend class Window;
 };
 
 
@@ -227,7 +231,6 @@ private:
 	ElementContainerPtr component_objects;
 	ElementTreePtr component_tree;
 
-	friend class Window;
 	friend class Element;
 };
 

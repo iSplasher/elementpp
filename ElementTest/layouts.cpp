@@ -51,23 +51,26 @@ SCENARIO("Layouts", "[Layout]") {
 	//priv::YGNodeLayoutGetTop( child2 );
 	//priv::YGNodeLayoutGetLeft( child2 );
 
-	//auto window = app->create<Window>();
-	//auto layout = app->create< Layout >();
-	//layout->widget = window;
-	//auto widget1 = app->create< Widget >();
-	//widget1->size = SizeF(50, 50);
+	auto window = app->create<Window>();
+	auto layout = app->create< Layout >();
+	layout->widget = window;
+	auto widget1 = app->create< Widget >();
+	widget1->size = SizeF(0, 0);
 	//widget1->alignment = Alignment::Center;
-	//auto widget2 = app->create< Widget >();
-	//widget2->size = SizeF(50, 0);
-	//layout->alignment;
-	//layout->append({ widget1 });
-	//layout->update();
-	//printWidget(window);
-	//printWidget(layout);
-	//printWidget(widget1);
-	//printWidget(widget2);
+	widget1->mouseMoved.changed([](MouseEvent m) {std::cout << "Widget 1: " << m.position << std::endl; });
+	auto widget2 = app->create< Widget >();
+	widget2->size = SizeF(0, 0);
+	widget2->mouseMoved.changed([](MouseEvent m) {std::cout << "Widget 2: " << m.position << std::endl; });
+	layout->alignment;
+	layout->append({ widget1 });
+	layout->append({ widget2 });
+	layout->update();
+	printWidget(window);
+	printWidget(layout);
+	printWidget(widget1);
+	printWidget(widget2);
 
-	//app->exec();
+	app->exec();
 
 	GIVEN("Layouts are instatiated") {
 		auto widget = app->create< Widget >();

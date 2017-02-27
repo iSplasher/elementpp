@@ -65,7 +65,7 @@ PointF Widget::mapFromParent( PointF _p ) const {
 	return _p - position;
 }
 
-PointF Widget::mapFromGlobal( PointF p ) {
+PointF Widget::mapFromScreen( PointF p ) {
 	auto w = this;
 
 	while( w ) {
@@ -75,7 +75,7 @@ PointF Widget::mapFromGlobal( PointF p ) {
 	return p;
 }
 
-PointF Widget::mapToGlobal( PointF p ) {
+PointF Widget::mapToScreen( PointF p ) {
 	auto w = this;
 
 	while( w ) {

@@ -11,9 +11,6 @@ NAMESPACE_BEGIN
 class Widget;
 class Layout;
 
-using WidgetPtr = std::unique_ptr< Widget >;
-using LayoutPtr = std::unique_ptr< Layout >;
-
 PRIV_NAMESPACE_BEGIN
 #include <yoga/Yoga.h>
 

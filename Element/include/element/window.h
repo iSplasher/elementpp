@@ -3,7 +3,7 @@
 #include "widget.h"
 #include "core/painter.h"
 
-typedef struct GLFWwindow _privRWindow;
+using _privRWindow = struct GLFWwindow;
 
 NAMESPACE_BEGIN
 
@@ -16,15 +16,17 @@ public:
 protected:
 	// methods
 
+	void update() override;
+
 private:
 	//methods
-	/// <summary>
-	/// Painting can only be done on active window.
-	/// </summary>
+	/**
+	 * \brief Painting can only be done on active window
+	 */
 	void setActive() const;
 
-	virtual void update();
-	void paint(Painter &painter) override;
+	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);
+	static void mousePressCb(_privRWindow* r_window, int button, int action, int mods);
 
 	//abitrary data members
 	double _old_mouse_x = 0;

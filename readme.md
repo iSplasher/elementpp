@@ -2,7 +2,7 @@
 
 >Currently under heavy development
 
-This is a GUI library written in modern C++. 
+This is a GUI library written in modern C++ (11/14). 
 It is cross-platform and was designed as a simple embeddable user interface library for applications. It can also be used for fullblown UI applications.
 Element++ emits a **declarative** functional reactive code pattern making it very easy to quickly write up some nice user interfaces.
 
