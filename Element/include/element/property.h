@@ -55,23 +55,15 @@ enum class ConnectionType {
 */
 using PropertyEventType = struct PropertyEventType;
 
+/**
+ * \brief Create a read-only propertyevent that acts like a view for other propertyevents
+ */
 using PropertyEventViewType = struct PropertyEventViewType;
 
 /**
 * \brief Create a read-only property that acts like a view for other properties
 */
 using PropertyViewType = struct PropertyViewType;
-
-
-/**
-* \brief Create a property with read-only policy
-*/
-using PropertyRead = struct PropertyRead;
-
-/**
-* \brief Create a property with read-write policy
-*/
-using PropertyWrite = struct PropertyWrite;
 
 
 /**
@@ -188,6 +180,7 @@ using PropertyEventView = Property< T, PropertyEventViewType, void >;
  * \tparam T type
  * \tparam Private class allowed to access this property
  * \tparam A // unspecified //
+ * \see PropertyView
  */
 template< typename T, typename Private = Element, typename A = void >
 class Property {
@@ -245,7 +238,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, Private, A > >( this, &status, &cont, C == ConnectionType::Scoped );
+		return Connection< Property< T, Private > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -371,7 +364,8 @@ private:
 
 /**
  * \brief A read-write property
- * \tparam T 
+ * \tparam T
+ * \see PropertyView
  */
 template< typename T >
 class Property< T, Element, void > {
@@ -502,7 +496,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, Element, void > >( this, &status, &cont, C == ConnectionType::Scoped );
+		return Connection< Property< T > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -567,6 +561,7 @@ private:
 /**
 * \brief A property view
 * \tparam T type
+* \see Property
 */
 template< typename T >
 class Property< T, PropertyViewType, void > {
@@ -633,7 +628,7 @@ public:
 				break;
 			}
 		}
-		return Connection< Property< T, PropertyViewType, void > >( this, &status, &cont, C == ConnectionType::Scoped );
+		return Connection< PropertyView< T > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -725,6 +720,7 @@ private:
 /**
 * \brief A property event stream
 * \tparam T
+* \see PropertyEventView
 */
 template< typename T >
 class Property< T, PropertyEventType, void > {
@@ -865,9 +861,9 @@ public:
 
 	// Relational operators
 
-	bool operator==( const PropertyEvent< T >& rhs ) const { return ( rhs.reactive == reactive ); }
+	bool operator==( const PropertyEvent< T >& rhs ) const { return rhs.reactive.Equals(reactive); }
 
-	bool operator!=( const PropertyEvent< T >& rhs ) const { return !( rhs.reactive != reactive ); }
+	bool operator!=( const PropertyEvent< T >& rhs ) const { return !( rhs.reactive.Equals(reactive) ); }
 
 private:
 	std::list< std::unique_ptr< Continuation > > continuations;
@@ -878,6 +874,126 @@ private:
 	friend class Property;
 };
 
+/**
+* \brief A propertyevent view
+* \tparam T type
+* \see PropertyEvent
+*/
+template< typename T >
+class Property< T, PropertyEventViewType, void > {
+	using Reactive = PRIV_NAMESPACE::EventsT< T >;
+	using func = std::function< void(T) >;
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
+
+public:
+
+	template<typename... Args >
+	explicit Property(Args&&... args) {
+		// TODO: find a way to static_assert function arguments count
+		reactive = react::Merge(args.reactive ...);
+	}
+
+	~Property() {
+		for (auto& p : continuations) {
+			if (p) {
+				p.reset();
+			}
+		}
+	}
+
+	// FUNCTIONS
+
+	/**
+	* \brief
+	* \tparam C connection release policy
+	* \param f function to changed
+	* \return
+	*/
+	template< ConnectionType C = ConnectionType::Permanent >
+	auto changed(func f) {
+		std::unique_ptr< Continuation > _cont = nullptr;
+		continuations.push_back(std::move(_cont));
+		auto& cont = continuations.back();
+
+		switch (C) {
+		case ConnectionType::Scoped:
+		case ConnectionType::Permanent:
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, f))));
+			break;
+		}
+		case ConnectionType::Temporary: // run only once
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, [=, &cont](T t) {
+				f(std::forward< T >(t));
+				if (cont)
+					cont.reset();
+			}))));
+			break;
+		}
+		}
+		return Connection< PropertyEventView<T> >(this, &status, &cont, C == ConnectionType::Scoped);
+	}
+
+
+	/**
+	* \brief Wait for all computations have been made
+	* \remark Equivalent to a thread.join()
+	* \see operator<<()
+	*/
+	void wait() { status.Wait(); }
+
+	/**
+	* \brief Get T
+	* \return T
+	*/
+	T get() {
+		return reactive.Value();;
+	}
+
+	// Relational operators
+
+	bool operator==(const PropertyEventView< T >& rhs) { return rhs.reactive.Equals(reactive); }
+
+	bool operator!=(const PropertyEventView< T >& rhs) { return !(rhs.reactive.Equals( reactive )); }
+
+private:
+
+	// MOVE & COPY
+
+	Property(const Property& other)
+		: continuations(other.continuations),
+		reactive(other.reactive),
+		status(other.status) {}
+
+	Property(Property&& other) noexcept
+		: continuations(std::move(other.continuations)),
+		reactive(std::move(other.reactive)),
+		status(std::move(other.status)) {}
+
+	Property& operator=(const Property& other) {
+		if (this == &other)
+			return *this;
+		continuations = other.continuations;
+		reactive = other.reactive;
+		status = other.status;
+		return *this;
+	}
+
+	Property& operator=(Property&& other) noexcept {
+		if (this == &other)
+			return *this;
+		continuations = std::move(other.continuations);
+		reactive = std::move(other.reactive);
+		status = std::move(other.status);
+		return *this;
+	}
+
+
+	std::list< std::unique_ptr< Continuation > > continuations;
+	Reactive reactive;
+	react::TransactionStatus status = react::TransactionStatus();
+};
 
 /**
  * \brief Python/C#-like syntatic sugar for class properties.

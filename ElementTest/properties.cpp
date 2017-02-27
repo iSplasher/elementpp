@@ -259,7 +259,7 @@ SCENARIO("Regular properties", "[Property]") {
 		WHEN("A simple std::string based property view is instantiated") {
 
 			PropertyView< std::string > view1( [](std::string a, std::string b, std::string c) -> std::string { return a + b + c; },
-			                                                first, second, t.third );
+			                                   first, second, t.third );
 
 			THEN("PropertyView has the same value as returned by function") {
 				REQUIRE(view1 == "hello world!");
@@ -293,10 +293,10 @@ SCENARIO("Regular properties", "[Property]") {
 
 			THEN("PropertyView connection can also refer to other properties") {
 
-				view1.changed([&first](std::string s) {
-						if(first != "changed ")
-							first = "changed ";
-					});
+				view1.changed( [&first](std::string s) {
+					              if( first != "changed " )
+						              first = "changed ";
+				              } );
 
 				REQUIRE(view1 == "hello world!");
 				first << "async ";
@@ -304,7 +304,7 @@ SCENARIO("Regular properties", "[Property]") {
 				REQUIRE(view1 == "changed world!");
 				first = "new ";
 				REQUIRE(view1 == "changed world!"); // reactive applies the value to itself before going through all connections
-				
+
 			}
 
 		}
@@ -315,11 +315,11 @@ SCENARIO("Regular properties", "[Property]") {
 			second = "0";
 
 			PropertyView< int > view2(
-				[](std::string a, std::string b) -> int { return std::stoi(a) + std::stoi(b); },
-				first, second);
+			                          [](std::string a, std::string b) -> int { return std::stoi( a ) + std::stoi( b ); },
+			                          first, second );
 
 			THEN("PropertyView has the same value as returned by function") {
-				
+
 				REQUIRE(view2 == 0);
 
 				first = "1";
@@ -332,7 +332,7 @@ SCENARIO("Regular properties", "[Property]") {
 				REQUIRE(view2 == 3);
 
 			}
-			
+
 		}
 
 	}
@@ -342,15 +342,15 @@ SCENARIO("Regular properties", "[Property]") {
 SCENARIO("Event streams", "[Property]") {
 
 	Application* app = Application::instance();
-	if (!app)
+	if( !app )
 		app = new Application();
 
 	GIVEN("Simple event streams can be instantiated") {
 		std::string eventv1{ "" }, eventv2{ "" };
 		PropertyEvent< std::string > event1;
-		event1.changed([&](std::string v) {eventv1 = v; });
+		event1.changed( [&](std::string v) { eventv1 = v; } );
 		PropertyEvent< std::string > event2;
-		event2.changed([&](std::string v) {eventv2 = v; });
+		event2.changed( [&](std::string v) { eventv2 = v; } );
 
 		WHEN("Event is pushed") {
 
@@ -382,8 +382,8 @@ SCENARIO("Event streams", "[Property]") {
 
 		WHEN("Event is pushed function call") {
 
-			event1("hello");
-			event2("world");
+			event1( "hello" );
+			event2( "world" );
 
 			THEN("Same object is returned") {
 				REQUIRE(eventv1 == "hello");
@@ -394,9 +394,9 @@ SCENARIO("Event streams", "[Property]") {
 
 		WHEN("Event is pushed function call async") {
 
-			event1("hello", true);
+			event1( "hello", true );
 			REQUIRE(eventv1 == "");
-			event2("world", true);
+			event2( "world", true );
 			REQUIRE(eventv2 == "");
 
 			THEN("Same object is returned") {
@@ -409,6 +409,55 @@ SCENARIO("Event streams", "[Property]") {
 		}
 
 	}
-	
-}
 
+	GIVEN("Event views") {
+
+		std::string eventv1{ "" };
+
+		PropertyEvent< std::string > event1;
+		PropertyEvent< std::string > event2;
+
+		PropertyEventView<std::string> eventview1{event1, event2};
+
+		eventview1.changed([&](std::string v)
+		{
+			eventv1 = v;
+		});
+
+		WHEN("Events are pushed") {
+
+			event1("hello");
+			event2("world");
+
+			THEN("Then the last event value is propogated last") {
+				REQUIRE(eventv1 == "world");
+			}
+
+		}
+
+		WHEN("Events are pushed async") {
+
+			event1("hello", true);
+			event2("world", true);
+
+			THEN("Then the last async event value is propogated last") {
+				event2.wait();
+				REQUIRE(eventv1 == "world");
+			}
+		}
+
+		WHEN("Some events are pushed async") {
+
+			event1("hello", true);
+			event2("world");
+
+			THEN("Then the async event value is propogated last") {
+				event1.wait();
+				REQUIRE(eventv1 == "hello");
+			}
+		}
+		
+	}
+
+
+}
