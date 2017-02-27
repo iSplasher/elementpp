@@ -30,7 +30,7 @@ enum class ConnectionType {
 
 
 /**
- * \brief Create an event stream
+ * \brief Create a property that acts like an event steam
  */
 using PropertyEventType = struct PropertyEventType;
 
@@ -245,9 +245,9 @@ public:
 
 	bool operator==( const Property< T, Private >& rhs ) { return ( rhs.reactive.Value() == reactive.Value() ); }
 
-	bool operator!=( const T& rhs ) { return !( rhs == reactive.Value() ); }
+	bool operator!=( const T& rhs ) { return !( rhs != reactive.Value() ); }
 
-	bool operator!=( const Property< T, Private >& rhs ) { return !( rhs.reactive.Value() == reactive.Value() ); }
+	bool operator!=( const Property< T, Private >& rhs ) { return !( rhs.reactive.Value() != reactive.Value() ); }
 
 	bool operator<( const T& rhs ) { return ( rhs < reactive.Value() ); }
 
@@ -506,9 +506,9 @@ public:
 
 	bool operator==( const Property< T, Element >& rhs ) const { return ( rhs.reactive.Value() == reactive.Value() ); }
 
-	bool operator!=( const T& rhs ) const { return !( rhs == reactive.Value() ); }
+	bool operator!=( const T& rhs ) const { return !( rhs != reactive.Value() ); }
 
-	bool operator!=( const Property< T, Element >& rhs ) const { return !( rhs.reactive.Value() == reactive.Value() ); }
+	bool operator!=( const Property< T, Element >& rhs ) const { return !( rhs.reactive.Value() != reactive.Value() ); }
 
 	bool operator<( const T& rhs ) const { return ( rhs < reactive.Value() ); }
 
@@ -633,9 +633,9 @@ public:
 
 	bool operator==( const PropertyView< T >& rhs ) { return ( rhs.reactive.Value() == reactive.Value() ); }
 
-	bool operator!=( const T& rhs ) { return !( rhs == reactive.Value() ); }
+	bool operator!=( const T& rhs ) { return !( rhs != reactive.Value() ); }
 
-	bool operator!=( const PropertyView< T >& rhs ) { return !( rhs.reactive.Value() == reactive.Value() ); }
+	bool operator!=( const PropertyView< T >& rhs ) { return !( rhs.reactive.Value() != reactive.Value() ); }
 
 	bool operator<( const T& rhs ) { return ( rhs < reactive.Value() ); }
 
@@ -841,7 +841,7 @@ public:
 
 	bool operator==(const Property< T, PropertyEventType >& rhs) const { return (rhs.reactive == reactive ); }
 
-	bool operator!=(const Property< T, PropertyEventType >& rhs) const { return !(rhs.reactive == reactive ); }
+	bool operator!=(const Property< T, PropertyEventType >& rhs) const { return !(rhs.reactive != reactive ); }
 
 private:
 	std::list< std::unique_ptr< Continuation > > continuations;
