@@ -410,6 +410,33 @@ SCENARIO("Event streams", "[Property]") {
 
 	}
 
+	GIVEN("Simple read-only event streams can be instantiated") {
+
+		std::string eventv1{ "" };
+
+		WHEN("Declared in class") {
+
+			struct T {
+				PropertyEvent< std::string, T > first;
+
+				void push() { first( "hello" ); }
+
+			};
+
+			T t;
+			t.first.changed( [&](std::string v) { eventv1 = v; } );
+
+			THEN("Class can push values") {
+
+				REQUIRE(eventv1 == "");
+				t.push();
+				REQUIRE(eventv1 == "hello");
+
+			}
+
+		}
+	}
+
 	GIVEN("Event views") {
 
 		std::string eventv1{ "" };
@@ -417,17 +444,16 @@ SCENARIO("Event streams", "[Property]") {
 		PropertyEvent< std::string > event1;
 		PropertyEvent< std::string > event2;
 
-		PropertyEventView<std::string> eventview1{event1, event2};
+		PropertyEventView< std::string > eventview1{ event1, event2 };
 
-		eventview1.changed([&](std::string v)
-		{
-			eventv1 = v;
-		});
+		eventview1.changed( [&](std::string v) {
+			                   eventv1 = v;
+		                   } );
 
 		WHEN("Events are pushed") {
 
-			event1("hello");
-			event2("world");
+			event1( "hello" );
+			event2( "world" );
 
 			THEN("Then the last event value is propogated last") {
 				REQUIRE(eventv1 == "world");
@@ -437,8 +463,8 @@ SCENARIO("Event streams", "[Property]") {
 
 		WHEN("Events are pushed async") {
 
-			event1("hello", true);
-			event2("world", true);
+			event1( "hello", true );
+			event2( "world", true );
 
 			THEN("Then the last async event value is propogated last") {
 				event2.wait();
@@ -448,16 +474,15 @@ SCENARIO("Event streams", "[Property]") {
 
 		WHEN("Some events are pushed async") {
 
-			event1("hello", true);
-			event2("world");
+			event1( "hello", true );
+			event2( "world" );
 
 			THEN("Then the async event value is propogated last") {
 				event1.wait();
 				REQUIRE(eventv1 == "hello");
 			}
 		}
-		
-	}
 
+	}
 
 }

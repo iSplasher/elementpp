@@ -156,8 +156,8 @@ class Property< T, Element, void >; // Property<T>
 template< typename T >
 class Property< T, PropertyViewType, void >; // PropertyView<T>
 
-template< typename T, typename A >
-class Property< T, PropertyEventType, A >; // PropertyEvent<T, AccessClass>
+template< typename T, typename AccessClass >
+class Property< T, PropertyEventType, AccessClass >; // PropertyEvent<T, AccessClass>
 
 template< typename T >
 class Property< T, PropertyEventType, void >; // PropertyEvent<T>
@@ -189,11 +189,6 @@ class Property {
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 
 public:
-
-	Property& operator=( const Property& other ) {
-		reactive <<= other.reactive.Value();
-		return *this;
-	}
 
 	/**
 	* \brief property->member
@@ -324,6 +319,18 @@ private:
 	*/
 	auto& operator=( T value ) {
 		reactive <<= std::forward< T >( value );
+		return *this;
+	}
+
+	/**
+	* \brief Property = {value, value, ...}
+	* \param value initializer list
+	* \return
+	*/
+	auto& operator=(std::initializer_list< T > value) {
+		for (auto& x : value) {
+			this = x;
+		}
 		return *this;
 	}
 
@@ -716,9 +723,183 @@ private:
 	}
 };
 
+/**
+* \brief A read-only property event stream
+* \tparam T
+* \see PropertyEventView
+*/
+template< typename T, typename Private >
+class Property< T, PropertyEventType, Private > {
+	using Reactive = PRIV_NAMESPACE::EventSourceT< T >;
+	using func = std::function< void(T) >;
+	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
+
+public:
+
+	Property() : reactive(react::MakeEventSource< PRIV_NAMESPACE::D, T >()) { }
+
+	~Property() {
+		for (auto& p : continuations) {
+			if (p) {
+				p.reset();
+			}
+		}
+	}
+
+	// FUNCTIONS
+
+	/**
+	* \brief Construct a connection to a function that will be called on every property change
+	* \tparam C connection release policy
+	* \param f function to changed
+	* \return
+	*/
+	template< ConnectionType C = ConnectionType::Permanent >
+	auto changed(func f) {
+		std::unique_ptr< Continuation > _cont = nullptr;
+		continuations.push_back(std::move(_cont));
+		auto& cont = continuations.back();
+
+		switch (C) {
+		case ConnectionType::Scoped:
+		case ConnectionType::Permanent:
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, f))));
+			break;
+		}
+		case ConnectionType::Temporary: // run only once
+		{
+			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, [=, &cont](T t) {
+				f(std::forward< T >(t));
+				if (cont)
+					cont.reset();
+			}))));
+			break;
+		}
+		}
+		return Connection< PropertyEvent< T, Private > >(this, &status, &cont, C == ConnectionType::Scoped);
+	}
+
+	/**
+	* \brief Wait for all async computations have been made
+	* \remark Equivalent to a thread.join()
+	* \see operator<<()
+	*/
+	void wait() { status.Wait(); }
+
+	// Relational operators
+
+	bool operator==(const PropertyEvent< T, Private >& rhs) const { return rhs.reactive.Equals(reactive); }
+
+	bool operator!=(const PropertyEvent< T, Private >& rhs) const { return !(rhs.reactive.Equals(reactive)); }
+
+private:
+
+	// MOVE & COPY
+
+	Property(const Property& other)
+		: continuations(other.continuations),
+		reactive(other.reactive),
+		status(other.status) {}
+
+	Property(Property&& other) noexcept
+		: continuations(std::move(other.continuations)),
+		reactive(std::move(other.reactive)),
+		status(std::move(other.status)) {}
+
+	Property& operator=(const Property& other) {
+		if (this == &other)
+			return *this;
+		continuations = other.continuations;
+		reactive = other.reactive;
+		status = other.status;
+		return *this;
+	}
+
+	Property& operator=(Property&& other) noexcept {
+		if (this == &other)
+			return *this;
+		continuations = std::move(other.continuations);
+		reactive = std::move(other.reactive);
+		status = std::move(other.status);
+		return *this;
+	}
+
+	/**
+	* \brief property = value
+	* \param value T
+	* \return
+	*/
+	auto& operator=(T value) {
+		reactive << std::forward< T >(value);
+		return *this;
+	}
+
+	/**
+	* \brief Property = {value, value, ...}
+	* \param value initializer list
+	* \return
+	*/
+	auto& operator=(std::initializer_list< T > value) {
+		for (auto& x : value) {
+			this = x;
+		}
+		return *this;
+	}
+
+	/**
+	* \brief Property << value. This operator will propogate the value asynchronously
+	* \param value T
+	* \see wait()
+	*/
+	void operator<<(T value) { react::AsyncTransaction< PRIV_NAMESPACE::D >(status, [=] { reactive << value; }); }
+
+	/**
+	* \brief Property << {value, value, ...}. This operator will propogate the value asynchronously
+	* \param value initializer list
+	* \see wait()
+	*/
+	void operator<<(std::initializer_list< T > value) {
+		react::AsyncTransaction< PRIV_NAMESPACE::D >(status, [=] {
+			for (auto& x : value) {
+				reactive << x;
+			}
+		});
+	}
+
+	/**
+	* \brief Property( value )
+	* \param value T
+	* \param async propogate this value asynchronously
+	*/
+	void operator()(T value, bool async = false) {
+		if (async)
+			*this << std::forward< T >(value);
+		else
+			*this = std::forward< T >(value);
+	}
+
+	/**
+	* \brief Property( {value, value, ...} )
+	* \param value initializer list
+	*/
+	void operator()(std::initializer_list< T > value) {
+		this << std::forward< std::initializer_list< T > >(value);
+	}
+
+	std::list< std::unique_ptr< Continuation > > continuations;
+	Reactive reactive;
+	react::TransactionStatus status = react::TransactionStatus();
+
+	friend Private;
+
+	template< typename P, typename PropertyEventViewType, typename C >
+	friend class Property;
+};
+
 
 /**
-* \brief A property event stream
+* \brief A read-write property event stream
 * \tparam T
 * \see PropertyEventView
 */
@@ -861,9 +1042,9 @@ public:
 
 	// Relational operators
 
-	bool operator==( const PropertyEvent< T >& rhs ) const { return rhs.reactive.Equals(reactive); }
+	bool operator==( const PropertyEvent< T >& rhs ) const { return rhs.reactive.Equals( reactive ); }
 
-	bool operator!=( const PropertyEvent< T >& rhs ) const { return !( rhs.reactive.Equals(reactive) ); }
+	bool operator!=( const PropertyEvent< T >& rhs ) const { return !( rhs.reactive.Equals( reactive ) ); }
 
 private:
 	std::list< std::unique_ptr< Continuation > > continuations;
@@ -874,6 +1055,7 @@ private:
 	friend class Property;
 };
 
+
 /**
 * \brief A propertyevent view
 * \tparam T type
@@ -882,20 +1064,20 @@ private:
 template< typename T >
 class Property< T, PropertyEventViewType, void > {
 	using Reactive = PRIV_NAMESPACE::EventsT< T >;
-	using func = std::function< void(T) >;
+	using func = std::function< void( T ) >;
 	using Continuation = react::Continuation< PRIV_NAMESPACE::D >;
 
 public:
 
-	template<typename... Args >
-	explicit Property(Args&&... args) {
+	template< typename... Args >
+	explicit Property( Args&&... args ) {
 		// TODO: find a way to static_assert function arguments count
-		reactive = react::Merge(args.reactive ...);
+		reactive = react::Merge( args.reactive ... );
 	}
 
 	~Property() {
-		for (auto& p : continuations) {
-			if (p) {
+		for( auto& p : continuations ) {
+			if( p ) {
 				p.reset();
 			}
 		}
@@ -910,29 +1092,29 @@ public:
 	* \return
 	*/
 	template< ConnectionType C = ConnectionType::Permanent >
-	auto changed(func f) {
+	auto changed( func f ) {
 		std::unique_ptr< Continuation > _cont = nullptr;
-		continuations.push_back(std::move(_cont));
+		continuations.push_back( std::move( _cont ) );
 		auto& cont = continuations.back();
 
-		switch (C) {
-		case ConnectionType::Scoped:
-		case ConnectionType::Permanent:
-		{
-			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, f))));
-			break;
+		switch( C ) {
+			case ConnectionType::Scoped:
+			case ConnectionType::Permanent:
+			{
+				cont.reset( new Continuation( std::move( react::MakeContinuation( reactive, f ) ) ) );
+				break;
+			}
+			case ConnectionType::Temporary: // run only once
+			{
+				cont.reset( new Continuation( std::move( react::MakeContinuation( reactive, [=, &cont](T t) {
+					                                                                  f( std::forward< T >( t ) );
+					                                                                  if( cont )
+						                                                                  cont.reset();
+				                                                                  } ) ) ) );
+				break;
+			}
 		}
-		case ConnectionType::Temporary: // run only once
-		{
-			cont.reset(new Continuation(std::move(react::MakeContinuation(reactive, [=, &cont](T t) {
-				f(std::forward< T >(t));
-				if (cont)
-					cont.reset();
-			}))));
-			break;
-		}
-		}
-		return Connection< PropertyEventView<T> >(this, &status, &cont, C == ConnectionType::Scoped);
+		return Connection< PropertyEventView< T > >( this, &status, &cont, C == ConnectionType::Scoped );
 	}
 
 
@@ -953,26 +1135,26 @@ public:
 
 	// Relational operators
 
-	bool operator==(const PropertyEventView< T >& rhs) { return rhs.reactive.Equals(reactive); }
+	bool operator==( const PropertyEventView< T >& rhs ) { return rhs.reactive.Equals( reactive ); }
 
-	bool operator!=(const PropertyEventView< T >& rhs) { return !(rhs.reactive.Equals( reactive )); }
+	bool operator!=( const PropertyEventView< T >& rhs ) { return !( rhs.reactive.Equals( reactive ) ); }
 
 private:
 
 	// MOVE & COPY
 
-	Property(const Property& other)
-		: continuations(other.continuations),
-		reactive(other.reactive),
-		status(other.status) {}
+	Property( const Property& other )
+		: continuations( other.continuations ),
+		  reactive( other.reactive ),
+		  status( other.status ) {}
 
-	Property(Property&& other) noexcept
-		: continuations(std::move(other.continuations)),
-		reactive(std::move(other.reactive)),
-		status(std::move(other.status)) {}
+	Property( Property&& other ) noexcept
+		: continuations( std::move( other.continuations ) ),
+		  reactive( std::move( other.reactive ) ),
+		  status( std::move( other.status ) ) {}
 
-	Property& operator=(const Property& other) {
-		if (this == &other)
+	Property& operator=( const Property& other ) {
+		if( this == &other )
 			return *this;
 		continuations = other.continuations;
 		reactive = other.reactive;
@@ -980,12 +1162,12 @@ private:
 		return *this;
 	}
 
-	Property& operator=(Property&& other) noexcept {
-		if (this == &other)
+	Property& operator=( Property&& other ) noexcept {
+		if( this == &other )
 			return *this;
-		continuations = std::move(other.continuations);
-		reactive = std::move(other.reactive);
-		status = std::move(other.status);
+		continuations = std::move( other.continuations );
+		reactive = std::move( other.reactive );
+		status = std::move( other.status );
 		return *this;
 	}
 
@@ -994,6 +1176,7 @@ private:
 	Reactive reactive;
 	react::TransactionStatus status = react::TransactionStatus();
 };
+
 
 /**
  * \brief Python/C#-like syntatic sugar for class properties.
