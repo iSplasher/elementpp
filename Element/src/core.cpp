@@ -67,9 +67,11 @@ static void closeWindowCallback( GLFWwindow* r_window ) {
 
 Application::Application() :
 	Element(),
+	elementCount( this, std::mem_fn( &Application::getElementCount ) ),
+	doubleClickInterval( this, std::mem_fn( &Application::getDoubleClickInterval ), std::mem_fn(&Application::setDoubleClickInterval)),
+	clickInterval( this, std::mem_fn( &Application::getClickInterval ), std::mem_fn(&Application::setClickInterval)),
 	component_objects( std::make_unique< ElementContainer >() ),
-	component_tree( std::make_unique< ElementTree >() ),
-	elementCount( this, std::mem_fn( &Application::getElementCount ) ){
+	component_tree( std::make_unique< ElementTree >() ){
 	internal_tree = component_tree->tree_iterator();
 
 	assert(self == nullptr);
@@ -115,5 +117,10 @@ bool Application::processEv() const {
 std::size_t Application::getElementCount() const {
 	return component_objects->size();
 }
+
+float Application::getDoubleClickInterval() const { return double_click_interval; }
+void Application::setDoubleClickInterval(float i) { double_click_interval = i; }
+float Application::getClickInterval() const { return click_interval; }
+void Application::setClickInterval(float i) { click_interval = i; }
 
 

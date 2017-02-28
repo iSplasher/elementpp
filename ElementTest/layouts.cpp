@@ -5,13 +5,13 @@
 
 USING_NAMESPACE
 
-void printWidget(PRIV_NAMESPACE::Layoutable* e) {
+void printWidget( PRIV_NAMESPACE::Layoutable* e ) {
 	std::cout << e->objectName << ": \n\t"
-	<< "Geometry: " << e->geometry << "\n\t"
-	<< "Margin: (" << e->marginLeft << ", " << e->marginTop << ", " << e->marginRight << ", " << e->marginBottom << ")" << "\n\t"
-	<< "Border: (" << e->borderLeft << ", " << e->borderTop << ", " << e->borderRight << ", " << e->borderBottom << ")" << "\n\t"
-	<< "Padding: (" << e->paddingLeft << ", " << e->paddingTop << ", " << e->paddingRight << ", " << e->paddingBottom << ")" << "\n\t"
-	<< std::endl;
+			<< "Geometry: " << e->geometry << "\n\t"
+			<< "Margin: (" << e->marginLeft << ", " << e->marginTop << ", " << e->marginRight << ", " << e->marginBottom << ")" << "\n\t"
+			<< "Border: (" << e->borderLeft << ", " << e->borderTop << ", " << e->borderRight << ", " << e->borderBottom << ")" << "\n\t"
+			<< "Padding: (" << e->paddingLeft << ", " << e->paddingTop << ", " << e->paddingRight << ", " << e->paddingBottom << ")" << "\n\t"
+			<< std::endl;
 }
 
 SCENARIO("Layouts", "[Layout]") {
@@ -51,30 +51,53 @@ SCENARIO("Layouts", "[Layout]") {
 	//priv::YGNodeLayoutGetTop( child2 );
 	//priv::YGNodeLayoutGetLeft( child2 );
 
-	auto window = app->create<Window>();
+	auto window = app->create< Window >();
 	auto layout = app->create< Layout >();
 	layout->widget = window;
-	auto widget1 = app->create< Widget >();
-	widget1->size = SizeF(0, 0);
+	auto widget1 = app->create< Widget >(window);
+	widget1->size = Size( 0, 0 );
 	//widget1->alignment = Alignment::Center;
-	widget1->mouseMoved.changed([](MouseEvent m) {std::cout << "Widget 1: " << m.position << std::endl; });
-	auto widget2 = app->create< Widget >();
-	widget2->size = SizeF(0, 0);
-	widget2->mouseMoved.changed([](MouseEvent m) {std::cout << "Widget 2: " << m.position << std::endl; });
+	//widget1->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 1: " << m.position << std::endl; } );
+	//widget1->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 1: " << m.position << std::endl; } );
+	//widget1->released.changed( [](MouseEvent m) { std::cout << "Released: Widget 1: " << m.position << std::endl; } );
+	widget1->leftClick.changed( [](Point p) { std::cout << "Left Click: Widget 1: " << p << std::endl; } );
+	widget1->rightClick.changed( [](Point p) { std::cout << "Right Click: Widget 1: " << p << std::endl; } );
+	widget1->clicked.changed( [](MouseEvent m) { std::cout << "Clicked: Widget 1: " << m.position << std::endl; } );
+	widget1->leftDoubleClick.changed([](Point p) { std::cout << "Double Left Click: Widget 1: " << p << std::endl; });
+	widget1->rightDoubleClick.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
+	widget1->doubleClicked.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
+	auto widget2 = app->create< Widget >(widget1);
+	widget2->size = Size( 0, 0 );
+	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
+	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
+	//widget2->released.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );
 	layout->alignment;
-	layout->append({ widget1 });
-	layout->append({ widget2 });
+	layout->append( { widget1 } );
+	layout->append( { widget2 } );
 	layout->update();
-	printWidget(window);
-	printWidget(layout);
-	printWidget(widget1);
-	printWidget(widget2);
+
+	auto widget11 = app->create< Widget >( widget1 );
+	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
+	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
+	//widget11->released.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );
+	auto widget12 = app->create< Widget >( widget1 );
+	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
+	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
+	//widget12->released.changed( [](MouseEvent m) { std::cout << "Released: Widget 4: " << m.position << std::endl; } );
+	auto layout1 = app->create< Layout >();
+	layout1->widget = widget1;
+	layout1->append({widget11, widget12});
+
+	//printWidget(window);
+	//printWidget(layout);
+	//printWidget(widget1);
+	//printWidget(widget2);
 
 	app->exec();
 
 	GIVEN("Layouts are instatiated") {
 		auto widget = app->create< Widget >();
-		widget->size = SizeF( 200, 200 );
+		widget->size = Size( 200, 200 );
 		auto layout1 = app->create< Layout >();
 		layout1->widget = widget;
 		auto layout2 = app->create< Layout >();
@@ -85,9 +108,9 @@ SCENARIO("Layouts", "[Layout]") {
 			widget->update();
 
 			THEN("Layout default values") {
-				REQUIRE(layout1->size == SizeF(0, 0));
-				REQUIRE(layout1->position == PointF(0, 0));
-				REQUIRE(layout1->geometry == RectF(PointF(0, 0), SizeF(0, 0)));
+				REQUIRE(layout1->size == Size(0, 0));
+				REQUIRE(layout1->position == Point(0, 0));
+				REQUIRE(layout1->geometry == Rect(Point(0, 0), Size(0, 0)));
 			}
 
 		}
@@ -115,15 +138,15 @@ SCENARIO("Layouts", "[Layout]") {
 				REQUIRE(layout4->children().size() == 0);
 			}
 
-				WHEN("Layout is updated") {
-					layout1->update();
+			WHEN("Layout is updated") {
+				layout1->update();
 
-					THEN("Layout sizes has been recalculated") {
-						REQUIRE(layout1->size == SizeF(200, 200));
-						REQUIRE(layout2->size == SizeF(200, 200));
-						REQUIRE(layout3->size == SizeF(200, 200));
-						REQUIRE(layout4->size == SizeF(200, 200));
-					}
+				THEN("Layout sizes has been recalculated") {
+					REQUIRE(layout1->size == Size(200, 200));
+					REQUIRE(layout2->size == Size(200, 200));
+					REQUIRE(layout3->size == Size(200, 200));
+					REQUIRE(layout4->size == Size(200, 200));
+				}
 
 			}
 

@@ -30,11 +30,11 @@ public:
 
 	// POSITION & SIZE 
 
-	Property<PointF> position;
-	Property<SizeF> size;
-	Property<SizeF> minSize;
-	Property<SizeF> maxSize;
-	PropertyView< RectF > geometry;
+	Property<Point> position;
+	Property<Size> size;
+	Property<Size> minSize;
+	Property<Size> maxSize;
+	PropertyView< Rect > geometry;
 
 	// Margin
 
@@ -42,7 +42,7 @@ public:
 	Property<float> marginTop;
 	Property<float> marginRight;
 	Property<float> marginBottom;
-	//PropertyView< RectF > margin;
+	//PropertyView< Rect > margin;
 
 	// BORDER
 
@@ -50,14 +50,14 @@ public:
 	Property<float> borderTop;
 	Property<float> borderRight;
 	Property<float> borderBottom;
-	//PropertyView< RectF > border;
+	//PropertyView< Rect > border;
 
 	// PADDING
 	Property<float> paddingLeft;
 	Property<float> paddingTop;
 	Property<float> paddingRight;
 	Property<float> paddingBottom;
-	//PropertyView< RectF > padding;
+	//PropertyView< Rect > padding;
 
 	// STYLE
 
@@ -85,10 +85,10 @@ private:
 
 	void setGrow(float);
 	void setShrink(float);
-	void setMaxSize(SizeF);
-	void setMinSize(SizeF);
-	void setSize(SizeF);
-	void setPosition(PointF);
+	void setMaxSize(Size);
+	void setMinSize(Size);
+	void setSize(Size);
+	void setPosition(Point);
 	void setAlignment(Alignment);
 	void setMargin(float, Direction);
 	void setBorder(float, Direction);
@@ -128,10 +128,10 @@ public:
 
 	// POSITION & SIZE 
 
-	PropertyView<PointF> position;
-	PropertyView<SizeF> size;
-	PropertyView<SizeF> minSize;
-	PropertyView<SizeF> maxSize;
+	PropertyView<Point> position;
+	PropertyView<Size> size;
+	PropertyView<Size> minSize;
+	PropertyView<Size> maxSize;
 
 	// STYLE
 

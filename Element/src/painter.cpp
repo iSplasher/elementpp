@@ -134,7 +134,7 @@ const Painter& Painter::begin( float pixel_ratio ) {
 	}
 	begun = true;
 	w->parent_window->setActive();
-	SizeF s = w->size;
+	Size s = w->size;
 	nvgBeginFrame( context, s.width, s.height, pixel_ratio );
 	return *this;
 }
@@ -173,8 +173,8 @@ const Painter& Painter::restore() {
 
 const Painter& Painter::reset() {
 	nvgReset( context );
-	o_origin = PointF();
-	origin = PointF();
+	o_origin = Point();
+	origin = Point();
 	o_b = nullptr;
 	b = nullptr;
 	o_p = nullptr;
@@ -204,7 +204,7 @@ const Painter& Painter::setBrush( Brush& brush ) {
 	return *this;
 }
 
-const Painter& Painter::clip( RectF rect ) const {
+const Painter& Painter::clip( Rect rect ) const {
 	translate( rect );
 	nvgScissor(context, rect.x, rect.y, rect.width, rect.height);
 	return *this;
@@ -215,7 +215,7 @@ const Painter& Painter::resetClip() const {
 	return *this;
 }
 
-const Painter& Painter::drawRect( RectF rect ) const {
+const Painter& Painter::drawRect( Rect rect ) const {
 	beginPath();
 	translate( rect );
 	nvgRect( context, rect.x, rect.y, rect.width, rect.height );
@@ -223,7 +223,7 @@ const Painter& Painter::drawRect( RectF rect ) const {
 	return *this;
 }
 
-const Painter& Painter::drawRoundedRect( RectF rect, float radius ) const {
+const Painter& Painter::drawRoundedRect( Rect rect, float radius ) const {
 	beginPath();
 	translate( rect );
 	nvgRoundedRect( context, rect.x, rect.y, rect.width, rect.height, radius );
@@ -231,7 +231,7 @@ const Painter& Painter::drawRoundedRect( RectF rect, float radius ) const {
 	return *this;
 }
 
-const Painter& Painter::drawRoundedRect( RectF rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left ) const {
+const Painter& Painter::drawRoundedRect( Rect rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left ) const {
 	beginPath();
 	translate( rect );
 	nvgRoundedRectVarying( context, rect.x, rect.y, rect.width, rect.height, rad_top_left, rad_top_right, rad_bottom_right, rad_bottom_left );
@@ -239,7 +239,7 @@ const Painter& Painter::drawRoundedRect( RectF rect, float rad_top_left, float r
 	return *this;
 }
 
-const Painter& Painter::drawEllipse( PointF center, SizeF size ) const {
+const Painter& Painter::drawEllipse( Point center, Size size ) const {
 	beginPath();
 	translate( center );
 	nvgEllipse( context, center.x, center.y, size.width, size.height );
@@ -247,7 +247,7 @@ const Painter& Painter::drawEllipse( PointF center, SizeF size ) const {
 	return *this;
 }
 
-const Painter& Painter::drawCircle( PointF center, float radius ) const {
+const Painter& Painter::drawCircle( Point center, float radius ) const {
 	beginPath();
 	translate( center );
 	nvgCircle( context, center.x, center.y, radius );
@@ -255,7 +255,7 @@ const Painter& Painter::drawCircle( PointF center, float radius ) const {
 	return *this;
 }
 
-const Painter& Painter::drawLine( PointF start, PointF end ) const {
+const Painter& Painter::drawLine( Point start, Point end ) const {
 	beginPath();
 	translate( start );
 	translate( end );
@@ -271,23 +271,23 @@ void Painter::paintWidget( Widget* w ) {
 	Pen p( *this );
 	p.setColor( w->foregroundColor );
 	p.setWidth( 0 );
-	SizeF size = w->size;
+	Size size = w->size;
 	b.setColor( w->borderColor );
-	drawRoundedRect( RectF( 0, 0, size.width, size.height ) , w->borderRadiusTopLeft, w->borderRadiusTopRight, w->borderRadiusBottomRight, w->borderRadiusBottomLeft); // border
+	drawRoundedRect( Rect( 0, 0, size.width, size.height ) , w->borderRadiusTopLeft, w->borderRadiusTopRight, w->borderRadiusBottomRight, w->borderRadiusBottomLeft); // border
 	b.setColor( w->backgroundColor );
-	auto content_geometry = RectF( w->borderLeft, w->borderTop, size.width - w->borderRight * 2, size.height - w->borderBottom * 2 );
-	drawRect( RectF( content_geometry ) ); // contents
+	auto content_geometry = Rect( w->borderLeft, w->borderTop, size.width - w->borderRight * 2, size.height - w->borderBottom * 2 );
+	drawRect( Rect( content_geometry ) ); // contents
 	p.setWidth( 1 );
 }
 
-void Painter::translate( RectF& r ) const {
+void Painter::translate( Rect& r ) const {
 	if( !( current_widget->type == ElementType::Window ) ) {
 		r += origin;
 		r.y += top_margin;
 	}
 }
 
-void Painter::translate( PointF& p ) const {
+void Painter::translate( Point& p ) const {
 	if( !( current_widget->type == ElementType::Window ) ) {
 		p += origin;
 		p.y += top_margin;

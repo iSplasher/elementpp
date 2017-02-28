@@ -156,8 +156,8 @@ std::ostream& operator <<( std::ostream& out, const PointT< T >& p ) {
 	return out;
 }
 
-using Point = PointT< int >;
-using PointF = PointT< float >;
+using Point = PointT< float >;
+using PointI = PointT< int >;
 using PointD = PointT< double >;
 using PointU = PointT< unsigned >;
 
@@ -308,9 +308,10 @@ std::ostream& operator <<( std::ostream& out, const SizeT< T >& s ) {
 	return out;
 }
 
-using Size = SizeT< int >;
-using SizeF = SizeT< float >;
+using Size = SizeT< float >;
+using SizeI = SizeT< int >;
 using SizeD = SizeT< double >;
+using SizeU = SizeT< unsigned >;
 
 
 /// <summary>
@@ -688,8 +689,8 @@ std::ostream& operator <<( std::ostream& out, const RectT< T >& r ) {
 	return out;
 }
 
-using Rect = RectT< int >;
-using RectF = RectT< float >;
+using Rect = RectT< float >;
+using RectI = RectT< int >;
 using RectD = RectT< double >;
 using RectU = RectT< unsigned >;
 

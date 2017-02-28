@@ -7,8 +7,8 @@ USING_NAMESPACE
 USING_NAMESPACE_PRIV
 
 Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
-                                               geometry( [](PointF pos, SizeF size) -> RectF {
-	                                                         return RectF( pos, size );
+                                               geometry( [](Point pos, Size size) -> Rect {
+	                                                         return Rect( pos, size );
                                                          }, position, size ),
                                                marginLeft( 0 ),
                                                marginTop( 0 ),
@@ -34,7 +34,7 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 	}
 
 	// connect properties
-	position.changed( [&](PointF n) {
+	position.changed( [&](Point n) {
 		                 if( node ) {
 			                 YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
 			                 YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
@@ -42,15 +42,15 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 				                 dirty_layout = true;
 		                 }
 	                 } );
-	size.changed( [&](SizeF n) {
+	size.changed( [&](Size n) {
 		             if( type != ElementType::Layout ) {
 			             setSize( n );
 		             }
 	             } );
-	minSize.changed( [&](SizeF n) {
+	minSize.changed( [&](Size n) {
 		                setMinSize( n );
 	                } );
-	maxSize.changed( [&](SizeF n) {
+	maxSize.changed( [&](Size n) {
 		                setMaxSize( n );
 	                } );
 
@@ -174,10 +174,10 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
-		position = PointF( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
-		size = SizeF( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
-		minSize = SizeF( YGNodeStyleGetMinWidth( node ).value, YGNodeStyleGetMinHeight( node ).value );
-		maxSize = SizeF( YGNodeStyleGetMaxWidth( node ).value, YGNodeStyleGetMaxHeight( node ).value );
+		position = Point( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
+		size = Size( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
+		minSize = Size( YGNodeStyleGetMinWidth( node ).value, YGNodeStyleGetMinHeight( node ).value );
+		maxSize = Size( YGNodeStyleGetMaxWidth( node ).value, YGNodeStyleGetMaxHeight( node ).value );
 
 		marginLeft = YGNodeStyleGetMargin( node, YGEdgeLeft ).value;
 		marginTop = YGNodeStyleGetMargin( node, YGEdgeTop ).value;
@@ -253,7 +253,7 @@ void Layoutable::setShrink( float n ) {
 		dirty_layout = true;
 }
 
-void Layoutable::setMaxSize( SizeF n ) {
+void Layoutable::setMaxSize( Size n ) {
 	if( node ) {
 		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetMaxWidth( node, n.width );
@@ -269,7 +269,7 @@ void Layoutable::setMaxSize( SizeF n ) {
 		dirty_layout = true;
 }
 
-void Layoutable::setMinSize( SizeF n ) {
+void Layoutable::setMinSize( Size n ) {
 	if( node ) {
 		if( n.width && type != ElementType::Layout )
 			YGNodeStyleSetMinWidth( node, n.width );
@@ -288,7 +288,7 @@ void Layoutable::setMinSize( SizeF n ) {
 		dirty_layout = true;
 }
 
-void Layoutable::setSize( SizeF n ) {
+void Layoutable::setSize( Size n ) {
 	if( node ) {
 		auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
 				YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
@@ -325,7 +325,7 @@ void Layoutable::setSize( SizeF n ) {
 		dirty_layout = true;
 }
 
-void Layoutable::setPosition( PointF n ) {
+void Layoutable::setPosition( Point n ) {
 	if( node ) {
 
 		if( n.x && type != ElementType::Layout )
@@ -480,10 +480,10 @@ Layout* Layoutable::getLayout() const {
 }
 
 Layout::Layout() : Layoutable(),
-                   position( [](PointF p)-> PointF { return p; }, Layoutable::position ),
-                   size( [](SizeF s)-> SizeF { return s; }, Layoutable::size ),
-                   minSize( [](SizeF s)-> SizeF { return s; }, Layoutable::minSize ),
-                   maxSize( [](SizeF s)-> SizeF { return s; }, Layoutable::maxSize ),
+                   position( [](Point p)-> Point { return p; }, Layoutable::position ),
+                   size( [](Size s)-> Size { return s; }, Layoutable::size ),
+                   minSize( [](Size s)-> Size { return s; }, Layoutable::minSize ),
+                   maxSize( [](Size s)-> Size { return s; }, Layoutable::maxSize ),
                    orientation( Orientation::Default ),
                    wrap( false ),
                    widget( this, std::mem_fn( &Layout::getWidget ), std::mem_fn( &Layout::setWidget ) ) {
@@ -565,7 +565,7 @@ void Layout::take( Layoutable* item ) {
 
 void Layout::invalidate() {
 
-	RectF r;
+	Rect r;
 
 	if( _widget ) { // if this layout is managing a widget, use the widget's properties
 		r = _widget->geometry;

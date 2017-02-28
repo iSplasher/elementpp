@@ -40,7 +40,7 @@ static MouseButton getMouseButtons( GLFWwindow* r_window ) {
 	}
 
 	if( left == GLFW_PRESS && left == right == middle ) {
-		buttons = MouseButton::All;
+		buttons = MouseButton::Any;
 	}
 
 	return buttons;
@@ -73,7 +73,7 @@ static KeyModifier getKeyModifiers( GLFWwindow* r_window ) {
 	return modifiers;
 }
 
-Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
+Window::Window( Size win_size, Window* parent ) : Widget( parent ) {
 #ifndef OS_WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -114,11 +114,11 @@ Window::Window( SizeF win_size, Window* parent ) : Widget( parent ) {
 
 	objectName = "Window";
 	painter = std::make_unique< Painter >( this );
-	position.changed( [&](PointF p) {
+	position.changed( [&](Point p) {
 		                 glfwSetWindowPos( r_window, p.x, p.y );
 	                 } );
 	size = win_size;
-	size.changed( [&](SizeF s) { glfwSetWindowSize( r_window, s.width, s.height ); } ); // TODO: confirm size
+	size.changed( [&](Size s) { glfwSetWindowSize( r_window, s.width, s.height ); } ); // TODO: confirm size
 	backgroundColor = Color( 250, 250, 250, 200 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
 	marginLeft = marginTop = marginRight = marginBottom = 0;
@@ -135,7 +135,7 @@ Window::~Window() {
 void Window::update() {
 	int fb_width;
 	int fb_height;
-	SizeF s = size;
+	Size s = size;
 
 	glfwGetFramebufferSize( r_window, &fb_width, &fb_height );
 	glViewport( 0, 0, fb_width, fb_height );
@@ -160,24 +160,26 @@ void Window::setActive() const {
 }
 
 void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
-	PointF p = PointF( xpos, ypos );
+	Point p = Point( xpos, ypos );
 	auto buttons = getMouseButtons( r_window );
 
-	auto contains = [](Widget* a, PointF b) { a->geometry.get().contains(b) && !a->blockEvents; };
+	auto contains = [](Widget* a, Point b) { a->geometry.get().contains( b ) && !a->blockEvents; };
 
 	// wigdets that contains point receives
-	Widget* w_p = getWindow(r_window);
-	while(w_p) {
-		for( auto x : w->children() ) {
-			if( x->type == ElementType::Widget ) {
-				auto w = static_cast< Widget* >( x );
-				if( w->geometry.get().contains( p ) && !w->blockEvents ) {
-					w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
-				}
+	mouseMovedHelper( getWindow( r_window ), p, buttons );
+}
+
+void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
+	for( auto c : w->children() ) { // go through all children
+		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
+			auto c_w = static_cast< Widget* >( c );
+			if( c_w->geometry.get().contains( p ) && !c_w->blockEvents ) { // only if widget contains point
+				c_w->mouseMoved = MouseEvent{ c_w->mapFromWindow( p ), buttons, c_w };
+				mouseMovedHelper( c_w, p, buttons ); // now repeat this for its children
+				break; // since this widget contains this point, we don't need to go through its siblings
 			}
 		}
 	}
-
 }
 
 void Window::mousePressCb( _privRWindow* r_window, int button, int action, int mods ) {
@@ -215,19 +217,82 @@ void Window::mousePressCb( _privRWindow* r_window, int button, int action, int m
 		modifiers |= KeyModifier::Meta;
 	}
 
-	PointD m_pos;
-	glfwGetCursorPos( r_window, &m_pos.x, &m_pos.y );
+	PointD m_pos_d;
+	glfwGetCursorPos( r_window, &m_pos_d.x, &m_pos_d.y );
 
-	// window receives
-	auto window = getWindow( r_window );
+	auto wind = getWindow( r_window );
+	auto m_pos =  Point( m_pos_d );
 
-	// wigdets that contains point receives
-	for (auto x : window->children()) {
-		if (x->type == ElementType::Widget) {
-			auto w = static_cast< Widget* >(x);
-			if (w->geometry.get().contains(m_pos) && !w->blockEvents) {
+	auto now = std::chrono::steady_clock::now();
+	auto delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_pressed ).count();
+
+	auto click = false, d_click = false;
+
+	// if release, check if time since last press is within click interval
+	if (!btn_press) { // also, only if cursor is still within rect
+
+		if (delta < App->clickInterval && flags(m_button & wind->last_pressed_buttons))
+			click = true;
+
+		if (delta < App->doubleClickInterval && flags(m_button & wind->last_pressed_buttons))
+			d_click = true;
+	}
+
+	wind->last_pressed_buttons = m_button;
+	if( btn_press )
+		wind->button_press_rect = Rect(m_pos - 1.5f, 1.5f, 1.5f);
+		wind->last_pressed = now;
+
+	mousePressedHelper( wind, btn_press, m_button, modifiers, m_pos, click, d_click );
+
+}
+
+void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click ) {
+	for( auto c : w->children() ) { // go through all children
+		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
+			auto c_w = static_cast< Widget* >( c );
+			if( c_w->geometry.get().contains( p ) && !c_w->blockEvents ) { // only if widget contains point
+				auto m_event = MouseEvent( c_w->mapFromWindow( p ), buttons, c_w );
+				if( btn_press ) {
+					if( flags( buttons & MouseButton::Any ) )
+						c_w->pressed = m_event;
+					if( flags( buttons & MouseButton::Left ) )
+						c_w->leftPress = p;
+					if( flags( buttons & MouseButton::Right ) )
+						c_w->rightPress = p;
+
+				}
+				else {
+					if( flags( buttons & MouseButton::Any ) )
+						c_w->released = m_event;
+					if( flags( buttons & MouseButton::Left ) )
+						c_w->leftReleased = p;
+					if( flags( buttons & MouseButton::Right ) )
+						c_w->rightReleased = p;
+
+				}
+
+				if (click) {
+					if (flags(buttons & MouseButton::Any))
+						c_w->clicked = m_event;
+					if (flags(buttons & MouseButton::Left))
+						c_w->leftClick = p;
+					if (flags(buttons & MouseButton::Right))
+						c_w->rightClick = p;
+				}
+
+				if (d_click) {
+					if (flags(buttons & MouseButton::Any))
+						c_w->doubleClicked = m_event;
+					if (flags(buttons & MouseButton::Left))
+						c_w->leftDoubleClick = p;
+					if (flags(buttons & MouseButton::Right))
+						c_w->rightDoubleClick = p;
+				}
+
+				mousePressedHelper( c_w, btn_press, buttons, modifiers, p, click, d_click ); // now repeat this for its children
+				break; // since this widget contains this point, we don't need to go through its siblings
 			}
 		}
 	}
-
 }

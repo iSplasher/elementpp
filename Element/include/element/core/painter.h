@@ -170,8 +170,8 @@ public:
 	 * \param rect rectangle
 	 * \return painter
 	 */
-	const Painter& clip(RectF rect) const;
-	const Painter& clip(Rect rect) const { return clip(RectF(rect)); };
+	const Painter& clip(Rect rect) const;
+	const Painter& clip(RectI rect) const { return clip(Rect(rect)); };
 
 
 	/**
@@ -184,20 +184,20 @@ public:
 	/// Draw a rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
-	const Painter& drawRect(RectF rect) const;
-	const Painter& drawRect(Rect rect) const { return drawRect(RectF(rect)); }
+	const Painter& drawRect(Rect rect) const;
+	const Painter& drawRect(RectI rect) const { return drawRect(Rect(rect)); }
 
 	/// <summary>
 	/// Draw a rounded rectangle shape
 	/// </summary>
 	/// <param name="rect">Shape dimensions</param>
 	/// <param name="radius">Radius of the rect corners</param>
-	const Painter& drawRoundedRect(RectF rect, float radius) const;
-	const Painter& drawRoundedRect(Rect rect, int radius) const { return drawRoundedRect(RectF(rect), radius); }
+	const Painter& drawRoundedRect(Rect rect, float radius) const;
+	const Painter& drawRoundedRect(RectI rect, int radius) const { return drawRoundedRect(Rect(rect), radius); }
 
-	const Painter& drawRoundedRect(RectF rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left) const;
-	const Painter& drawRoundedRect(Rect rect, int rad_top_left, int rad_top_right, int rad_bottom_right, int rad_bottom_left) const {
-		return drawRoundedRect(RectF(rect), rad_top_left, rad_top_right, rad_bottom_right, rad_bottom_left);
+	const Painter& drawRoundedRect(Rect rect, float rad_top_left, float rad_top_right, float rad_bottom_right, float rad_bottom_left) const;
+	const Painter& drawRoundedRect(RectI rect, int rad_top_left, int rad_top_right, int rad_bottom_right, int rad_bottom_left) const {
+		return drawRoundedRect(Rect(rect), rad_top_left, rad_top_right, rad_bottom_right, rad_bottom_left);
 	}
 
 	/// <summary>
@@ -205,28 +205,28 @@ public:
 	/// </summary>
 	/// <param name="center">Center of ellipse</param>
 	/// <param name="size">Width and height of ellipse</param>
-	const Painter& drawEllipse(PointF center, SizeF size) const;
+	const Painter& drawEllipse(Point center, Size size) const;
 
 	/// <summary>
 	/// Draw a circle shape
 	/// </summary>
 	/// <param name="center">Center of circle</param>
 	/// <param name="radius">Circle radius</param>
-	const Painter& drawCircle(PointF center, float radius) const;
+	const Painter& drawCircle(Point center, float radius) const;
 
 	/// <summary>
 	/// Draw a line
 	/// </summary>
 	/// <param name="start">Start point of line</param>
 	/// <param name="end">End point of line</param>
-	const Painter& drawLine(PointF start, PointF end) const;
+	const Painter& drawLine(Point start, Point end) const;
 
 private:
 
 	// helper methods
 	void paintWidget(Widget* w);
-	void translate(RectF &r) const;
-	void translate(PointF &p) const;
+	void translate(Rect &r) const;
+	void translate(Point &p) const;
 	void beginPath() const;
 	void applyPB() const;
 
@@ -234,8 +234,8 @@ private:
 
 	Widget *w = nullptr;
 	// Coordinates will be translated to this widget's parent
-	PointF origin;
-	PointF o_origin;
+	Point origin;
+	Point o_origin;
 	Widget *current_widget = nullptr;
 	PainterContext* context = nullptr;
 	Pen *p = nullptr;

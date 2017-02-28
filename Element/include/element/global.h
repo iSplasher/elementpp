@@ -104,7 +104,7 @@ DEFINE_ENUM_FLAGS(MouseButton)
 
 
 enum class MouseButton {
-	All = 0xF, // 28bits = 0xFFFFFFFF,
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
 	None = 0x0,
 	Left = 1,
 	Right = 1 << 2,
@@ -116,6 +116,7 @@ DEFINE_ENUM_FLAGS(KeyModifier)
 
 
 enum class KeyModifier {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
 	None = 0x0,
 	Shift = 1,
 	Control = 1 << 2,

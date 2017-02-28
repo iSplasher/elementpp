@@ -11,7 +11,7 @@ NAMESPACE_BEGIN
 class Element;
 using ElementPtr = std::unique_ptr< Element >;
 class Window;
-class Wigdet;
+class Widget;
 class Application;
 
 
@@ -147,6 +147,14 @@ public:
 	// PROPERTIES
 
 	const Accessor< std::size_t, Application > elementCount;
+	/**
+	 * \brief Get/Set doubleclick interval in milliseconds. Default value is 500.
+	 */
+	const Accessor< float, Application > doubleClickInterval;
+	/**
+	 * \brief Get/Set click interval in milliseconds. Default value is 350.
+	 */
+	const Accessor< float, Application > clickInterval;
 
 	// FUNCTIONS
 
@@ -222,11 +230,18 @@ private:
 	bool processEv() const;
 
 	std::size_t getElementCount() const;
+	float getDoubleClickInterval() const;
+	void setDoubleClickInterval( float i );
+	float getClickInterval() const;
+	void setClickInterval( float i );
 
 	// data members
 	static Application* self;
 	bool should_quit = false;
 	bool is_running = false;
+
+	float double_click_interval = 500.0f;
+	float click_interval = 350.0f;
 
 	ElementContainerPtr component_objects;
 	ElementTreePtr component_tree;

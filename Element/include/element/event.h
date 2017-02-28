@@ -9,12 +9,12 @@ class Widget;
 
 struct MouseEvent {
 
-	MouseEvent( PointF position = PointF(), MouseButton button = MouseButton::None, Widget* widget = nullptr )
+	MouseEvent( Point position = Point(), MouseButton button = MouseButton::None, Widget* widget = nullptr )
 		: position( position ),
 		  button( button ),
 		  widget( widget ) {}
 
-	PointF position;
+	Point position;
 	MouseButton button;
 	Widget* widget = nullptr;
 

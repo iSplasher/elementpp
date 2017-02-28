@@ -6,20 +6,20 @@
 USING_NAMESPACE
 
 Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
-                                                 contentGeometry( [&](RectF n) -> RectF {
-	                                                                  return RectF( n.x + paddingLeft + borderLeft,
+                                                 contentGeometry( [&](Rect n) -> Rect {
+	                                                                  return Rect( n.x + paddingLeft + borderLeft,
 	                                                                                n.y + paddingTop + borderLeft,
 	                                                                                n.width - ( paddingRight + borderRight ) * 2,
 	                                                                                n.height - ( paddingBottom + borderBottom ) * 2 );
                                                                   }, geometry ),
-                                                 contentSize( [&](SizeF n) -> SizeF {
-	                                                              return SizeF( n.width - ( paddingRight + borderRight ) * 2,
+                                                 contentSize( [&](Size n) -> Size {
+	                                                              return Size( n.width - ( paddingRight + borderRight ) * 2,
 	                                                                            n.height - ( paddingBottom + borderBottom ) * 2 );
                                                               }, size ),
                                                  borderRadiusTopLeft( 0 ),
                                                  borderRadiusTopRight( 0 ),
-                                                 borderRadiusBottomRight( 0 ),
-                                                 borderRadiusBottomLeft( 0 ) {
+                                                 borderRadiusBottomLeft( 0 ),
+                                                 borderRadiusBottomRight( 0 ) {
 	objectName = "Widget";
 	setType( ElementType::Widget );
 
@@ -38,34 +38,34 @@ Widget::~Widget() {
 void Widget::paint( Painter& painter ) {
 	auto b = Brush( painter );
 	b.setColor( Color( 255, 255, 255 ) );
-	painter.drawRect( RectF( 0, 0, contentSize ) );
+	painter.drawRect( Rect( 0, 0, contentSize ) );
 }
 
 void Widget::update() {
 	if( parent_window ) {
 		auto& painter = *parent_window->painter;
 		painter.save();
-		painter.origin = PointF( mapToWindow( PointF( 0, 0 ) ) );
+		painter.origin = Point( mapToWindow( Point( 0, 0 ) ) );
 		painter.current_widget = this;
 		if( paintWidget )
 			painter.paintWidget( this );
-		painter.origin = PointF( contentGeometry.get().pos() );
-		painter.clip( RectF( 0, 0, contentSize ) );
+		painter.origin = Point( contentGeometry.get().pos() );
+		painter.clip( Rect( 0, 0, contentSize ) );
 		paint( painter );
 		painter.restore();
 	}
 	Layoutable::update();
 }
 
-PointF Widget::mapToParent( PointF _p ) const {
+Point Widget::mapToParent( Point _p ) const {
 	return _p + position;
 }
 
-PointF Widget::mapFromParent( PointF _p ) const {
+Point Widget::mapFromParent( Point _p ) const {
 	return _p - position;
 }
 
-PointF Widget::mapFromScreen( PointF p ) {
+Point Widget::mapFromScreen( Point p ) {
 	auto w = this;
 
 	while( w ) {
@@ -75,7 +75,7 @@ PointF Widget::mapFromScreen( PointF p ) {
 	return p;
 }
 
-PointF Widget::mapToScreen( PointF p ) {
+Point Widget::mapToScreen( Point p ) {
 	auto w = this;
 
 	while( w ) {
@@ -94,7 +94,7 @@ void Widget::setParent( Element* e ) {
 		parent_window = parent_widget->parent_window;
 }
 
-PointF Widget::mapFromWindow( PointF p ) {
+Point Widget::mapFromWindow( Point p ) {
 	if( type == ElementType::Window ) {
 		return p;
 	}
@@ -107,7 +107,7 @@ PointF Widget::mapFromWindow( PointF p ) {
 	return p;
 }
 
-PointF Widget::mapToWindow( PointF p ) {
+Point Widget::mapToWindow( Point p ) {
 	if( type == ElementType::Window ) {
 		return p;
 	}
