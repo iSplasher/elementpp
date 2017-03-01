@@ -60,12 +60,12 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 1: " << m.position << std::endl; } );
 	//widget1->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 1: " << m.position << std::endl; } );
 	//widget1->released.changed( [](MouseEvent m) { std::cout << "Released: Widget 1: " << m.position << std::endl; } );
-	widget1->leftClick.changed( [](Point p) { std::cout << "Left Click: Widget 1: " << p << std::endl; } );
-	widget1->rightClick.changed( [](Point p) { std::cout << "Right Click: Widget 1: " << p << std::endl; } );
-	widget1->clicked.changed( [](MouseEvent m) { std::cout << "Clicked: Widget 1: " << m.position << std::endl; } );
-	widget1->leftDoubleClick.changed([](Point p) { std::cout << "Double Left Click: Widget 1: " << p << std::endl; });
-	widget1->rightDoubleClick.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
-	widget1->doubleClicked.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
+	//widget1->leftClick.changed( [](Point p) { std::cout << "Left Click: Widget 1: " << p << std::endl; } );
+	//widget1->rightClick.changed( [](Point p) { std::cout << "Right Click: Widget 1: " << p << std::endl; } );
+	//widget1->clicked.changed( [](MouseEvent m) { std::cout << "Clicked: Widget 1: " << m.position << std::endl; } );
+	widget1->leftDoublePress.changed([](Point p) { std::cout << "Double Left Click: Widget 1: " << p << std::endl; });
+	widget1->rightDoublePress.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
+	widget1->doublePressed.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
 	auto widget2 = app->create< Widget >(widget1);
 	widget2->size = Size( 0, 0 );
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );

@@ -221,33 +221,44 @@ void Window::mousePressCb( _privRWindow* r_window, int button, int action, int m
 	glfwGetCursorPos( r_window, &m_pos_d.x, &m_pos_d.y );
 
 	auto wind = getWindow( r_window );
-	auto m_pos =  Point( m_pos_d );
+	auto m_pos = Point( m_pos_d );
 
 	auto now = std::chrono::steady_clock::now();
-	auto delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_pressed ).count();
+	auto click_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_pressed ).count();
+	auto release_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_released ).count();
 
-	auto click = false, d_click = false;
+	auto click = false, d_click = false, d_press = false;
+	if( wind->button_press_rect.contains( m_pos ) ) { // only if cursor is still within rect
 
-	// if release, check if time since last press is within click interval
-	if (!btn_press) { // also, only if cursor is still within rect
+		// if release, check if time since last press is within click interval
+		if( !btn_press ) {
 
-		if (delta < App->clickInterval && flags(m_button & wind->last_pressed_buttons))
-			click = true;
+			if( click_delta > 20 && click_delta < App->clickInterval && flags( m_button & wind->last_pressed_buttons ) )
+				click = true;
 
-		if (delta < App->doubleClickInterval && flags(m_button & wind->last_pressed_buttons))
-			d_click = true;
+			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
+				d_click = true;
+		}
+		else {
+			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
+				d_press = true;
+		}
 	}
 
 	wind->last_pressed_buttons = m_button;
-	if( btn_press )
-		wind->button_press_rect = Rect(m_pos - 1.5f, 1.5f, 1.5f);
+	if( btn_press ) {
+		wind->button_press_rect = Rect( m_pos - 1.5f, 3.0f, 3.0f );
 		wind->last_pressed = now;
+	}
+	else {
+		wind->last_released = now;
+	}
 
-	mousePressedHelper( wind, btn_press, m_button, modifiers, m_pos, click, d_click );
+	mousePressedHelper( wind, btn_press, m_button, modifiers, m_pos, click, d_click, d_press );
 
 }
 
-void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click ) {
+void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click, bool d_press ) {
 	for( auto c : w->children() ) { // go through all children
 		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
 			auto c_w = static_cast< Widget* >( c );
@@ -272,25 +283,35 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 
 				}
 
-				if (click) {
-					if (flags(buttons & MouseButton::Any))
+				if( click ) {
+					if( flags( buttons & MouseButton::Any ) )
 						c_w->clicked = m_event;
-					if (flags(buttons & MouseButton::Left))
+					if( flags( buttons & MouseButton::Left ) )
 						c_w->leftClick = p;
-					if (flags(buttons & MouseButton::Right))
+					if( flags( buttons & MouseButton::Right ) )
 						c_w->rightClick = p;
 				}
 
-				if (d_click) {
-					if (flags(buttons & MouseButton::Any))
+				if( d_click ) {
+					if( flags( buttons & MouseButton::Any ) )
 						c_w->doubleClicked = m_event;
-					if (flags(buttons & MouseButton::Left))
+					if( flags( buttons & MouseButton::Left ) )
 						c_w->leftDoubleClick = p;
-					if (flags(buttons & MouseButton::Right))
+					if( flags( buttons & MouseButton::Right ) )
 						c_w->rightDoubleClick = p;
+
 				}
 
-				mousePressedHelper( c_w, btn_press, buttons, modifiers, p, click, d_click ); // now repeat this for its children
+				if( d_press ) {
+					if( flags( buttons & MouseButton::Any ) )
+						c_w->doublePressed = m_event;
+					if( flags( buttons & MouseButton::Left ) )
+						c_w->leftDoublePress = p;
+					if( flags( buttons & MouseButton::Right ) )
+						c_w->rightDoublePress = p;
+				}
+
+				mousePressedHelper( c_w, btn_press, buttons, modifiers, p, click, d_click, d_press ); // now repeat this for its children
 				break; // since this widget contains this point, we don't need to go through its siblings
 			}
 		}

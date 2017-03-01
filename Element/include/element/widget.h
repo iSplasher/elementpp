@@ -72,6 +72,19 @@ public:
 	PropertyEvent<MouseEvent, Window> pressed;
 
 	/**
+	* \brief Left mouse button is doublepressed
+	*/
+	PropertyEvent<Point, Window> leftDoublePress;
+	/**
+	* \brief Right mouse button is doublepressed
+	*/
+	PropertyEvent<Point, Window> rightDoublePress;
+	/**
+	* \brief Any mouse button is doublepressed
+	*/
+	PropertyEvent<MouseEvent, Window> doublePressed;
+
+	/**
 	 * \brief Left mouse button is released
 	 */
 	PropertyEvent<Point, Window> leftReleased;

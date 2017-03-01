@@ -30,11 +30,12 @@ private:
 	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);
 	static void mouseMovedHelper(Widget* w, Point p, MouseButton buttons);
 	static void mousePressCb(_privRWindow* r_window, int button, int action, int mods);
-	static void mousePressedHelper(Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click);
+	static void mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click, bool d_press );
 
 	//abitrary data members
 	MouseButton last_pressed_buttons = MouseButton::None; // buttons that were last pressed
 	std::chrono::time_point<std::chrono::steady_clock> last_pressed; // time point a button was last pressed
+	std::chrono::time_point<std::chrono::steady_clock> last_released; // time point a button was last released
 	Rect button_press_rect; // a rect surrounding the point a button pressed
 	int d_clicks_count = 0; // counts clicks until 2 is reached for doubleclick
 
