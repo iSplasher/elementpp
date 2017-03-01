@@ -11,8 +11,8 @@ NAMESPACE_BEGIN
 
 class ELEMENT_API Window : public Widget {
 public:
-	explicit Window(Window* parent = nullptr) : Window(Size(500, 300), parent) {}
-	explicit Window(Size size, Window* parent = nullptr);
+	explicit Window(Window* parent = nullptr) : Window(Rect(700, 450, 500, 300), parent) {}
+	explicit Window(Rect rect, Window* parent = nullptr);
 	virtual ~Window();
 
 protected:
@@ -35,7 +35,7 @@ private:
 	//abitrary data members
 	MouseButton last_pressed_buttons = MouseButton::None; // buttons that were last pressed
 	std::chrono::time_point<std::chrono::steady_clock> last_pressed; // time point a button was last pressed
-	std::chrono::time_point<std::chrono::steady_clock> last_released; // time point a button was last released
+	std::chrono::time_point<std::chrono::steady_clock> last_released; // time point a button was last release
 	Rect button_press_rect; // a rect surrounding the point a button pressed
 	int d_clicks_count = 0; // counts clicks until 2 is reached for doubleclick
 

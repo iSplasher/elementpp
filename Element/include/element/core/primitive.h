@@ -3,6 +3,8 @@
 #include "element/global.h"
 #include "element/property.h"
 
+#include <cmath>
+
 typedef struct NVGcolor _PColor;
 
 NAMESPACE_BEGIN
@@ -22,6 +24,17 @@ struct ELEMENT_API PointT {
 
 	template< typename O >
 	explicit PointT( const PointT< O >& point ) : PointT< T >( point.x, point.y ) {}
+
+	/**
+	 * \brief Calculate the distance between this point and another point
+	 * \tparam O 
+	 * \param point 
+	 * \return distance between this point and other point 
+	 */
+	template< typename O >
+	T distanceTo(const PointT< O >& point) {
+		return std::sqrt(std::pow((point.x - x), 2) + pow((point.y - y), 2));
+	}
 
 	// operators for PointT
 
@@ -741,7 +754,7 @@ public:
 	float hue = 0;
 	float sat = 0;
 	float light = 0;
-	float alpha = 0;
+	float alpha = 255.0f;
 
 private:
 	enum Type {

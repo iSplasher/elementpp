@@ -44,7 +44,7 @@ enum class ConnectionType {
 	Permanent,
 
 	/**
-	* \brief Create a permanent connection that will be released when the connection object goes out of scope
+	* \brief Create a permanent connection that will be release when the connection object goes out of scope
 	*/
 	Scoped
 };

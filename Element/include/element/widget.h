@@ -55,6 +55,7 @@ public:
 	Property< float > borderRadiusBottomRight;
 
 	bool paintWidget = true;
+	bool isDraggable = false;
 
 	// Events
 
@@ -82,20 +83,20 @@ public:
 	/**
 	* \brief Any mouse button is doublepressed
 	*/
-	PropertyEvent<MouseEvent, Window> doublePressed;
+	PropertyEvent<MouseEvent, Window> doublePress;
 
 	/**
 	 * \brief Left mouse button is released
 	 */
-	PropertyEvent<Point, Window> leftReleased;
+	PropertyEvent<Point, Window> leftRelease;
 	/**
 	 * \brief Right mouse button is released
 	 */
-	PropertyEvent<Point, Window> rightReleased;
+	PropertyEvent<Point, Window> rightRelease;
 	/**
 	 * \brief Any mouse button is released
 	 */
-	PropertyEvent<MouseEvent, Window> released;
+	PropertyEvent<MouseEvent, Window> release;
 
 	/**
 	* \brief Left mouse button is clicked
@@ -108,7 +109,7 @@ public:
 	/**
 	* \brief Any mouse button is clicked
 	*/
-	PropertyEvent<MouseEvent, Window> clicked; // TODO: maybe rename to 'click' for consistency?
+	PropertyEvent<MouseEvent, Window> click;
 
 	/**
 	* \brief Left mouse button is doubleclicked
@@ -121,7 +122,7 @@ public:
 	/**
 	* \brief Any mouse button is doubleclicked
 	*/
-	PropertyEvent<MouseEvent, Window> doubleClicked; // TODO: maybe rename to 'click' for consistency?
+	PropertyEvent<MouseEvent, Window> doubleClick;
 
 	/**
 	 * \brief Mouse moved
@@ -223,28 +224,20 @@ public:
 	Rect mapToScreen( Rect p ) { return Rect( mapToScreen( p.pos() ), p.size() ); }
 
 
-protected:
-
-	struct Drag {
-		bool is_draggable = true;
-		Point start_mouse_pos;
-		Point start_pos;
-	};
-
+private:
 
 	// data members
 	Window* parent_window = nullptr;
 	Widget* parent_widget;
-	MoveState move_state = Normal;
 	PainterContext* this_paint = nullptr;
-	Drag drag;
-
-private:
+	Point last_leftpress_pos; // save for wigdet movement
 
 	void setParent( Element* ) override;
+	static void handleMove(MouseEvent m_ev); // handle movement
 
 	friend class Painter;
 	friend class Layout;
+	friend class Window;
 };
 
 

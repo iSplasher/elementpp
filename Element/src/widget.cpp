@@ -23,6 +23,9 @@ Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
 	objectName = "Widget";
 	setType( ElementType::Widget );
 
+	mouseMoved.changed(handleMove);
+	leftPress.changed([&](Point p) { this->last_leftpress_pos = p; });
+
 	marginLeft = marginTop = marginRight = marginBottom = 5;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 5;
 	borderLeft = borderTop = borderRight = borderBottom = 5;
@@ -36,9 +39,6 @@ Widget::~Widget() {
 }
 
 void Widget::paint( Painter& painter ) {
-	auto b = Brush( painter );
-	b.setColor( Color( 255, 255, 255 ) );
-	painter.drawRect( Rect( 0, 0, contentSize ) );
 }
 
 void Widget::update() {
@@ -94,6 +94,22 @@ void Widget::setParent( Element* e ) {
 		parent_window = parent_widget->parent_window;
 }
 
+void Widget::handleMove( MouseEvent m_ev ) {
+	auto w = m_ev.widget;
+	if (w->isDraggable) {
+		// check if left button is pressed
+		if (flags(m_ev.button & MouseButton::Left)) {
+			auto last_pos = w->mapToScreen(w->last_leftpress_pos);
+			auto curr_pos = w->mapToScreen(m_ev.position);
+			// calculate distance between current mouse pos with last pressed pos
+			auto delta = Point(curr_pos.x - last_pos.x, curr_pos.y - last_pos.y);
+			std::cout << "Delta: " << delta << std::endl;
+			// add to current widget poisiton
+			w->position = w->position.get() + delta;
+		}
+	}
+}
+
 Point Widget::mapFromWindow( Point p ) {
 	if( type == ElementType::Window ) {
 		return p;
@@ -102,7 +118,7 @@ Point Widget::mapFromWindow( Point p ) {
 
 	while( w ) {
 		p -= w->position;
-		w = w->parent_widget && w->type == ElementType::Window ? nullptr : w->parent_widget;
+		w = w->parent_widget && w->parent_widget->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
@@ -115,7 +131,7 @@ Point Widget::mapToWindow( Point p ) {
 
 	while( w ) {
 		p += w->position;
-		w = w->parent_widget && w->type == ElementType::Window ? nullptr : w->parent_widget;
+		w = w->parent_widget && w->parent_widget->type == ElementType::Window ? nullptr : w->parent_widget;
 	}
 	return p;
 }
