@@ -26,6 +26,7 @@ private:
 	 * \brief Painting can only be done on active window
 	 */
 	void setActive() const;
+	void updateGeometry();
 
 	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);
 	static void mouseMovedHelper(Widget* w, Point p, MouseButton buttons);
@@ -40,12 +41,12 @@ private:
 	int d_clicks_count = 0; // counts clicks until 2 is reached for doubleclick
 
 	bool is_dragging = false;
-
 	bool _inited = false;
+	Point curr_pos;
+	Size curr_size;
 
 	UniquePainter painter;
-	// render window
-	_privRWindow *r_window;
+	_privRWindow *r_window; // render window
 
 	friend class Painter;
 	friend class Widget;

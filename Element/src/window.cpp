@@ -116,12 +116,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	isDraggable = true;
 	painter = std::make_unique< Painter >( this );
 	position = win_rect.pos();
-	position.changed( [&](Point p)
-	{
-		glfwSetWindowPos( r_window, p.x, p.y ); // TODO:: MOVE TO MAIN THREAD;
-	} );
 	size = win_rect.size();
-	size.changed( [&](Size s) { glfwSetWindowSize( r_window, s.width, s.height ); } );
 	backgroundColor = Color( 250, 250, 250, 200 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
 	marginLeft = marginTop = marginRight = marginBottom = 0;
@@ -136,6 +131,13 @@ Window::~Window() {
 }
 
 void Window::update() {
+	if(App && !(App->threadInitedIn == std::this_thread::get_id())) {
+		std::cerr << "Window thread and Application thread differ, cannot update." << std::endl; // TODO: maybe log too?
+		return;
+	}
+
+	updateGeometry();
+
 	int fb_width;
 	int fb_height;
 	Size s = size;
@@ -160,6 +162,19 @@ void Window::update() {
 
 void Window::setActive() const {
 	glfwMakeContextCurrent( r_window );
+}
+
+void Window::updateGeometry() {
+	if (curr_pos != position) {
+		curr_pos = position;
+		glfwSetWindowPos(r_window, curr_pos.x, curr_pos.y);
+	}
+
+	if (curr_size != size) {
+		curr_size = size;
+		glfwSetWindowSize(r_window, curr_size.width, curr_size.height);
+	}
+		
 }
 
 void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {

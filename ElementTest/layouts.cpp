@@ -54,6 +54,7 @@ SCENARIO("Layouts", "[Layout]") {
 	auto window = app->create< Window >();
 	//window->mouseMoved.changed( [&](MouseEvent m) { std::cout << "Window: " << window->position.get() << std::endl; } );
 	//window->mouseMoved.changed( [](MouseEvent m) { std::cout << "Window: " << m.position << std::endl; } );
+	//window->leftPress.changed( [](MouseEvent m) { std::cout << "Left Pressed: Window: " << m.position << std::endl; } );
 	auto layout = app->create< Layout >();
 	layout->widget = window;
 	auto widget1 = app->create< Widget >(window);

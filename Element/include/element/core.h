@@ -6,6 +6,7 @@
 #include "core/tree.h"
 
 #include <atomic>
+#include <thread>
 
 NAMESPACE_BEGIN
 class Element;
@@ -198,6 +199,7 @@ public:
 	// PROPERTIES
 
 	Property< bool, Application > isRunning; // read only
+	const std::thread::id threadInitedIn = std::this_thread::get_id();
 
 
 	void print_tree() const {
