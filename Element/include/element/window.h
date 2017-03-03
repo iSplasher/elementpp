@@ -15,9 +15,6 @@ public:
 	explicit Window(Rect rect, Window* parent = nullptr);
 	virtual ~Window();
 
-protected:
-	// methods
-
 	void update() override;
 
 private:
@@ -42,8 +39,8 @@ private:
 
 	bool is_dragging = false;
 	bool _inited = false;
-	Point curr_pos;
-	Size curr_size;
+	Point current_pos;
+	Size current_size;
 
 	UniquePainter painter;
 	_privRWindow *r_window; // render window

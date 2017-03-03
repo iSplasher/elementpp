@@ -26,8 +26,7 @@ Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
 	mouseMoved.changed(handleMove);
 	leftPress.changed([&](Point p)
 	{
-		this->last_mouse_pos = this->mapToScreen( p );
-		this->last_widget_pos = this->position;
+		this->last_mouse_pos = p;
 	});
 
 	marginLeft = marginTop = marginRight = marginBottom = 5;
@@ -103,13 +102,9 @@ void Widget::handleMove( MouseEvent m_ev ) {
 	if (w->isDraggable) {
 		// check if left button is pressed
 		if (flags(m_ev.button & MouseButton::Left)) {
-			auto last_pos = w->last_widget_pos;
-			auto curr_pos = w->mapToScreen(m_ev.position);
-			// calculate distance between current mouse pos with last pressed pos
-			auto delta = curr_pos - w->last_mouse_pos;
-			std::cout << "Widget Pos: " << last_pos << "Mouse Post: " << w->last_mouse_pos << " Current Pos: " << curr_pos << " Delta: " << delta << std::endl;
-			// add to current widget poisiton
-			w->position = last_pos + delta;
+
+			auto curr_m = w->mapToScreen(m_ev.position);
+			w->position = curr_m - w->last_mouse_pos;
 		}
 	}
 }

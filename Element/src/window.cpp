@@ -2,11 +2,10 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-//#ifdef OS_WINDOWS
-//#define GLFW_EXPOSE_NATIVE_WIN32
-//#define GLFW_EXPOSE_NATIVE_WGL
-//#include <GLFW/glfw3native.h>
-//#endif
+#ifdef OS_WINDOWS
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#endif
 
 #include "element/core/painter.h"
 
@@ -115,7 +114,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	objectName = "Window";
 	isDraggable = true;
 	painter = std::make_unique< Painter >( this );
-	position = win_rect.pos();
+	current_pos = position = win_rect.pos();
 	size = win_rect.size();
 	backgroundColor = Color( 250, 250, 250, 200 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
@@ -165,31 +164,42 @@ void Window::setActive() const {
 }
 
 void Window::updateGeometry() {
-	if (curr_pos != position) {
-		curr_pos = position;
-		glfwSetWindowPos(r_window, curr_pos.x, curr_pos.y);
+	if (current_pos != position) {
+		current_pos = position;
+		glfwSetWindowPos(r_window, std::floor(current_pos.x), std::floor(current_pos.y));
 	}
 
-	if (curr_size != size) {
-		curr_size = size;
-		glfwSetWindowSize(r_window, curr_size.width, curr_size.height);
+	if (current_size != size) {
+		current_size = size;
+		glfwSetWindowSize(r_window, std::floor(current_size.width), std::floor(current_size.height));
 	}
 		
 }
 
 void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 	Point p = Point( xpos, ypos );
+	 // It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
+#ifdef OS_WINDOWS
+	auto hwnd = glfwGetWin32Window(r_window);
+	POINT pos;
+	pos.x = p.x;
+	pos.y = p.y;
+	ClientToScreen(hwnd, &pos);
+	p.x = pos.x;
+	p.y = pos.y;
+#else
+	static_assert(false, "Coordinates in screen space has not yet been implemented on this platform")
+#endif
 	auto buttons = getMouseButtons( r_window );
-
-	auto contains = [](Widget* a, Point b) { a->geometry.get().contains( b ) && !a->blockEvents; };
-
-	// wigdets that contains point receives
-	mouseMovedHelper( getWindow( r_window ), p, buttons );
+	auto win = getWindow(r_window);
+	p = win->mapFromScreen(p);
+	mouseMovedHelper( win, p, buttons );
 }
 
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 	if( w->blockEvents )
 		return;
+
 
 	w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
 

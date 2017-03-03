@@ -230,7 +230,6 @@ private:
 	Window* parent_window = nullptr;
 	Widget* parent_widget;
 	PainterContext* this_paint = nullptr;
-	Point last_widget_pos;
 	Point last_mouse_pos;
 
 	void setParent( Element* ) override;
