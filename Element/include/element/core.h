@@ -3,7 +3,7 @@
 #include "global.h"
 #include "event.h"
 #include "property.h"
-#include "core/tree.h"
+#include "core/_tree.h"
 
 #include <atomic>
 #include <thread>
@@ -125,10 +125,6 @@ private:
 	friend class Widget;
 	friend class Window;
 };
-
-
-// A pointer to the application instance
-#define App Application::instance()
 
 
 /**

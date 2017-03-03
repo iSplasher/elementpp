@@ -25,6 +25,8 @@ private:
 	void setActive() const;
 	void updateGeometry();
 
+	static void windowResizedCb(_privRWindow* r_window, int width, int height);
+	static void windowMovedCb(_privRWindow* r_window, int xpos, int ypos);
 	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);
 	static void mouseMovedHelper(Widget* w, Point p, MouseButton buttons);
 	static void mousePressCb(_privRWindow* r_window, int button, int action, int mods);

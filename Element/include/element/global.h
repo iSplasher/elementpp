@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cassert>
+#include <cmath>
 
 // macros
 
@@ -52,6 +53,7 @@ NAMESPACE_BEGIN
 
 #define DEFINE_ENUM_FLAGS(T) \
 enum class T;	\
+inline T	operator	+	(T x, int y)	{	return static_cast<T>	(static_cast<int>(x) + static_cast<int>(y));	}; \
 inline T	operator	&	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) & static_cast<int>(y));	}; \
 inline T	operator	|	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) | static_cast<int>(y));	}; \
 inline T	operator	^	(T x, T y)		{	return static_cast<T>	(static_cast<int>(x) ^ static_cast<int>(y));	}; \
@@ -65,6 +67,8 @@ DEFINE_ENUM_FLAGS(Direction)
 
 
 enum class Direction {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
 	Left = 1,
 	Top = 1 << 1,
 	Right = 1 << 2,
@@ -78,6 +82,8 @@ DEFINE_ENUM_FLAGS(Orientation)
 
 
 enum class Orientation {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
 	Vertical = 1,
 	Horizontal = 1 << 1,
 	Reverse = 1 << 2,
@@ -89,6 +95,8 @@ DEFINE_ENUM_FLAGS(Alignment)
 
 
 enum class Alignment {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
 	Start = 1,
 	End = 1 << 1,
 	Left = 1 << 2,
@@ -124,5 +132,24 @@ enum class KeyModifier {
 	Meta = 1 << 4
 };
 
+DEFINE_ENUM_FLAGS(Cursor)
 
+
+enum class Cursor {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Arrow = 1,
+	IBeam = 1 << 2,
+	Cross = 1 << 3,
+	Hand = 1 << 4,
+	HResize = 1 << 5,
+	VResize = 1 << 6
+};
+
+
+
+class Application;
+
+// A pointer to the application instance
+#define App Application::instance()
 NAMESPACE_END

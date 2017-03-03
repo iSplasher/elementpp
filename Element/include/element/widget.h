@@ -54,8 +54,11 @@ public:
 	Property< float > borderRadiusBottomLeft;
 	Property< float > borderRadiusBottomRight;
 
+	Property< Cursor > cursor;
+
 	bool paintWidget = true;
 	bool isDraggable = false;
+	bool isResizeable = false;
 
 	// Events
 
@@ -130,9 +133,14 @@ public:
 	PropertyEvent<MouseEvent, Window> mouseMoved;
 
 	/**
-	 * \brief Widget moved
+	 * \brief When the widget is moved this property emits the new position
 	 */
-	PropertyEvent<MouseEvent, Window> moved;
+	PropertyEvent<Point, Widget> moved;
+
+	/**
+	* \brief When the widget is resized this property emits the new size
+	*/
+	PropertyEvent<Size, Widget> resized;
 
 
 	/**
@@ -231,9 +239,13 @@ private:
 	Widget* parent_widget;
 	PainterContext* this_paint = nullptr;
 	Point last_mouse_pos;
+	float resize_range_width= 4;
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement
+	void windowMovedHelper(Point);
+	void windowResizedHelper(Size);
+	Direction InResizeRange(Point);
 
 	friend class Painter;
 	friend class Layout;

@@ -1,9 +1,8 @@
 #pragma once
 
 #include "element/global.h"
-#include "element/property.h"
 
-#include <cmath>
+#include <string>
 
 typedef struct NVGcolor _PColor;
 

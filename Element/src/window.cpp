@@ -7,7 +7,7 @@
 #include <GLFW/glfw3native.h>
 #endif
 
-#include "element/core/painter.h"
+#include "element/core/painter.h" // necessary to include AFTER glew
 
 USING_NAMESPACE
 
@@ -91,6 +91,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	}
 
 	glfwSetWindowUserPointer( r_window, this );
+	glfwSetWindowPosCallback( r_window, windowMovedCb);
 	glfwSetCursorPosCallback( r_window, mouseMovedCb );
 	glfwSetMouseButtonCallback( r_window, mousePressCb );
 
@@ -113,6 +114,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 
 	objectName = "Window";
 	isDraggable = true;
+	isResizeable = true;
 	painter = std::make_unique< Painter >( this );
 	current_pos = position = win_rect.pos();
 	size = win_rect.size();
@@ -176,6 +178,20 @@ void Window::updateGeometry() {
 		
 }
 
+void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
+	auto win = getWindow(r_window);
+	if (!win->blockEvents) {
+		win->windowResizedHelper(Size(width, height));
+	}
+}
+
+void Window::windowMovedCb( _privRWindow* r_window, int xpos, int ypos ) {
+	auto win = getWindow(r_window);
+	if (!win->blockEvents) {
+		win->windowMovedHelper( Point(xpos, ypos) );
+	}
+}
+
 void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 	Point p = Point( xpos, ypos );
 	 // It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
@@ -199,7 +215,6 @@ void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 	if( w->blockEvents )
 		return;
-
 
 	w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
 

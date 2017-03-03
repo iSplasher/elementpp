@@ -8,26 +8,34 @@ USING_NAMESPACE
 Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
                                                  contentGeometry( [&](Rect n) -> Rect {
 	                                                                  return Rect( n.x + paddingLeft + borderLeft,
-	                                                                                n.y + paddingTop + borderLeft,
-	                                                                                n.width - ( paddingRight + borderRight ) * 2,
-	                                                                                n.height - ( paddingBottom + borderBottom ) * 2 );
+	                                                                               n.y + paddingTop + borderLeft,
+	                                                                               n.width - ( paddingRight + borderRight ) * 2,
+	                                                                               n.height - ( paddingBottom + borderBottom ) * 2 );
                                                                   }, geometry ),
                                                  contentSize( [&](Size n) -> Size {
 	                                                              return Size( n.width - ( paddingRight + borderRight ) * 2,
-	                                                                            n.height - ( paddingBottom + borderBottom ) * 2 );
+	                                                                           n.height - ( paddingBottom + borderBottom ) * 2 );
                                                               }, size ),
                                                  borderRadiusTopLeft( 0 ),
                                                  borderRadiusTopRight( 0 ),
                                                  borderRadiusBottomLeft( 0 ),
-                                                 borderRadiusBottomRight( 0 ) {
+                                                 borderRadiusBottomRight( 0 ),
+                                                 cursor( Cursor::Arrow ) {
 	objectName = "Widget";
 	setType( ElementType::Widget );
 
-	mouseMoved.changed(handleMove);
-	leftPress.changed([&](Point p)
-	{
-		this->last_mouse_pos = p;
-	});
+	mouseMoved.changed( handleMove );
+	size.changed( [&](Size s) {
+		             if( this->type != ElementType::Window )
+			             this->resized = s;
+	             } );
+	position.changed( [&](Point p) {
+		                 if( this->type != ElementType::Window )
+			                 this->moved = p;
+	                 } );
+	leftPress.changed( [&](Point p) {
+		                  this->last_mouse_pos = p;
+	                  } );
 
 	marginLeft = marginTop = marginRight = marginBottom = 5;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 5;
@@ -41,8 +49,7 @@ Widget::~Widget() {
 	// TODO: delete paint context
 }
 
-void Widget::paint( Painter& painter ) {
-}
+void Widget::paint( Painter& painter ) {}
 
 void Widget::update() {
 	if( parent_window ) {
@@ -99,14 +106,42 @@ void Widget::setParent( Element* e ) {
 
 void Widget::handleMove( MouseEvent m_ev ) {
 	auto w = m_ev.widget;
-	if (w->isDraggable) {
+	if( w->isDraggable ) {
 		// check if left button is pressed
-		if (flags(m_ev.button & MouseButton::Left)) {
+		if( flags( m_ev.button & MouseButton::Left ) ) {
 
-			auto curr_m = w->mapToScreen(m_ev.position);
+			auto curr_m = w->mapToScreen( m_ev.position );
 			w->position = curr_m - w->last_mouse_pos;
 		}
 	}
+
+	if( w->isResizeable ) {
+		auto d = w->InResizeRange( m_ev.position );
+		if( !flags( d & Direction::None ) ) { }
+	}
+}
+
+void Widget::windowMovedHelper( Point p ) {
+	moved = p;
+}
+
+void Widget::windowResizedHelper( Size s ) {
+	resized = s;
+}
+
+Direction Widget::InResizeRange( Point p ) {
+	auto r = geometry.get();
+
+	if( ( p.x - r.x ) < resize_range_width )
+		return Direction::Left;
+	else if( ( r.x + r.width - p.x ) < resize_range_width )
+		return Direction::Right;
+	else if( ( p.y - r.y ) < resize_range_width )
+		return Direction::Top;
+	else if( ( r.y + r.height - p.y ) < resize_range_width )
+		return Direction::Bottom;
+
+	return Direction::None;
 }
 
 Point Widget::mapFromWindow( Point p ) {
