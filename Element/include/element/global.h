@@ -152,4 +152,6 @@ class Application;
 
 // A pointer to the application instance
 #define App Application::instance()
+#define REQUIRE_APP 
+
 NAMESPACE_END

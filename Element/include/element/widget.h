@@ -10,6 +10,11 @@ NAMESPACE_BEGIN
 class Painter;
 class Window;
 
+PRIV_NAMESPACE_BEGIN
+class _Cursor;
+NAMESPACE_END
+
+
 
 /**
  * \brief Base widget. Should be used to compose more specific widgets.
@@ -54,7 +59,7 @@ public:
 	Property< float > borderRadiusBottomLeft;
 	Property< float > borderRadiusBottomRight;
 
-	Property< Cursor > cursor;
+	Cursor cursor = Cursor::Arrow;
 
 	bool paintWidget = true;
 	bool isDraggable = false;
@@ -239,7 +244,7 @@ private:
 	Widget* parent_widget;
 	PainterContext* this_paint = nullptr;
 	Point last_mouse_pos;
-	float resize_range_width= 4;
+	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement

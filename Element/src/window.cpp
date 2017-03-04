@@ -11,8 +11,6 @@
 
 USING_NAMESPACE
 
-// Callbacks start
-
 // helper functions
 
 static Window* getWindow( GLFWwindow* r_window ) {
@@ -91,7 +89,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	}
 
 	glfwSetWindowUserPointer( r_window, this );
-	glfwSetWindowPosCallback( r_window, windowMovedCb);
+	glfwSetWindowPosCallback( r_window, windowMovedCb );
 	glfwSetCursorPosCallback( r_window, mouseMovedCb );
 	glfwSetMouseButtonCallback( r_window, mousePressCb );
 
@@ -132,7 +130,7 @@ Window::~Window() {
 }
 
 void Window::update() {
-	if(App && !(App->threadInitedIn == std::this_thread::get_id())) {
+	if( App && !( App->threadInitedIn == std::this_thread::get_id() ) ) {
 		std::cerr << "Window thread and Application thread differ, cannot update." << std::endl; // TODO: maybe log too?
 		return;
 	}
@@ -166,53 +164,60 @@ void Window::setActive() const {
 }
 
 void Window::updateGeometry() {
-	if (current_pos != position) {
+	if( current_pos != position ) {
 		current_pos = position;
-		glfwSetWindowPos(r_window, std::floor(current_pos.x), std::floor(current_pos.y));
+		glfwSetWindowPos( r_window, std::floor( current_pos.x ), std::floor( current_pos.y ) );
 	}
 
-	if (current_size != size) {
+	if( current_size != size ) {
 		current_size = size;
-		glfwSetWindowSize(r_window, std::floor(current_size.width), std::floor(current_size.height));
+		glfwSetWindowSize( r_window, std::floor( current_size.width ), std::floor( current_size.height ) );
 	}
-		
+
 }
 
 void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
-	auto win = getWindow(r_window);
-	if (!win->blockEvents) {
-		win->windowResizedHelper(Size(width, height));
+	auto win = getWindow( r_window );
+	if( !win->blockEvents ) {
+		win->windowResizedHelper( Size( width, height ) );
 	}
 }
 
 void Window::windowMovedCb( _privRWindow* r_window, int xpos, int ypos ) {
-	auto win = getWindow(r_window);
-	if (!win->blockEvents) {
-		win->windowMovedHelper( Point(xpos, ypos) );
+	auto win = getWindow( r_window );
+	if( !win->blockEvents ) {
+		win->windowMovedHelper( Point( xpos, ypos ) );
 	}
 }
 
 void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 	Point p = Point( xpos, ypos );
-	 // It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
+	// It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
 #ifdef OS_WINDOWS
-	auto hwnd = glfwGetWin32Window(r_window);
+	auto hwnd = glfwGetWin32Window( r_window );
 	POINT pos;
 	pos.x = p.x;
 	pos.y = p.y;
-	ClientToScreen(hwnd, &pos);
+	ClientToScreen( hwnd, &pos );
 	p.x = pos.x;
 	p.y = pos.y;
 #else
 	static_assert(false, "Coordinates in screen space has not yet been implemented on this platform")
 #endif
 	auto buttons = getMouseButtons( r_window );
-	auto win = getWindow(r_window);
-	p = win->mapFromScreen(p);
+	auto win = getWindow( r_window );
+	p = win->mapFromScreen( p );
 	mouseMovedHelper( win, p, buttons );
 }
 
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
+	if( w->_cursor )
+		w->_cursor->apply( w->cursor );
+	else {
+		w->_cursor.reset( new PRIV_NAMESPACE::_Cursor( w->cursor, w->parent_window->r_window ) );
+		w->_cursor->apply( w->cursor );
+	}
+
 	if( w->blockEvents )
 		return;
 
@@ -227,6 +232,7 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 			}
 		}
 	}
+
 }
 
 void Window::mousePressCb( _privRWindow* r_window, int button, int action, int mods ) {
@@ -366,4 +372,72 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 			}
 		}
 	}
+}
+
+PRIV_NAMESPACE::_Cursor::_Cursor( Cursor c, _privRWindow* r_window ) {
+	this->r_window = r_window;
+	_newCursor( c );
+}
+
+void priv::_Cursor::apply( Cursor c ) {
+	if( c != old_cursor ) {
+		_destroy();
+		_newCursor( c );
+	}
+	if( r_window ) {
+		if( cursor )
+			glfwSetCursor( r_window, cursor );
+		else
+			glfwSetCursor( r_window, nullptr );
+	}
+}
+
+void priv::_Cursor::_newCursor( Cursor c ) {
+	old_cursor = c;
+	if( !flags( c & Cursor::None ) ) {
+		switch( c ) {
+
+			case Cursor::None:
+				cursor = nullptr;
+				break;
+			case Cursor::Arrow:
+				cursor = glfwCreateStandardCursor( GLFW_ARROW_CURSOR );
+				break;
+			case Cursor::IBeam:
+				cursor = glfwCreateStandardCursor( GLFW_IBEAM_CURSOR );
+				break;
+			case Cursor::Cross:
+				cursor = glfwCreateStandardCursor( GLFW_CROSSHAIR_CURSOR );
+				break;
+			case Cursor::Hand:
+				cursor = glfwCreateStandardCursor( GLFW_HAND_CURSOR );
+				break;
+			case Cursor::HResize:
+				cursor = glfwCreateStandardCursor( GLFW_HRESIZE_CURSOR );
+				break;
+			case Cursor::VResize:
+				cursor = glfwCreateStandardCursor( GLFW_VRESIZE_CURSOR );
+				break;
+			default:
+				// implementation idea:
+				/*
+				* get cursor image and size like this, from application
+				* App->registeredCursor(Cursor::User)
+				*
+				* User should register new cursor like this
+				* App->registerCursor(image, size);
+				*/
+				break;
+		}
+	}
+}
+
+void priv::_Cursor::_destroy() {
+	if( cursor )
+		glfwDestroyCursor( cursor );
+	cursor = nullptr;
+}
+
+PRIV_NAMESPACE::_Cursor::~_Cursor() {
+	_destroy();
 }

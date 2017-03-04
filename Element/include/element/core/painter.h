@@ -231,6 +231,7 @@ private:
 	void applyPB() const;
 
 	// TODO: Create a save-stack struct to store old objects instead!
+	// TODO: use <stack>
 
 	Widget *w = nullptr;
 	// Coordinates will be translated to this widget's parent

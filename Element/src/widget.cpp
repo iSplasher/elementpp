@@ -19,8 +19,7 @@ Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
                                                  borderRadiusTopLeft( 0 ),
                                                  borderRadiusTopRight( 0 ),
                                                  borderRadiusBottomLeft( 0 ),
-                                                 borderRadiusBottomRight( 0 ),
-                                                 cursor( Cursor::Arrow ) {
+                                                 borderRadiusBottomRight( 0 ) {
 	objectName = "Widget";
 	setType( ElementType::Widget );
 
@@ -114,34 +113,14 @@ void Widget::handleMove( MouseEvent m_ev ) {
 			w->position = curr_m - w->last_mouse_pos;
 		}
 	}
-
-	if( w->isResizeable ) {
-		auto d = w->InResizeRange( m_ev.position );
-		if( !flags( d & Direction::None ) ) { }
-	}
 }
 
 void Widget::windowMovedHelper( Point p ) {
 	moved = p;
 }
 
-void Widget::windowResizedHelper( Size s ) {
+void Widget::windowResizedHelper(Size s) {
 	resized = s;
-}
-
-Direction Widget::InResizeRange( Point p ) {
-	auto r = geometry.get();
-
-	if( ( p.x - r.x ) < resize_range_width )
-		return Direction::Left;
-	else if( ( r.x + r.width - p.x ) < resize_range_width )
-		return Direction::Right;
-	else if( ( p.y - r.y ) < resize_range_width )
-		return Direction::Top;
-	else if( ( r.y + r.height - p.y ) < resize_range_width )
-		return Direction::Bottom;
-
-	return Direction::None;
 }
 
 Point Widget::mapFromWindow( Point p ) {

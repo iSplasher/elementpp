@@ -6,6 +6,7 @@
 #include <chrono>
 
 using _privRWindow = struct GLFWwindow;
+using _privCursor = struct GLFWcursor;
 
 NAMESPACE_BEGIN
 
@@ -51,5 +52,19 @@ private:
 	friend class Widget;
 	friend class Application;
 };
+
+PRIV_NAMESPACE_BEGIN
+class _Cursor {
+	void _newCursor(Cursor c);
+	void _destroy();
+	Cursor old_cursor = Cursor::None;
+	_privCursor* cursor = nullptr;
+	_privRWindow* r_window = nullptr;
+public:
+	explicit _Cursor(Cursor, _privRWindow*);
+	~_Cursor();
+	void apply(Cursor);
+};
+NAMESPACE_END
 
 NAMESPACE_END
