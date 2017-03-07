@@ -119,7 +119,7 @@ void Widget::windowMovedHelper( Point p ) {
 	moved = p;
 }
 
-void Widget::windowResizedHelper(Size s) {
+void Widget::windowResizedHelper( Size s ) {
 	resized = s;
 }
 

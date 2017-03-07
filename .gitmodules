@@ -1,0 +1,3 @@
+[submodule "Element/src/deps/minimal-glfw"]
+	path = Element/src/deps/minimal-glfw
+	url = https://github.com/iSplasher/minimal-glfw

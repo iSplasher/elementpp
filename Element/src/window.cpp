@@ -211,12 +211,9 @@ void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 }
 
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
-	if( w->_cursor )
-		w->_cursor->apply( w->cursor );
-	else {
+	if( !w->_cursor )
 		w->_cursor.reset( new PRIV_NAMESPACE::_Cursor( w->cursor, w->parent_window->r_window ) );
-		w->_cursor->apply( w->cursor );
-	}
+	w->_cursor->apply( w->cursor );
 
 	if( w->blockEvents )
 		return;
@@ -425,7 +422,7 @@ void priv::_Cursor::_newCursor( Cursor c ) {
 				* App->registeredCursor(Cursor::User)
 				*
 				* User should register new cursor like this
-				* App->registerCursor(image, size);
+				* App->registerCursor(Cursor::User+n, image, size);
 				*/
 				break;
 		}
