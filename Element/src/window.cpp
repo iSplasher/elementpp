@@ -1,12 +1,12 @@
 #include "element/window.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+
+#include "deps/minimal-glfw/include/GLFW/glfw3.h"
 #ifdef OS_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
+#include "deps/minimal-glfw/include/GLFW/glfw3native.h"
 #endif
-
 #include "element/core/painter.h" // necessary to include AFTER glew
 
 USING_NAMESPACE
@@ -79,7 +79,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 #endif
 	glfwWindowHint( GLFW_DEPTH_BITS, 16 );
 	glfwWindowHint( GLFW_ALPHA_BITS, 8 );
-	glfwWindowHint( GLFW_TRANSPARENT, true );
+	//glfwWindowHint( GLFW_TRANSPARENT, true );
 	glfwWindowHint( GLFW_DECORATED, false );
 	glfwWindowHint( GLFW_SAMPLES, 12 );
 	r_window = glfwCreateWindow( win_rect.width, win_rect.height, "Element++", nullptr, nullptr );

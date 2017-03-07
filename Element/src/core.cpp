@@ -2,7 +2,7 @@
 #include "element/window.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "deps/minimal-glfw/include/GLFW/glfw3.h"
 
 USING_NAMESPACE
 
