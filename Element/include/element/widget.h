@@ -245,12 +245,12 @@ private:
 	PainterContext* this_paint = nullptr;
 	Point last_mouse_pos;
 	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
+	bool in_resizeable_range = false;
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement
 	void windowMovedHelper(Point);
 	void windowResizedHelper(Size);
-	Direction InResizeRange(Point);
 
 	friend class Painter;
 	friend class Layout;

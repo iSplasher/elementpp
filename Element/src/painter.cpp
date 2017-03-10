@@ -117,7 +117,12 @@ Painter::Painter( Window* window ) :
 	def_pen(std::make_unique<Pen>( *this )), def_brush( std::make_unique<Brush>( *this ) ){
 	w = window;
 	if( !w->this_paint ) {
-		w->this_paint = nvgCreateGL3( NVG_STENCIL_STROKES | NVG_DEBUG );
+		auto n_flags = NVG_STENCIL_STROKES | NVG_ANTIALIAS;;
+
+#ifdef _DEBUG
+		n_flags |= NVG_DEBUG;
+#endif
+		w->this_paint = nvgCreateGL3( n_flags );
 		if( !w->this_paint ) {
 			std::cout << "Fatal: Could not create paint context\n";
 		}

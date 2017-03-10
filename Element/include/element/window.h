@@ -26,6 +26,8 @@ private:
 	void setActive() const;
 	void updateGeometry();
 
+	static void applyWidgetCursor(Widget* w);
+	static bool resizeHelper(Widget* w, Point p, MouseButton buttons);
 	static void windowResizedCb(_privRWindow* r_window, int width, int height);
 	static void windowMovedCb(_privRWindow* r_window, int xpos, int ypos);
 	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);
@@ -34,6 +36,9 @@ private:
 	static void mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click, bool d_press );
 
 	//abitrary data members
+	std::unique_ptr<PRIV_NAMESPACE::_Cursor> hresize_cursor = nullptr;
+	std::unique_ptr<PRIV_NAMESPACE::_Cursor> vresize_cursor = nullptr;
+
 	MouseButton last_pressed_buttons = MouseButton::None; // buttons that were last pressed
 	std::chrono::time_point<std::chrono::steady_clock> last_pressed; // time point a button was last pressed
 	std::chrono::time_point<std::chrono::steady_clock> last_released; // time point a button was last release
@@ -64,6 +69,7 @@ public:
 	explicit _Cursor(Cursor, _privRWindow*);
 	~_Cursor();
 	void apply(Cursor);
+	void apply();
 };
 NAMESPACE_END
 

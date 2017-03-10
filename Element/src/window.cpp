@@ -13,6 +13,58 @@ USING_NAMESPACE
 
 // helper functions
 
+static float getPixelRatio(GLFWwindow *window) {
+#if defined(OS_WINDOWS)
+	HWND hWnd = glfwGetWin32Window(window);
+	HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	/* The following function only exists on Windows 8.1+, but we don't want to make that a dependency */
+	static HRESULT(WINAPI *GetDpiForMonitor_)(HMONITOR, UINT, UINT*, UINT*) = nullptr;
+	static bool GetDpiForMonitor_tried = false;
+
+	if (!GetDpiForMonitor_tried) {
+		auto shcore = LoadLibrary(TEXT("shcore"));
+		if (shcore) {
+			GetDpiForMonitor_ = reinterpret_cast< decltype(GetDpiForMonitor_) >( GetProcAddress( shcore, "GetDpiForMonitor" ) );
+			FreeLibrary(shcore);
+		}
+
+		GetDpiForMonitor_tried = true;
+	}
+
+	if (GetDpiForMonitor_) {
+		uint32_t dpiX, dpiY;
+		if (GetDpiForMonitor_(monitor, 0 /* effective DPI */, &dpiX, &dpiY) == S_OK)
+			return std::round(dpiX / 96.0);
+	}
+	return 1.f;
+#elif defined(OS_LINUX)
+	(void)window;
+
+	/* Try to read the pixel ratio from GTK */
+	FILE *fp = popen("gsettings get org.gnome.desktop.interface scaling-factor", "r");
+	if (!fp)
+		return 1;
+
+	int ratio = 1;
+	if (fscanf(fp, "uint32 %i", &ratio) != 1)
+		return 1;
+
+	if (pclose(fp) != 0)
+		return 1;
+
+	return ratio >= 1 ? ratio : 1;
+#else
+
+	int fb_width;
+	int fb_height;
+	SizeI s;
+
+	glfwGetFramebufferSize(window, &fb_width, &fb_height);
+	glfwGetWindowSize(window, &s.width, &s.height);
+	return static_cast< float >(fb_width) / static_cast< float >(s.width);
+#endif
+}
+
 static Window* getWindow( GLFWwindow* r_window ) {
 	return static_cast< Window* >( glfwGetWindowUserPointer( r_window ) );
 }
@@ -109,7 +161,8 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 #endif
 		_inited = true;
 	}
-
+	hresize_cursor = std::make_unique<PRIV_NAMESPACE::_Cursor>(Cursor::HResize, r_window);
+	vresize_cursor = std::make_unique<PRIV_NAMESPACE::_Cursor>(Cursor::VResize, r_window);
 	objectName = "Window";
 	isDraggable = true;
 	isResizeable = true;
@@ -139,7 +192,6 @@ void Window::update() {
 
 	int fb_width;
 	int fb_height;
-	Size s = size;
 
 	glfwGetFramebufferSize( r_window, &fb_width, &fb_height );
 	glViewport( 0, 0, fb_width, fb_height );
@@ -149,9 +201,8 @@ void Window::update() {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glEnable( GL_CULL_FACE );
 
-	float px_ratio = static_cast< float >( fb_width ) / static_cast< float >( s.width );
 
-	painter->begin( px_ratio );
+	painter->begin( getPixelRatio( r_window ) );
 	Widget::update();
 	painter->end();
 	if( r_window ) {
@@ -174,6 +225,47 @@ void Window::updateGeometry() {
 		glfwSetWindowSize( r_window, std::floor( current_size.width ), std::floor( current_size.height ) );
 	}
 
+}
+
+void Window::applyWidgetCursor( Widget* w ) {
+	if (!w->_cursor)
+		w->_cursor.reset(new PRIV_NAMESPACE::_Cursor(w->cursor, w->parent_window->r_window));
+	w->_cursor->apply(w->cursor);
+}
+
+bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
+	Direction dir = Direction::None;
+	auto r = w->geometry.get();
+	auto resize_range = 4.0f;
+	if ((p.x - r.x) < resize_range)
+		dir = Direction::Left;
+	else if ((r.x + r.width - p.x) < resize_range)
+			dir = Direction::Right;
+	else if ((p.y - r.y) < resize_range)
+			dir = Direction::Top;
+	else if ((r.y + r.height - p.y) < resize_range)
+			dir = Direction::Bottom;
+
+	switch(dir) {
+		case Direction::Left:
+			w->parent_window->hresize_cursor->apply();
+		break;
+		case Direction::Top:
+			w->parent_window->vresize_cursor->apply();
+		break;
+		case Direction::Right:
+			w->parent_window->hresize_cursor->apply();
+		break;
+		case Direction::Bottom:
+			w->parent_window->vresize_cursor->apply();
+		break;
+		default: 
+			return false;
+	}
+
+	if(flags(buttons & MouseButton::Left)) {
+	}
+	return true;
 }
 
 void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
@@ -211,14 +303,13 @@ void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
 }
 
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
-	if( !w->_cursor )
-		w->_cursor.reset( new PRIV_NAMESPACE::_Cursor( w->cursor, w->parent_window->r_window ) );
-	w->_cursor->apply( w->cursor );
-
 	if( w->blockEvents )
 		return;
 
 	w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
+
+	if (!resizeHelper(w, p, buttons))
+		applyWidgetCursor(w);
 
 	for( auto c : w->children() ) { // go through all children
 		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
@@ -229,6 +320,7 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 			}
 		}
 	}
+
 
 }
 
@@ -387,6 +479,10 @@ void priv::_Cursor::apply( Cursor c ) {
 		else
 			glfwSetCursor( r_window, nullptr );
 	}
+}
+
+void priv::_Cursor::apply() {
+	apply(old_cursor);
 }
 
 void priv::_Cursor::_newCursor( Cursor c ) {
