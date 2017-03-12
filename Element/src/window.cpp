@@ -236,7 +236,10 @@ void Window::applyWidgetCursor( Widget* w ) {
 bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 	Direction dir = Direction::None;
 	auto r = w->geometry.get();
-	auto resize_range = 4.0f;
+	if (w->type == ElementType::Window) {
+		r = Point();
+	}
+	auto resize_range = 6.0f;
 	if ((p.x - r.x) < resize_range)
 		dir = Direction::Left;
 	else if ((r.x + r.width - p.x) < resize_range)
@@ -308,19 +311,23 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 
 	w->mouseMoved = MouseEvent{ w->mapFromWindow( p ), buttons, w };
 
-	if (!resizeHelper(w, p, buttons))
-		applyWidgetCursor(w);
+	auto innermost = true; // this child is the innermost
 
-	for( auto c : w->children() ) { // go through all children
+	for( auto &c : w->children() ) { // go through all children
 		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
 			auto c_w = static_cast< Widget* >( c );
 			if( c_w->geometry.get().contains( p ) ) { // only if widget contains point
 				mouseMovedHelper( c_w, p, buttons ); // now repeat this for its children
+				innermost = false;
 				break; // since this widget contains this point, we don't need to go through its siblings
 			}
 		}
 	}
 
+	if (innermost) {
+		if ((w->isResizeable && !resizeHelper(w, p, buttons) ) || !w->isResizeable )
+			applyWidgetCursor(w);
+	}
 
 }
 
