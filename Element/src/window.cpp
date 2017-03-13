@@ -13,28 +13,28 @@ USING_NAMESPACE
 
 // helper functions
 
-static float getPixelRatio(GLFWwindow *window) {
+static float getPixelRatio( GLFWwindow* window ) {
 #if defined(OS_WINDOWS)
-	HWND hWnd = glfwGetWin32Window(window);
-	HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	HWND hWnd = glfwGetWin32Window( window );
+	HMONITOR monitor = MonitorFromWindow( hWnd, MONITOR_DEFAULTTONEAREST );
 	/* The following function only exists on Windows 8.1+, but we don't want to make that a dependency */
-	static HRESULT(WINAPI *GetDpiForMonitor_)(HMONITOR, UINT, UINT*, UINT*) = nullptr;
+	static HRESULT (WINAPI *GetDpiForMonitor_)( HMONITOR, UINT, UINT*, UINT* ) = nullptr;
 	static bool GetDpiForMonitor_tried = false;
 
-	if (!GetDpiForMonitor_tried) {
-		auto shcore = LoadLibrary(TEXT("shcore"));
-		if (shcore) {
+	if( !GetDpiForMonitor_tried ) {
+		auto shcore = LoadLibrary( TEXT("shcore") );
+		if( shcore ) {
 			GetDpiForMonitor_ = reinterpret_cast< decltype(GetDpiForMonitor_) >( GetProcAddress( shcore, "GetDpiForMonitor" ) );
-			FreeLibrary(shcore);
+			FreeLibrary( shcore );
 		}
 
 		GetDpiForMonitor_tried = true;
 	}
 
-	if (GetDpiForMonitor_) {
+	if( GetDpiForMonitor_ ) {
 		uint32_t dpiX, dpiY;
-		if (GetDpiForMonitor_(monitor, 0 /* effective DPI */, &dpiX, &dpiY) == S_OK)
-			return std::round(dpiX / 96.0);
+		if( GetDpiForMonitor_( monitor, 0 /* effective DPI */, &dpiX, &dpiY ) == S_OK )
+			return std::round( dpiX / 96.0 );
 	}
 	return 1.f;
 #elif defined(OS_LINUX)
@@ -161,8 +161,8 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 #endif
 		_inited = true;
 	}
-	hresize_cursor = std::make_unique<PRIV_NAMESPACE::_Cursor>(Cursor::HResize, r_window);
-	vresize_cursor = std::make_unique<PRIV_NAMESPACE::_Cursor>(Cursor::VResize, r_window);
+	hresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::HResize, r_window );
+	vresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::VResize, r_window );
 	objectName = "Window";
 	isDraggable = true;
 	isResizeable = true;
@@ -201,7 +201,6 @@ void Window::update() {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glEnable( GL_CULL_FACE );
 
-
 	painter->begin( getPixelRatio( r_window ) );
 	Widget::update();
 	painter->end();
@@ -228,53 +227,85 @@ void Window::updateGeometry() {
 }
 
 void Window::applyWidgetCursor( Widget* w ) {
-	if (!w->_cursor)
-		w->_cursor.reset(new PRIV_NAMESPACE::_Cursor(w->cursor, w->parent_window->r_window));
-	w->_cursor->apply(w->cursor);
+	if( !w->_cursor )
+		w->_cursor.reset( new PRIV_NAMESPACE::_Cursor( w->cursor, w->parent_window->r_window ) );
+	w->_cursor->apply( w->cursor );
 }
 
 bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
-	Direction dir = Direction::None;
-	auto r = w->geometry.get();
-	if (w->type == ElementType::Window) {
-		r = Point();
-	}
-	auto resize_range = 6.0f;
-	if ((p.x - r.x) < resize_range)
-		dir = Direction::Left;
-	else if ((r.x + r.width - p.x) < resize_range)
-			dir = Direction::Right;
-	else if ((p.y - r.y) < resize_range)
-			dir = Direction::Top;
-	else if ((r.y + r.height - p.y) < resize_range)
-			dir = Direction::Bottom;
+	Direction dir = inResizeRangeHelper( w, p );
 
-	switch(dir) {
+	switch( dir ) {
+		case Direction::Right:
 		case Direction::Left:
 			w->parent_window->hresize_cursor->apply();
-		break;
+			break;
 		case Direction::Top:
-			w->parent_window->vresize_cursor->apply();
-		break;
-		case Direction::Right:
-			w->parent_window->hresize_cursor->apply();
-		break;
 		case Direction::Bottom:
 			w->parent_window->vresize_cursor->apply();
-		break;
-		default: 
+			break;
+		default:
 			return false;
 	}
 
-	if(flags(buttons & MouseButton::Left)) {
+	if( flags( buttons & MouseButton::Left ) && w->is_resizing ) {
+		auto new_rect = w->geometry.get();
+
+		auto delta_pos = p - w->resize_pos;
+
+		switch( dir ) {
+			case Direction::Left:
+				new_rect.x += delta_pos.x;
+				new_rect.width -= delta_pos.x;
+				w->resize_pos = Point(0, p.y);
+				break;
+			case Direction::Top:
+				new_rect.y += delta_pos.y;
+				new_rect.height -= delta_pos.y;
+				w->resize_pos = Point(p.x, 0);
+				break;
+			case Direction::Right:
+				new_rect.width += delta_pos.x;
+				w->resize_pos = p;
+				break;
+			case Direction::Bottom:
+				new_rect.height += delta_pos.y;
+				w->resize_pos = p;
+				break;
+		}
+
+		std::cout << "Last Update Pos: " << w->resize_pos << " Current Pos: " << p <<  std::endl;
+
+		w->position = new_rect.pos();
+		w->size = new_rect.size();
+
 	}
 	return true;
+}
+
+Direction Window::inResizeRangeHelper( Widget* w, Point p ) {
+	auto r = w->geometry.get();
+	if( w->type == ElementType::Window ) {
+		r = Point();
+	}
+	Direction dir = Direction::None;
+	auto resize_range = 6.0f;
+	if( ( p.x - r.x ) < resize_range )
+		dir = Direction::Left;
+	else if( ( r.x + r.width - p.x ) < resize_range )
+		dir = Direction::Right;
+	else if( ( p.y - r.y ) < resize_range )
+		dir = Direction::Top;
+	else if( ( r.y + r.height - p.y ) < resize_range )
+		dir = Direction::Bottom;
+
+	return dir;
 }
 
 void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
 	auto win = getWindow( r_window );
 	if( !win->blockEvents ) {
-		win->windowResizedHelper( Size( width, height ) );
+		win->resized = Rect( win->position, Size( width, height ) );
 	}
 }
 
@@ -313,7 +344,7 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 
 	auto innermost = true; // this child is the innermost
 
-	for( auto &c : w->children() ) { // go through all children
+	for( auto& c : w->children() ) { // go through all children
 		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
 			auto c_w = static_cast< Widget* >( c );
 			if( c_w->geometry.get().contains( p ) ) { // only if widget contains point
@@ -324,9 +355,9 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 		}
 	}
 
-	if (innermost) {
-		if ((w->isResizeable && !resizeHelper(w, p, buttons) ) || !w->isResizeable )
-			applyWidgetCursor(w);
+	if( innermost ) {
+		if( ( w->isResizeable && !resizeHelper( w, p, buttons ) ) || !w->isResizeable )
+			applyWidgetCursor( w );
 	}
 
 }
@@ -459,15 +490,27 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 			w->rightDoublePress = p;
 	}
 
+	auto innermost = true; // this child is the innermost
+
 	for( auto c : w->children() ) { // go through all children
 		if( c->type == ElementType::Widget ) { // we don't want child windows to get this event
 			auto c_w = static_cast< Widget* >( c );
 			if( c_w->geometry.get().contains( p ) ) { // only if widget contains point
 				mousePressedHelper( c_w, btn_press, buttons, modifiers, p, click, d_click, d_press ); // now repeat this for its children
+				innermost = false;
 				break; // since this widget contains this point, we don't need to go through its siblings
 			}
 		}
 	}
+
+	if( innermost ) {
+		if( w->isResizeable && inResizeRangeHelper( w, p ) != Direction::None ) {
+			w->is_resizing = btn_press;
+			if (flags(buttons & MouseButton::Left))
+				w->resize_pos = w->mapFromWindow(p);
+		}
+	}
+
 }
 
 PRIV_NAMESPACE::_Cursor::_Cursor( Cursor c, _privRWindow* r_window ) {
@@ -489,7 +532,7 @@ void priv::_Cursor::apply( Cursor c ) {
 }
 
 void priv::_Cursor::apply() {
-	apply(old_cursor);
+	apply( old_cursor );
 }
 
 void priv::_Cursor::_newCursor( Cursor c ) {

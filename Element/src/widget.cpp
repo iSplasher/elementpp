@@ -24,10 +24,6 @@ Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
 	setType( ElementType::Widget );
 
 	mouseMoved.changed( handleMove );
-	size.changed( [&](Size s) {
-		             if( this->type != ElementType::Window )
-			             this->resized = s;
-	             } );
 	position.changed( [&](Point p) {
 		                 if( this->type != ElementType::Window )
 			                 this->moved = p;
@@ -105,7 +101,7 @@ void Widget::setParent( Element* e ) {
 
 void Widget::handleMove( MouseEvent m_ev ) {
 	auto w = m_ev.widget;
-	if( w->isDraggable ) {
+	if( w->isDraggable && !w->is_resizing ) {
 		// check if left button is pressed
 		if( flags( m_ev.button & MouseButton::Left ) ) {
 
@@ -117,10 +113,6 @@ void Widget::handleMove( MouseEvent m_ev ) {
 
 void Widget::windowMovedHelper( Point p ) {
 	moved = p;
-}
-
-void Widget::windowResizedHelper( Size s ) {
-	resized = s;
 }
 
 Point Widget::mapFromWindow( Point p ) {

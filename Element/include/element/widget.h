@@ -145,7 +145,7 @@ public:
 	/**
 	* \brief When the widget is resized this property emits the new size
 	*/
-	PropertyEvent<Size, Widget> resized;
+	PropertyEvent<Rect, Window> resized;
 
 
 	/**
@@ -245,12 +245,12 @@ private:
 	PainterContext* this_paint = nullptr;
 	Point last_mouse_pos;
 	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
-	bool in_resizeable_range = false;
+	bool is_resizing = false;
+	Point resize_pos;
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement
 	void windowMovedHelper(Point);
-	void windowResizedHelper(Size);
 
 	friend class Painter;
 	friend class Layout;

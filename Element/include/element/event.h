@@ -7,21 +7,24 @@ NAMESPACE_BEGIN
 class Element;
 class Widget;
 
-struct MouseEvent {
+
+struct Event {
+	Event( Widget* w ) : widget( w ) {}
+
+	Widget* widget = nullptr;
+};
+
+
+struct MouseEvent : Event {
 
 	MouseEvent( Point position = Point(), MouseButton button = MouseButton::None, Widget* widget = nullptr )
-		: position( position ),
-		  button( button ),
-		  widget( widget ) {}
+		: Event( widget ),
+		  position( position ),
+		  button( button ) {}
 
 	Point position;
 	MouseButton button;
-	Widget* widget = nullptr;
-
-
-
 };
-
 
 
 NAMESPACE_END
