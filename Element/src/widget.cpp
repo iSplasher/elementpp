@@ -101,7 +101,7 @@ void Widget::setParent( Element* e ) {
 
 void Widget::handleMove( MouseEvent m_ev ) {
 	auto w = m_ev.widget;
-	if( w->isDraggable && !w->is_resizing ) {
+	if( w->isDraggable && w->parent_window->grabbed_widget != w ) {
 		// check if left button is pressed
 		if( flags( m_ev.button & MouseButton::Left ) ) {
 

@@ -245,7 +245,6 @@ private:
 	PainterContext* this_paint = nullptr;
 	Point last_mouse_pos;
 	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
-	bool is_resizing = false;
 	Point resize_pos;
 	Direction resize_dir = Direction::None;
 

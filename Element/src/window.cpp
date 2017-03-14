@@ -247,7 +247,7 @@ void Window::applyWidgetResizeCursor( Widget* w, Direction dir ) {
 
 bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 
-	if( flags( buttons & MouseButton::Left ) && w->is_resizing ) {
+	if( flags( buttons & MouseButton::Left ) && w->parent_window->grabbed_widget == w) {
 		auto new_rect = w->geometry.get();
 
 		auto delta_pos = p - w->resize_pos;
@@ -519,7 +519,6 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 		if( !w->parent_window->grabbed_widget && btn_press ) {
 			w->resize_dir = inResizeRangeHelper(w, p);
 			if( w->isResizeable && w->resize_dir != Direction::None ) {
-				w->is_resizing = btn_press;
 				w->parent_window->grabbed_widget = w;
 				if( flags( buttons & MouseButton::Left ) )
 					w->resize_pos = w->mapFromWindow( p );
