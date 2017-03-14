@@ -27,7 +27,8 @@ private:
 	void updateGeometry();
 
 	static void applyWidgetCursor(Widget* w);
-	static bool resizeHelper(Widget* w, Point p, MouseButton buttons);
+	static void applyWidgetResizeCursor(Widget* w, Direction dir);
+	static bool resizeHelper(Widget* w, Point p, MouseButton buttons );
 	static Direction inResizeRangeHelper(Widget* w, Point p);
 	static void windowResizedCb(_privRWindow* r_window, int width, int height);
 	static void windowMovedCb(_privRWindow* r_window, int xpos, int ypos);
@@ -50,6 +51,7 @@ private:
 	bool _inited = false;
 	Point current_pos;
 	Size current_size;
+	Widget* grabbed_widget = nullptr;
 
 	UniquePainter painter;
 	_privRWindow *r_window; // render window

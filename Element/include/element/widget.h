@@ -247,6 +247,7 @@ private:
 	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
 	bool is_resizing = false;
 	Point resize_pos;
+	Direction resize_dir = Direction::None;
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement
