@@ -52,6 +52,7 @@ SCENARIO("Layouts", "[Layout]") {
 	//priv::YGNodeLayoutGetLeft( child2 );
 
 	auto window = app->create< Window >();
+	//window->resized.changed( [](Rect r) { std::cout << "Window: " << r << std::endl; } );
 	//window->mouseMoved.changed( [&](MouseEvent m) { std::cout << "Window: " << window->position.get() << std::endl; } );
 	//window->mouseMoved.changed( [](MouseEvent m) { std::cout << "Window: " << m.position << std::endl; } );
 	//window->leftPress.changed( [](MouseEvent m) { std::cout << "Left Pressed: Window: " << m.position << std::endl; } );
@@ -81,6 +82,7 @@ SCENARIO("Layouts", "[Layout]") {
 
 	auto widget11 = app->create< Widget >( widget1 );
 	widget11->isResizeable = true;
+	//widget11->resized.changed( [](Rect r) { std::cout << "Widget 3: " << r << std::endl; } );
 	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
 	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
 	//widget11->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );

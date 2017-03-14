@@ -145,7 +145,7 @@ public:
 	/**
 	* \brief When the widget is resized this property emits the new size
 	*/
-	PropertyEvent<Rect, Window> resized;
+	PropertyEvent<Rect, Widget> resized;
 
 
 	/**

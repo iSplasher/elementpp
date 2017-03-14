@@ -275,7 +275,7 @@ bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 
 		//std::cout << "Last Update Pos: " << w->resize_pos << " Current Pos: " << p <<  std::endl;
 
-		w->position = new_rect.pos();
+		w->position = new_rect.pos(); // important this is assigned to first. Size triggeres resize event which fetches position.
 		w->size = new_rect.size();
 
 	}
@@ -304,7 +304,7 @@ Direction Window::inResizeRangeHelper( Widget* w, Point p ) {
 void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
 	auto win = getWindow( r_window );
 	if( !win->blockEvents ) {
-		win->resized = Rect( win->position, Size( width, height ) );
+		//win->resized = Rect( win->position, Size( width, height ) );
 	}
 }
 

@@ -31,6 +31,7 @@ Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
 	leftPress.changed( [&](Point p) {
 		                  this->last_mouse_pos = p;
 	                  } );
+	size.changed([&](Size s) { resized = Rect(position, s); });
 
 	marginLeft = marginTop = marginRight = marginBottom = 5;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 5;
@@ -101,7 +102,7 @@ void Widget::setParent( Element* e ) {
 
 void Widget::handleMove( MouseEvent m_ev ) {
 	auto w = m_ev.widget;
-	if( w->isDraggable && w->parent_window->grabbed_widget != w ) {
+	if( w->isDraggable && !w->parent_window->grabbed_widget ) {
 		// check if left button is pressed
 		if( flags( m_ev.button & MouseButton::Left ) ) {
 
