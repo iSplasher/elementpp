@@ -72,6 +72,7 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->doublePress.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
 	auto widget2 = app->create< Widget >(widget1);
 	widget2->size = Size( 0, 0 );
+	widget2->isResizeable = true;
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
 	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
 	//widget2->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );
@@ -81,13 +82,13 @@ SCENARIO("Layouts", "[Layout]") {
 	layout->update();
 
 	auto widget11 = app->create< Widget >( widget1 );
-	widget11->isResizeable = true;
+	//widget11->isResizeable = true;
 	//widget11->resized.changed( [](Rect r) { std::cout << "Widget 3: " << r << std::endl; } );
 	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
 	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
 	//widget11->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );
 	auto widget12 = app->create< Widget >( widget1 );
-	widget12->isResizeable = true;
+	//widget12->isResizeable = true;
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
 	//widget12->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 4: " << m.position << std::endl; } );

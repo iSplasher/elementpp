@@ -240,6 +240,7 @@ public:
 private:
 
 	// data members
+
 	Window* parent_window = nullptr;
 	Widget* parent_widget;
 	PainterContext* this_paint = nullptr;

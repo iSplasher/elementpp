@@ -103,9 +103,9 @@ private:
 	bool dirty_layout = false; // layout has to recalculate
 	bool calculating = false; // layout is calculating
 	bool parent_has_calculated = false; // used to avoid an uncalculated node retrieving itself
+	Layout* bound_layout = nullptr; // layout that manages items for this widget
 
 	Layout* in_layout = nullptr; // layout this item is contained in
-	Layout* bound_layout = nullptr; // layout that manages items for this widget
 	LayoutNode node = nullptr;
 
 	friend class Layout;

@@ -43,9 +43,7 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 		                 }
 	                 } );
 	size.changed( [&](Size n) {
-		             if( type != ElementType::Layout ) {
 			             setSize( n );
-		             }
 	             } );
 	minSize.changed( [&](Size n) {
 		                setMinSize( n );
