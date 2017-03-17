@@ -248,6 +248,7 @@ void Window::applyWidgetResizeCursor( Widget* w, Direction dir ) {
 bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 	if( flags( buttons & MouseButton::Left ) && w->parent_window->grabbed_widget == w) {
 		p = w->mapFromWindow(p);
+
 		auto new_rect = w->geometry.get();
 
 		auto delta_pos = p - w->resize_pos;
@@ -273,7 +274,7 @@ bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 				break;
 		}
 
-		std::cout << "Current Pos: " << new_rect << " Delta Pos: " << delta_pos <<  std::endl;
+		//std::cout << "Current Pos: " << new_rect << " Delta Pos: " << delta_pos <<  std::endl;
 
 		w->position = new_rect.pos(); // important this is assigned to first. Size triggeres resize event which fetches position.
 		w->size = new_rect.size();

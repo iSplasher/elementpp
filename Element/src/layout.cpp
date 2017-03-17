@@ -1,7 +1,6 @@
 ﻿#include "element/layout.h"
 #include "element/widget.h"
-
-#include <yoga/Yoga.h>
+#include "deps/yoga/Yoga.h"
 
 USING_NAMESPACE
 USING_NAMESPACE_PRIV
@@ -43,7 +42,7 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 		                 }
 	                 } );
 	size.changed( [&](Size n) {
-			             setSize( n );
+		             setSize( n );
 	             } );
 	minSize.changed( [&](Size n) {
 		                setMinSize( n );
@@ -319,6 +318,7 @@ void Layoutable::setSize( Size n ) {
 		else
 			YGNodeStyleSetHeight( node, YGUndefined );
 	}
+
 	if( !calculating )
 		dirty_layout = true;
 }
@@ -477,6 +477,8 @@ Layout* Layoutable::getLayout() const {
 	return in_layout;
 }
 
+_LayoutConfig Layout::layout_config = nullptr;
+
 Layout::Layout() : Layoutable(),
                    position( [](Point p)-> Point { return p; }, Layoutable::position ),
                    size( [](Size s)-> Size { return s; }, Layoutable::size ),
@@ -487,7 +489,12 @@ Layout::Layout() : Layoutable(),
                    widget( this, std::mem_fn( &Layout::getWidget ), std::mem_fn( &Layout::setWidget ) ) {
 
 	setType( ElementType::Layout );
-	node = YGNodeNew();
+	if (!layout_config) {
+		layout_config = YGConfigNew();
+		YGConfigSetUseWebDefaults(layout_config, true);
+	}
+
+	node = YGNodeNewWithConfig(layout_config);
 	objectName = "Layout";
 
 	orientation.changed( [&](Orientation n) {
@@ -498,6 +505,11 @@ Layout::Layout() : Layoutable(),
 	             } );
 
 	Layout::applyStyle();
+}
+
+Layout::~Layout() {
+	if (layout_config)
+		YGConfigFree(layout_config);
 }
 
 void Layout::append( Layoutable* item, Alignment align ) {
@@ -516,7 +528,7 @@ void Layout::append( Layoutable* item, Alignment align ) {
 	item->in_layout = this;
 
 	if( !item->node ) {
-		item->node = YGNodeNew();
+		item->node = YGNodeNewWithConfig(layout_config);
 	}
 
 	auto n = YGNodeGetChildCount( node );
@@ -601,6 +613,21 @@ void Layout::setWidget( Widget* w ) {
 
 	if( w ) {
 		w->bound_layout = this;
+		/*if (w->node) {
+			YGNodeCopyStyle(node, w->node);
+			if (w->in_layout) {
+				YGNodeRemoveChild(w->in_layout->node, w->node);
+				w->in_layout->nodemap.erase(w->node);
+				
+				w->node = node;
+
+				auto n = YGNodeGetChildCount(w->in_layout->node);
+				YGNodeInsertChild(w->in_layout->node, w->node, n);
+				w->in_layout->nodemap.insert({ w->node, w });
+			}
+		} else {
+			w->node = node;
+		}*/
 	}
 }
 

@@ -7,16 +7,17 @@
 
 #include <unordered_map>
 
+using _LayoutNode = struct YGNode*;
+using _LayoutConfig = struct YGConfig*;
+
 NAMESPACE_BEGIN
 class Widget;
 class Layout;
 
 PRIV_NAMESPACE_BEGIN
-#include <yoga/Yoga.h>
 
 class Layoutable;
 
-using LayoutNode = YGNodeRef;
 using LayoutablePtr = std::unique_ptr< Layoutable >;
 
 
@@ -106,7 +107,7 @@ private:
 	Layout* bound_layout = nullptr; // layout that manages items for this widget
 
 	Layout* in_layout = nullptr; // layout this item is contained in
-	LayoutNode node = nullptr;
+	_LayoutNode node = nullptr;
 
 	friend class Layout;
 };
@@ -124,7 +125,7 @@ public:
 	// * structers
 	explicit Layout();
 
-	virtual ~Layout() = default;
+	virtual ~Layout();
 
 	// POSITION & SIZE 
 
@@ -181,7 +182,8 @@ private:
 	void applyStyle() override;
 
 	// data
-	std::unordered_map< priv::LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
+	std::unordered_map< _LayoutNode, PRIV_NAMESPACE::Layoutable* > nodemap;
+	static _LayoutConfig layout_config;
 	Widget* _widget = nullptr;
 };
 
