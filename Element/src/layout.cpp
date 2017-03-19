@@ -9,8 +9,8 @@ _LayoutConfig Layoutable::layout_config = nullptr;
 
 Layoutable::Layoutable(Layoutable* parent) : Element(parent),
 geometry([](Point pos, Size size) -> Rect {
-	return Rect(pos, size);
-}, position, size),
+	         return Rect(pos, size);
+         }, position, size),
 marginLeft(0),
 marginTop(0),
 marginRight(0),
@@ -26,12 +26,12 @@ paddingBottom(0),
 justifyContent(Justify::Default),
 alignItems(Align::Default),
 alignSelf(Align::Default),
-direction(Direction::Default),
 grow(0),
 shrink(0),
 basis(0),
-wrap(false),
-positionType(Position::Default) {
+positionType(Position::Default),
+direction(Direction::Default),
+wrap(false) {
 
 	if (!layout_config) {
 		layout_config = YGConfigNew();
@@ -317,6 +317,8 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if (node) {
+		if (type != ElementType::Window) {
+			
 		position = Point(YGNodeLayoutGetLeft(node), YGNodeLayoutGetTop(node));
 		size = Size(YGNodeLayoutGetWidth(node), YGNodeLayoutGetHeight(node));
 		minSize = Size(YGNodeStyleGetMinWidth(node).value, YGNodeStyleGetMinHeight(node).value);
@@ -326,6 +328,8 @@ void Layoutable::invalidated() {
 		marginTop = YGNodeStyleGetMargin(node, YGEdgeTop).value;
 		marginRight = YGNodeStyleGetMargin(node, YGEdgeRight).value;
 		marginBottom = YGNodeStyleGetMargin(node, YGEdgeBottom).value;
+
+		}
 
 		borderLeft = YGNodeStyleGetBorder(node, YGEdgeLeft);
 		borderTop = YGNodeStyleGetBorder(node, YGEdgeTop);

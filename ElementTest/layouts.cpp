@@ -6,7 +6,9 @@
 USING_NAMESPACE
 
 void printWidget( Layoutable* e ) {
+	auto t = e->type.get() == ElementType::Widget ? "Widget" : "Base";
 	std::cout << e->objectName << ": \n\t"
+			<< "Type: " << t << "\n\t"
 			<< "Geometry: " << e->geometry << "\n\t"
 			<< "Margin: (" << e->marginLeft << ", " << e->marginTop << ", " << e->marginRight << ", " << e->marginBottom << ")" << "\n\t"
 			<< "Border: (" << e->borderLeft << ", " << e->borderTop << ", " << e->borderRight << ", " << e->borderBottom << ")" << "\n\t"

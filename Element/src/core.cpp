@@ -11,10 +11,14 @@ Application* Application::self = nullptr;
 
 Element::Element() :
 	objectName( "Element" + std::to_string( ++id_counter ) ),
-	parent(this,  std::mem_fn(&Element::getParent), std::mem_fn(&Element::setParent)), core_id( id_counter ) {
+	parent( this, std::mem_fn( &Element::getParent ), std::mem_fn( &Element::setParent ) ),
+	core_id( id_counter ) {
+	setType(ElementType::Base);
 }
 
-Element::Element( Element *parent ) : Element() { this->parent = parent; }
+Element::Element( Element* parent ) : Element() {
+	this->parent = parent;
+}
 
 Element::~Element() {
 	// first we traverse the tree to tell our children that
@@ -29,7 +33,7 @@ Element::~Element() {
 
 			for( auto inner = iter.begin(); inner != iter.end(); ++inner ) {
 				( *inner )->parent_is_deleting = true;
-				(*( *inner )->object).reset();
+				( *( *inner )->object ).reset();
 			}
 			( *( *iter )->object ).reset();
 		}
@@ -50,10 +54,14 @@ Element* Element::getParent() const {
 	return _parent;
 }
 
-void Element::setParent(Element* new_parent ) {
+void Element::setParent( Element* new_parent ) {
 	if( App != nullptr && init ) {
-		if( new_parent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
-		else { this->internal_tree = App->internal_tree.reinsert( internal_tree ); }
+		if( new_parent ) {
+			this->internal_tree = new_parent->internal_tree.reinsert( internal_tree );
+		}
+		else {
+			this->internal_tree = App->internal_tree.reinsert( internal_tree );
+		}
 	}
 
 	_parent = new_parent;
@@ -69,10 +77,10 @@ static void closeWindowCallback( GLFWwindow* r_window ) {
 Application::Application() :
 	Element(),
 	elementCount( this, std::mem_fn( &Application::getElementCount ) ),
-	doubleClickInterval( this, std::mem_fn( &Application::getDoubleClickInterval ), std::mem_fn(&Application::setDoubleClickInterval)),
-	clickInterval( this, std::mem_fn( &Application::getClickInterval ), std::mem_fn(&Application::setClickInterval)),
+	doubleClickInterval( this, std::mem_fn( &Application::getDoubleClickInterval ), std::mem_fn( &Application::setDoubleClickInterval ) ),
+	clickInterval( this, std::mem_fn( &Application::getClickInterval ), std::mem_fn( &Application::setClickInterval ) ),
 	component_objects( std::make_unique< ElementContainer >() ),
-	component_tree( std::make_unique< ElementTree >() ){
+	component_tree( std::make_unique< ElementTree >() ) {
 	internal_tree = component_tree->tree_iterator();
 
 	assert(self == nullptr);
@@ -83,7 +91,7 @@ Application::Application() :
 
 	glEnable( GL_MULTISAMPLE );
 	objectName = "Application";
-	setType(ElementType::Application);
+	setType( ElementType::Application );
 }
 
 Application::~Application() {
@@ -104,9 +112,9 @@ Application* Application::instance() { return self; }
 
 bool Application::processEv() const {
 	// TODO: optimize this so it doesn't check all
-	for (auto &core : *component_tree) {
-		if (core->type == ElementType::Window) {
-			static_cast<Layoutable*>(core)->update();
+	for( auto& core : *component_tree ) {
+		if( core->type == ElementType::Window ) {
+			static_cast< Layoutable* >( core )->update();
 		}
 	}
 	glfwWaitEvents();
@@ -119,8 +127,6 @@ std::size_t Application::getElementCount() const {
 }
 
 float Application::getDoubleClickInterval() const { return double_click_interval; }
-void Application::setDoubleClickInterval(float i) { double_click_interval = i; }
+void Application::setDoubleClickInterval( float i ) { double_click_interval = i; }
 float Application::getClickInterval() const { return click_interval; }
-void Application::setClickInterval(float i) { click_interval = i; }
-
-
+void Application::setClickInterval( float i ) { click_interval = i; }

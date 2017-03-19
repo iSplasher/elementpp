@@ -20,6 +20,7 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
                                                  borderRadiusTopRight( 0 ),
                                                  borderRadiusBottomLeft( 0 ),
                                                  borderRadiusBottomRight( 0 ) {
+	this->parent = parent; // we've overriden setParent so we need to call from this class too
 	objectName = "Widget";
 	setType( ElementType::Widget );
 
@@ -93,7 +94,7 @@ Point Widget::mapToScreen( Point p ) {
 
 void Widget::setParent( Element* e ) {
 	Layoutable::setParent( e );
-	parent_widget = static_cast< Widget* >( e );
+	parent_widget = e ? static_cast< Widget* >( e ) : nullptr;
 	if( e && e->type == ElementType::Window )
 		parent_window = static_cast< Window* >( parent_widget );
 	else if( e )
