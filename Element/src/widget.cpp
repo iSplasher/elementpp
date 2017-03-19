@@ -5,7 +5,7 @@
 
 USING_NAMESPACE
 
-Widget::Widget( Widget* parent ) : PRIV_NAMESPACE::Layoutable( parent ),
+Widget::Widget( Widget* parent ) : Layoutable( parent ),
                                                  contentGeometry( [&](Rect n) -> Rect {
 	                                                                  return Rect( n.x + paddingLeft + borderLeft,
 	                                                                               n.y + paddingTop + borderLeft,

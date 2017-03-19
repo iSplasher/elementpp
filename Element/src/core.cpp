@@ -55,6 +55,7 @@ void Element::setParent(Element* new_parent ) {
 		if( new_parent ) { this->internal_tree = new_parent->internal_tree.reinsert( internal_tree ); }
 		else { this->internal_tree = App->internal_tree.reinsert( internal_tree ); }
 	}
+
 	_parent = new_parent;
 }
 
@@ -104,9 +105,8 @@ Application* Application::instance() { return self; }
 bool Application::processEv() const {
 	// TODO: optimize this so it doesn't check all
 	for (auto &core : *component_tree) {
-
-		if (core->type == ElementType::Window || core->type == ElementType::Layout) {
-			static_cast<Layout*>(core)->update();
+		if (core->type == ElementType::Window) {
+			static_cast<Layoutable*>(core)->update();
 		}
 	}
 	glfwWaitEvents();

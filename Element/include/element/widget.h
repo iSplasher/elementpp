@@ -19,7 +19,7 @@ NAMESPACE_END
 /**
  * \brief Base widget. Should be used to compose more specific widgets.
  */
-class ELEMENT_API Widget : public PRIV_NAMESPACE::Layoutable {
+class ELEMENT_API Widget : public Layoutable {
 public:
 
 	enum MoveState {
@@ -244,7 +244,7 @@ private:
 	Window* parent_window = nullptr;
 	Widget* parent_widget;
 	PainterContext* this_paint = nullptr;
-	Point last_mouse_pos;
+	Point last_mouse_pos; // needed to drag widget
 	std::unique_ptr<PRIV_NAMESPACE::_Cursor> _cursor = nullptr;
 	Point resize_pos;
 	Direction resize_dir = Direction::None;

@@ -12,7 +12,7 @@ NAMESPACE_BEGIN
 
 class ELEMENT_API Window : public Widget {
 public:
-	explicit Window(Window* parent = nullptr) : Window(Rect(700, 450, 500, 300), parent) {}
+	explicit Window(Window* parent = nullptr) : Window(Rect(0, 0, 500, 300), parent) {}
 	explicit Window(Rect rect, Window* parent = nullptr);
 	virtual ~Window();
 

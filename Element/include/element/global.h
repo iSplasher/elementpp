@@ -73,8 +73,18 @@ enum class Direction {
 	Top = 1 << 1,
 	Right = 1 << 2,
 	Bottom = 1 << 3,
-	Reverse = 1 << 4,
 	Default = 1 << 5
+};
+
+DEFINE_ENUM_FLAGS(ReadingDirection)
+
+
+enum class ReadingDirection {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	LTR = 1,
+	RTL = 1 << 1,
+	Default = 1 << 2
 };
 
 
@@ -90,11 +100,62 @@ enum class Orientation {
 	Default = 1 << 3
 };
 
+DEFINE_ENUM_FLAGS(Position)
 
-DEFINE_ENUM_FLAGS(Alignment)
+
+enum class Position {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Absolute = 1,
+	Relative = 1 << 1,
+	Default = 1 << 2
+};
+
+DEFINE_ENUM_FLAGS(Justify)
 
 
-enum class Alignment {
+enum class Justify {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Start = 1,
+	Center = 1 << 1,
+	End = 1 << 2,
+	SpaceBetween = 1 << 3,
+	SpaceAround = 1 << 4,
+	Default = 1 << 5,
+};
+
+DEFINE_ENUM_FLAGS(Align)
+
+
+enum class Align {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Start = 1,
+	Center = 1 << 1,
+	End = 1 << 2,
+	Stretch = 1 << 3,
+	Default = 1 << 4,
+};
+
+
+DEFINE_ENUM_FLAGS(Overflow)
+
+
+enum class Overflow {
+	Any = 0xF, // 28bits = 0xFFFFFFFF,
+	None = 0x0,
+	Visible = 1,
+	Hidden = 1 << 1,
+	Scroll = 1 << 2,
+	Default = 1 << 3
+};
+
+
+DEFINE_ENUM_FLAGS(Egde)
+
+
+enum class Edge {
 	Any = 0xF, // 28bits = 0xFFFFFFFF,
 	None = 0x0,
 	Start = 1,
@@ -103,8 +164,10 @@ enum class Alignment {
 	Top = 1 << 3,
 	Right = 1 << 4,
 	Bottom = 1 << 5,
-	Center = 1 << 6,
-	Default = 1 << 7
+	HCenter = 1 << 6,
+	VCenter = 1 << 7,
+	Default = 1 << 8,
+	All = 1 << 9
 };
 
 

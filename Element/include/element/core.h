@@ -21,7 +21,6 @@ enum class ElementType {
 	Application,
 	Widget,
 	Window,
-	Layout
 };
 
 enum class ExitCode {
