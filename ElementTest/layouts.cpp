@@ -70,10 +70,9 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->leftDoublePress.changed([](Point p) { std::cout << "Double Left Click: Widget 1: " << p << std::endl; });
 	//widget1->rightDoublePress.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
 	//widget1->doublePress.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
-	auto widget2 = app->create< Widget >();
-	widget2->size = Size( 0, 0 );
 	auto widget1 = app->create< Widget >(window);
 	widget1->isResizeable = true;
+	auto widget2 = app->create< Widget >(window);
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
 	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
 	//widget2->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );

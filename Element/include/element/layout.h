@@ -83,6 +83,8 @@ protected:
 
 	bool inLayout(Layoutable*) const;
 
+	static void setPixelRatio(float);
+
 private:
 
 	virtual void updateChildren();

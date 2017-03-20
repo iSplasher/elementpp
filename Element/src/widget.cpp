@@ -6,23 +6,23 @@
 USING_NAMESPACE
 
 Widget::Widget( Widget* parent ) : Layoutable( parent ),
-                                                 contentGeometry( [&](Rect n) -> Rect {
-	                                                                  return Rect( n.x + paddingLeft + borderLeft,
-	                                                                               n.y + paddingTop + borderLeft,
-	                                                                               n.width - ( paddingRight + borderRight ) * 2,
-	                                                                               n.height - ( paddingBottom + borderBottom ) * 2 );
-                                                                  }, geometry ),
-                                                 contentSize( [&](Size n) -> Size {
-	                                                              return Size( n.width - ( paddingRight + borderRight ) * 2,
-	                                                                           n.height - ( paddingBottom + borderBottom ) * 2 );
-                                                              }, size ),
-                                                 borderRadiusTopLeft( 0 ),
-                                                 borderRadiusTopRight( 0 ),
-                                                 borderRadiusBottomLeft( 0 ),
-                                                 borderRadiusBottomRight( 0 ) {
+                                   contentGeometry( [&](Rect n) -> Rect {
+	                                                    return Rect( n.x + paddingLeft + borderLeft,
+	                                                                 n.y + paddingTop + borderLeft,
+	                                                                 n.width - ( paddingRight + borderRight ) * 2,
+	                                                                 n.height - ( paddingBottom + borderBottom ) * 2 );
+                                                    }, geometry ),
+                                   contentSize( [&](Size n) -> Size {
+	                                                return Size( n.width - ( paddingRight + borderRight ) * 2,
+	                                                             n.height - ( paddingBottom + borderBottom ) * 2 );
+                                                }, size ),
+                                   borderRadiusTopLeft( 0 ),
+                                   borderRadiusTopRight( 0 ),
+                                   borderRadiusBottomLeft( 0 ),
+                                   borderRadiusBottomRight( 0 ) {
 	this->parent = parent; // we've overriden setParent so we need to call from this class too
 	objectName = "Widget";
-	if (parent) {
+	if( parent ) {
 		parent->append( this );
 	}
 	setType( ElementType::Widget );
@@ -35,13 +35,13 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
 	leftPress.changed( [&](Point p) {
 		                  this->last_mouse_pos = p;
 	                  } );
-	size.changed([&](Size s) { resized = Rect(position, s); });
+	size.changed( [&](Size s) { resized = Rect( position, s ); } );
 
 	marginLeft = marginTop = marginRight = marginBottom = 5;
-	paddingLeft = paddingTop = paddingRight = paddingBottom = 5;
-	borderLeft = borderTop = borderRight = borderBottom = 5;
-	borderColor = Color( 27, 27, 27, 200 );
-	backgroundColor = Color( 255, 0, 0 );
+	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
+	borderLeft = borderTop = borderRight = borderBottom = 0;
+	borderColor = Color( 0, 200, 0, 200 );
+	backgroundColor = Color( 255, 0, 0, 255 );
 	foregroundColor = Color( 0, 0, 0 );
 }
 
@@ -54,15 +54,16 @@ void Widget::paint( Painter& painter ) {}
 void Widget::update() {
 	if( parent_window ) {
 		auto& painter = *parent_window->painter;
-		painter.save();
-		painter.origin = Point( mapToWindow( Point( 0, 0 ) ) );
-		painter.current_widget = this;
-		if( paintWidget && parent_window )
+		if( paintWidget && parent_window ) {
+			painter.save();
+			painter.origin = Point( mapToWindow( Point( 0, 0 ) ) );
+			painter.current_widget = this;
 			painter.paintWidget( this );
-		painter.origin = Point( contentGeometry.get().pos() );
-		painter.clip( Rect( 0, 0, contentSize ) );
-		paint( painter );
-		painter.restore();
+			painter.origin = Point( contentGeometry.get().pos() );
+			painter.clip( Rect( 0, 0, contentSize ) );
+			paint( painter );
+			painter.restore();
+		}
 	}
 	Layoutable::update();
 }
@@ -96,6 +97,11 @@ Point Widget::mapToScreen( Point p ) {
 }
 
 void Widget::setParent( Element* e ) {
+	if( !e ) {
+		if( parent.get() )
+			static_cast< Widget* >( parent.get() )->take( this );
+	}
+
 	Layoutable::setParent( e );
 	parent_widget = e ? static_cast< Widget* >( e ) : nullptr;
 	if( e && e->type == ElementType::Window )
@@ -103,8 +109,8 @@ void Widget::setParent( Element* e ) {
 	else if( e )
 		parent_window = parent_widget->parent_window;
 
-	if (e) {
-		static_cast<Widget*>(e)->append(this);
+	if( e ) {
+		static_cast< Widget* >( e )->append( this );
 	}
 }
 

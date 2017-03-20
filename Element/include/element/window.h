@@ -18,6 +18,8 @@ public:
 
 	void update() override;
 
+	Property<float, Window> pixelRatio;
+
 private:
 	//methods
 	/**

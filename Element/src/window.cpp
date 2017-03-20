@@ -161,6 +161,9 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 #endif
 		_inited = true;
 	}
+
+	pixelRatio.changed([](float p) { setPixelRatio(p); });
+	pixelRatio = getPixelRatio(r_window);
 	hresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::HResize, r_window );
 	vresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::VResize, r_window );
 	objectName = "Window";
@@ -201,7 +204,9 @@ void Window::update() {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glEnable( GL_CULL_FACE );
 
-	painter->begin( getPixelRatio( r_window ) );
+	pixelRatio = getPixelRatio(r_window);
+
+	painter->begin( pixelRatio );
 	Widget::update();
 	painter->end();
 	if( r_window ) {
