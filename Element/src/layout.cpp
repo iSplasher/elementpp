@@ -240,22 +240,23 @@ void Layoutable::append( Layoutable* item ) {
 
 	auto l = static_cast<Layoutable*>(item->parent.get());
 
-	if (l == this)
-		return; // TODO: maybe warn?
-
 	// take from old widget
-	if (l)
+	if (l && l != this)
 		l->take(item);
 
-	item->parent = this;
+	if (l != this) {
+		item->parent = this;
+	}
 
 	if (!item->node) {
 		item->node = YGNodeNewWithConfig(layout_config);
 	}
 
-	auto n = YGNodeGetChildCount(node);
-	YGNodeInsertChild(node, item->node, n);
-	nodemap.insert({ item->node, item });
+	if (!nodemap.count(item->node)) {
+		auto n = YGNodeGetChildCount(node);
+		YGNodeInsertChild(node, item->node, n);
+		nodemap.insert({ item->node, item });
+	}
 
 	dirty_layout = true;
 }
@@ -277,8 +278,14 @@ void Layoutable::take( Layoutable* item ) {
 }
 
 void Layoutable::invalidate() {
-	if (parent.get()) { // if this layout is managing a widget, use the widget's properties
-		Size s = static_cast<Layoutable*>(parent.get())->size;
+	auto is_window = type == ElementType::Window;
+	if (parent.get() || is_window) { // if this layout is managing a widget, use the widget's properties
+		Size s;
+		if (is_window) {
+			s = this->size;
+		} else {
+			s = static_cast<Layoutable*>(parent.get())->size;
+		}
 		YGNodeCalculateLayout(node, s.width, s.height, YGDirectionLTR);
 	}
 	else { // else, use our own properties
@@ -307,6 +314,12 @@ void Layoutable::update() {
 	}
 
 	updateChildren();
+}
+
+bool Layoutable::inLayout( Layoutable* w ) const {
+	if (w->node)
+		return nodemap.count(w->node);
+	return false;
 }
 
 void Layoutable::updateChildren() {
@@ -428,37 +441,41 @@ void Layoutable::setSize(Size n) {
 }
 
 void Layoutable::setPosition(Point n) {
-	if (node && type != ElementType::Window) {
+	if (type != ElementType::Window) {
+		if (node) {
 
-			YGNodeStyleSetPosition(node, YGEdgeLeft, n.x);
-			YGNodeStyleSetPosition(node, YGEdgeTop, n.y);
+				YGNodeStyleSetPosition(node, YGEdgeLeft, n.x);
+				YGNodeStyleSetPosition(node, YGEdgeTop, n.y);
+		}
+		if (!calculating)
+			dirty_layout = true;
 	}
-	if (!calculating)
-		dirty_layout = true;
 }
 
 void Layoutable::setMargin(float n, Direction d) {
-	if (node) {
+	if (type != ElementType::Window) {
+		if (node) {
 
-		if (flags(d & Direction::Left)) {
-			YGNodeStyleSetMargin(node, YGEdgeLeft, n);
+			if (flags(d & Direction::Left)) {
+				YGNodeStyleSetMargin(node, YGEdgeLeft, n);
+			}
+
+			if (flags(d & Direction::Top)) {
+				YGNodeStyleSetMargin(node, YGEdgeTop, n);
+			}
+
+			if (flags(d & Direction::Right)) {
+				YGNodeStyleSetMargin(node, YGEdgeRight, n);
+			}
+
+			if (flags(d & Direction::Bottom)) {
+				YGNodeStyleSetMargin(node, YGEdgeBottom, n);
+			}
+
 		}
-
-		if (flags(d & Direction::Top)) {
-			YGNodeStyleSetMargin(node, YGEdgeTop, n);
-		}
-
-		if (flags(d & Direction::Right)) {
-			YGNodeStyleSetMargin(node, YGEdgeRight, n);
-		}
-
-		if (flags(d & Direction::Bottom)) {
-			YGNodeStyleSetMargin(node, YGEdgeBottom, n);
-		}
-
+		if (!calculating)
+			dirty_layout = true;
 	}
-	if (!calculating)
-		dirty_layout = true;
 }
 
 void Layoutable::setBorder( float n, Direction d ) {

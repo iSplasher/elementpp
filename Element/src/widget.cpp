@@ -22,6 +22,9 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
                                                  borderRadiusBottomRight( 0 ) {
 	this->parent = parent; // we've overriden setParent so we need to call from this class too
 	objectName = "Widget";
+	if (parent) {
+		parent->append( this );
+	}
 	setType( ElementType::Widget );
 
 	mouseMoved.changed( handleMove );
@@ -54,7 +57,7 @@ void Widget::update() {
 		painter.save();
 		painter.origin = Point( mapToWindow( Point( 0, 0 ) ) );
 		painter.current_widget = this;
-		if( paintWidget )
+		if( paintWidget && parent_window )
 			painter.paintWidget( this );
 		painter.origin = Point( contentGeometry.get().pos() );
 		painter.clip( Rect( 0, 0, contentSize ) );
@@ -99,6 +102,10 @@ void Widget::setParent( Element* e ) {
 		parent_window = static_cast< Window* >( parent_widget );
 	else if( e )
 		parent_window = parent_widget->parent_window;
+
+	if (e) {
+		static_cast<Widget*>(e)->append(this);
+	}
 }
 
 void Widget::handleMove( MouseEvent m_ev ) {

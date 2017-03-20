@@ -12,7 +12,6 @@ NAMESPACE_BEGIN
 class Element;
 using ElementPtr = std::unique_ptr< Element >;
 class Window;
-class Widget;
 class Application;
 
 
@@ -68,6 +67,9 @@ public:
 protected:
 
 	void setType( ElementType t ) { type = t; }
+	virtual void setParent(Element*);
+	Element* getParent() const;
+
 
 private:
 	using ElementTree = PRIV_NAMESPACE::tree< Element* >;
@@ -98,10 +100,6 @@ private:
 	}
 
 	// FUNCTIONS
-	virtual void setParent( Element* );
-
-	Element* getParent() const;
-
 
 	//log(LogLevel, std::string);
 
@@ -121,7 +119,6 @@ private:
 	bool parent_is_deleting = false;
 
 	friend class Application;
-	friend class Widget;
 	friend class Window;
 };
 
@@ -260,6 +257,7 @@ T* Application::create( Args&& ... args ) {
 	else { item->internal_tree = component_tree->push_back(item.get()); }
 
 	item->init = true;
+
 	return static_cast<T*>(item.get());
 }
 

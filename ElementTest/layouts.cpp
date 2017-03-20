@@ -6,9 +6,8 @@
 USING_NAMESPACE
 
 void printWidget( Layoutable* e ) {
-	auto t = e->type.get() == ElementType::Widget ? "Widget" : "Base";
 	std::cout << e->objectName << ": \n\t"
-			<< "Type: " << t << "\n\t"
+			<< "Children: " << e->children().size() << "\n\t"
 			<< "Geometry: " << e->geometry << "\n\t"
 			<< "Margin: (" << e->marginLeft << ", " << e->marginTop << ", " << e->marginRight << ", " << e->marginBottom << ")" << "\n\t"
 			<< "Border: (" << e->borderLeft << ", " << e->borderTop << ", " << e->borderRight << ", " << e->borderBottom << ")" << "\n\t"
@@ -60,7 +59,6 @@ SCENARIO("Layouts", "[Layout]") {
 	//window->mouseMoved.changed( [&](MouseEvent m) { std::cout << "Window: " << window->position.get() << std::endl; } );
 	//window->mouseMoved.changed( [](MouseEvent m) { std::cout << "Window: " << m.position << std::endl; } );
 	//window->leftPress.changed( [](MouseEvent m) { std::cout << "Left Pressed: Window: " << m.position << std::endl; } );
-	auto widget1 = app->create< Widget >(window);
 	//widget1->size = Size( 600, 400 );
 	//widget1->alignment = Edge::Center;
 	//widget1->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 1: " << m.position << std::endl; } );
@@ -72,15 +70,15 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->leftDoublePress.changed([](Point p) { std::cout << "Double Left Click: Widget 1: " << p << std::endl; });
 	//widget1->rightDoublePress.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
 	//widget1->doublePress.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
-	auto widget2 = app->create< Widget >(widget1);
-	//widget2->size = Size( 0, 0 );
+	auto widget2 = app->create< Widget >();
+	widget2->size = Size( 0, 0 );
+	auto widget1 = app->create< Widget >(window);
 	widget1->isResizeable = true;
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
 	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
 	//widget2->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );
-	window->append( { widget1 } );
-	window->append( { widget2 } );
-	window->update();
+	//window->append( { widget1 } );
+	//window->append( { widget2 } );
 
 	auto widget11 = app->create< Widget >( widget1 );
 	widget11->grow = 2;
@@ -89,20 +87,21 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
 	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
 	//widget11->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );
-	auto widget12 = app->create< Widget >( widget1 );
+	auto widget12 = app->create< Widget >();
+	widget12->parent = widget1;
 	widget12->isResizeable = true;
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
 	//widget12->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 4: " << m.position << std::endl; } );
-	widget1->append({widget11, widget12});
+	window->update();
 
 	auto p = [&](MouseEvent)
 	{
-		widget1->position = Point(10, 10);
 	printWidget(window);
 	printWidget(widget1);
 	printWidget(widget2);
-
+	printWidget(widget11);
+	printWidget(widget12);
 	};
 
 	window->click.changed(p);

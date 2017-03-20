@@ -79,6 +79,10 @@ public:
 	 */
 	virtual void update();
 
+protected:
+
+	bool inLayout(Layoutable*) const;
+
 private:
 
 	virtual void updateChildren();
