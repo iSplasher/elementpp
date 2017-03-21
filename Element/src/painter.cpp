@@ -280,7 +280,7 @@ void Painter::paintWidget( Widget* w ) {
 	b.setColor( w->borderColor );
 	drawRoundedRect( Rect( 0, 0, size.width, size.height ) , w->borderRadiusTopLeft, w->borderRadiusTopRight, w->borderRadiusBottomRight, w->borderRadiusBottomLeft); // border
 	b.setColor( w->backgroundColor );
-	auto content_geometry = Rect( w->borderLeft, w->borderTop, size.width - w->borderRight, size.height - w->borderBottom );
+	auto content_geometry = Rect( w->borderLeft, w->borderTop, size.width - (w->borderRight * 2), size.height - (w->borderBottom * 2) );
 	drawRect( Rect( content_geometry ) ); // contents
 	p.setWidth( 1 );
 }

@@ -15,6 +15,12 @@ void printWidget( Layoutable* e ) {
 			<< std::endl;
 }
 
+void setDefault( Widget* w ) {
+	w->borderLeft = w->borderTop = w->borderRight = w->borderBottom = 5;
+	w->paddingLeft = w->paddingTop = w->paddingRight = w->paddingBottom = 5;
+	w->marginLeft = w->marginTop = w->marginRight = w->marginBottom = 5;
+}
+
 SCENARIO("Layouts", "[Layout]") {
 	Application* app = Application::instance();
 	if( !app )
@@ -71,8 +77,11 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->rightDoublePress.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
 	//widget1->doublePress.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
 	auto widget1 = app->create< Widget >(window);
+	setDefault(widget1);
 	widget1->isResizeable = true;
-	auto widget2 = app->create< Widget >(window);
+	auto widget2 = app->create< Widget >();
+	setDefault(widget2);
+	widget2->objectName = "Widget2";
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
 	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
 	//widget2->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );
@@ -80,6 +89,7 @@ SCENARIO("Layouts", "[Layout]") {
 	//window->append( { widget2 } );
 
 	auto widget11 = app->create< Widget >( widget1 );
+	setDefault(widget11);
 	widget11->grow = 2;
 	//widget11->isResizeable = true;
 	//widget11->resized.changed( [](Rect r) { std::cout << "Widget 3: " << r << std::endl; } );
@@ -87,6 +97,7 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
 	//widget11->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );
 	auto widget12 = app->create< Widget >();
+	setDefault(widget12);
 	widget12->parent = widget1;
 	widget12->isResizeable = true;
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );

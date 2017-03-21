@@ -14,7 +14,7 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
                                                     }, geometry ),
                                    contentSize( [&](Size n) -> Size {
 	                                                return Size( n.width - ( paddingRight + borderRight ) * 2,
-	                                                             n.height - ( paddingBottom + borderBottom ) * 2 );
+	                                                             n.height - ( paddingBottom + borderBottom ) * 2);
                                                 }, size ),
                                    borderRadiusTopLeft( 0 ),
                                    borderRadiusTopRight( 0 ),
@@ -37,9 +37,6 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
 	                  } );
 	size.changed( [&](Size s) { resized = Rect( position, s ); } );
 
-	marginLeft = marginTop = marginRight = marginBottom = 5;
-	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
-	borderLeft = borderTop = borderRight = borderBottom = 0;
 	borderColor = Color( 0, 200, 0, 200 );
 	backgroundColor = Color( 255, 0, 0, 255 );
 	foregroundColor = Color( 0, 0, 0 );

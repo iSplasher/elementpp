@@ -296,6 +296,7 @@ void Layoutable::invalidate() {
 		i.second->calculating = true;
 		i.second->invalidated();
 		i.second->calculating = false;
+		i.second->dirty_layout = false;
 	}
 
 }
@@ -332,12 +333,16 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
+		std::cout << "\n";
+		YGNodePrint(node, YGPrintOptionsLayout);
+		std::cout << "\n";
+		YGNodePrint(node, YGPrintOptionsStyle);
+		std::cout << "\n";
 		float nan1, nan2;
 		if( type != ElementType::Window ) {
-
+			std::string obj = objectName;
 			position = Point( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
 			size = Size( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
-
 			nan1 = YGNodeStyleGetMinWidth(node).value;
 			nan2 = YGNodeStyleGetMinHeight( node ).value;
 			minSize = Size(std::isnan( nan1 ) ? 0 : nan1, std::isnan( nan2 ) ? 0 : nan2);
@@ -466,6 +471,8 @@ void Layoutable::setSize( Size n ) {
 void Layoutable::setPosition( Point n ) {
 	if( type != ElementType::Window ) {
 		if( node ) {
+
+			std::string obj = objectName;
 
 			YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
 			YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
