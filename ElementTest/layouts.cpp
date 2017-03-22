@@ -19,6 +19,7 @@ void setDefault( Widget* w ) {
 	w->borderLeft = w->borderTop = w->borderRight = w->borderBottom = 5;
 	w->paddingLeft = w->paddingTop = w->paddingRight = w->paddingBottom = 5;
 	w->marginLeft = w->marginTop = w->marginRight = w->marginBottom = 5;
+	w->positionType = Position::Relative;
 }
 
 SCENARIO("Layouts", "[Layout]") {
@@ -29,6 +30,9 @@ SCENARIO("Layouts", "[Layout]") {
 	auto window = app->create< Window >();
 	window->position = Point(700, 450);
 	window->size = Size(600, 400);
+
+	window->update();
+
 	//window->resized.changed( [](Rect r) { std::cout << "Window: " << r << std::endl; } );
 	//window->mouseMoved.changed( [&](MouseEvent m) { std::cout << "Window: " << window->position.get() << std::endl; } );
 	//window->mouseMoved.changed( [](MouseEvent m) { std::cout << "Window: " << m.position << std::endl; } );
@@ -88,5 +92,17 @@ SCENARIO("Layouts", "[Layout]") {
 	window->click.changed(p);
 
 	app->exec();
+
+	GIVEN("Flexlayout") {
+
+		WHEN("Event is pushed") {
+
+
+			THEN("Same object is returned") {
+			}
+
+		}
+
+	}
 
 }

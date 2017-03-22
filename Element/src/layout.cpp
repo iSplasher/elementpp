@@ -312,8 +312,8 @@ bool Layoutable::inLayout( Layoutable* w ) const {
 }
 
 void Layoutable::setPixelRatio( float p ) {
-	if (layout_config) {
-		YGConfigSetPointScaleFactor(layout_config, p);
+	if( layout_config ) {
+		YGConfigSetPointScaleFactor( layout_config, p );
 	}
 }
 
@@ -325,57 +325,63 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
+		//std::string obj = objectName;
+		//std::cout << "\n";
+		//YGNodePrint(node, YGPrintOptionsLayout);
+		//std::cout << "\n";
+		//YGNodePrint(node, YGPrintOptionsStyle);
+		//std::cout << "\n";
+
 		float nan1, nan2;
 		if( type != ElementType::Window ) {
-			std::string obj = objectName;
 			position = Point( YGNodeLayoutGetLeft( node ), YGNodeLayoutGetTop( node ) );
 			size = Size( YGNodeLayoutGetWidth( node ), YGNodeLayoutGetHeight( node ) );
-			nan1 = YGNodeStyleGetMinWidth(node).value;
+			nan1 = YGNodeStyleGetMinWidth( node ).value;
 			nan2 = YGNodeStyleGetMinHeight( node ).value;
-			minSize = Size(std::isnan( nan1 ) ? 0 : nan1, std::isnan( nan2 ) ? 0 : nan2);
-			nan1 = YGNodeStyleGetMaxWidth(node).value;
-			nan2 = YGNodeStyleGetMaxHeight(node).value;
-			maxSize = Size(std::isnan(nan1) ? 0 : nan1, std::isnan(nan2) ? 0 : nan2);
+			minSize = Size( std::isnan( nan1 ) ? 0 : nan1, std::isnan( nan2 ) ? 0 : nan2 );
+			nan1 = YGNodeStyleGetMaxWidth( node ).value;
+			nan2 = YGNodeStyleGetMaxHeight( node ).value;
+			maxSize = Size( std::isnan( nan1 ) ? 0 : nan1, std::isnan( nan2 ) ? 0 : nan2 );
 
 			nan1 = YGNodeStyleGetMargin( node, YGEdgeLeft ).value;
-			marginLeft = std::isnan(nan1) ? 0 : nan1;
-			nan1 = YGNodeStyleGetMargin(node, YGEdgeTop).value;
-			marginTop = std::isnan(nan1) ? 0 : nan1;
-			nan1 = YGNodeStyleGetMargin(node, YGEdgeRight).value;
-			marginRight = std::isnan(nan1) ? 0 : nan1;
-			nan1 = YGNodeStyleGetMargin(node, YGEdgeBottom).value;
-			marginBottom = std::isnan(nan1) ? 0 : nan1;
+			marginLeft = std::isnan( nan1 ) ? 0 : nan1;
+			nan1 = YGNodeStyleGetMargin( node, YGEdgeTop ).value;
+			marginTop = std::isnan( nan1 ) ? 0 : nan1;
+			nan1 = YGNodeStyleGetMargin( node, YGEdgeRight ).value;
+			marginRight = std::isnan( nan1 ) ? 0 : nan1;
+			nan1 = YGNodeStyleGetMargin( node, YGEdgeBottom ).value;
+			marginBottom = std::isnan( nan1 ) ? 0 : nan1;
 
 		}
 
-		nan1 = YGNodeStyleGetBorder(node, YGEdgeLeft);
-		borderLeft = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetBorder(node, YGEdgeTop);
-		borderTop = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetBorder(node, YGEdgeRight);
-		borderRight = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetBorder(node, YGEdgeBottom);
-		borderBottom = std::isnan(nan1) ? 0 : nan1;
+		nan1 = YGNodeStyleGetBorder( node, YGEdgeLeft );
+		borderLeft = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetBorder( node, YGEdgeTop );
+		borderTop = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetBorder( node, YGEdgeRight );
+		borderRight = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetBorder( node, YGEdgeBottom );
+		borderBottom = std::isnan( nan1 ) ? 0 : nan1;
 
-		nan1 = YGNodeStyleGetPadding(node, YGEdgeLeft).value;
-		paddingLeft = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetPadding(node, YGEdgeTop).value;
-		paddingTop = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetPadding(node, YGEdgeRight).value;
-		paddingRight = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetPadding(node, YGEdgeBottom).value;
-		paddingBottom = std::isnan(nan1) ? 0 : nan1;
+		nan1 = YGNodeStyleGetPadding( node, YGEdgeLeft ).value;
+		paddingLeft = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetPadding( node, YGEdgeTop ).value;
+		paddingTop = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetPadding( node, YGEdgeRight ).value;
+		paddingRight = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetPadding( node, YGEdgeBottom ).value;
+		paddingBottom = std::isnan( nan1 ) ? 0 : nan1;
 
-		nan1 = YGNodeStyleGetFlexGrow(node);
-		grow = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetFlexShrink(node);
-		shrink = std::isnan(nan1) ? 0 : nan1;
-		nan1 = YGNodeStyleGetFlexBasis(node).value;
-		basis = std::isnan(nan1) ? 0 : nan1;
+		nan1 = YGNodeStyleGetFlexGrow( node );
+		grow = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetFlexShrink( node );
+		shrink = std::isnan( nan1 ) ? 0 : nan1;
+		nan1 = YGNodeStyleGetFlexBasis( node ).value;
+		basis = std::isnan( nan1 ) ? 0 : nan1;
 	}
 
 	// inform all underlying items
-	for (auto i : nodemap) {
+	for( auto i : nodemap ) {
 		i.second->calculating = true;
 		i.second->invalidated();
 		i.second->calculating = false;
@@ -384,169 +390,181 @@ void Layoutable::invalidated() {
 }
 
 void Layoutable::setGrow( float n ) {
-	if( node ) {
-		if( n >= 0 )
-			YGNodeStyleSetFlexGrow( node, n );
-	}
-	if( !calculating )
+	if( !calculating ) {
+		if( node ) {
+			if( n >= 0 )
+				YGNodeStyleSetFlexGrow( node, n );
+		}
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setShrink( float n ) {
-	if( node ) {
-		if( n >= 0 )
-			YGNodeStyleSetFlexShrink( node, n );
-	}
-	if( !calculating )
+	if( !calculating ) {
+		if( node ) {
+			if( n >= 0 )
+				YGNodeStyleSetFlexShrink( node, n );
+		}
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setBasis( float n ) {
-	if( node ) {
-		if( n >= 0 )
-			YGNodeStyleSetFlexBasis( node, n );
-	}
-	if( !calculating )
+	if( !calculating ) {
+		if( node ) {
+			if( n >= 0 )
+				YGNodeStyleSetFlexBasis( node, n );
+		}
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setMaxSize( Size n ) {
-	if( node ) {
-		YGNodeStyleSetMaxWidth( node, n.width );
-		YGNodeStyleSetMaxHeight( node, n.height );
-	}
-	if( !calculating )
+	if( !calculating ) {
+		if( node ) {
+			YGNodeStyleSetMaxWidth( node, n.width );
+			YGNodeStyleSetMaxHeight( node, n.height );
+		}
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setMinSize( Size n ) {
-	if( node ) {
-		YGNodeStyleSetMinWidth( node, n.width );
-		YGNodeStyleSetMinHeight( node, n.height );
+	if( !calculating ) {
+		if( node ) {
+			YGNodeStyleSetMinWidth( node, n.width );
+			YGNodeStyleSetMinHeight( node, n.height );
 
-		if( !calculating )
-			dirty_layout = true;
-	}
-	if( !calculating )
+			if( !calculating )
+				dirty_layout = true;
+		}
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setSize( Size n ) {
-	if( node ) {
-		auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
-				YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
+	if( !calculating ) {
+		if( node ) {
+			auto row = YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRow ||
+					YGNodeStyleGetFlexDirection( node ) == YGFlexDirectionRowReverse;
 
-		//if( type != ElementType::Layout ) {
-		//	if( row ) {
-		//		if( n.width <= 0 )
-		//			grow = old_grow;
-		//		else {
-		//			old_grow = grow;
-		//			grow = 0;
-		//		}
-		//	}
-		//	else {
-		//		if( n.height <= 0 )
-		//			grow = old_grow;
-		//		else {
-		//			old_grow = grow;
-		//			grow = 0;
-		//		}
-		//	}
-		//}
+			//if( type != ElementType::Layout ) {
+			//	if( row ) {
+			//		if( n.width <= 0 )
+			//			grow = old_grow;
+			//		else {
+			//			old_grow = grow;
+			//			grow = 0;
+			//		}
+			//	}
+			//	else {
+			//		if( n.height <= 0 )
+			//			grow = old_grow;
+			//		else {
+			//			old_grow = grow;
+			//			grow = 0;
+			//		}
+			//	}
+			//}
 
-		YGNodeStyleSetWidth( node, n.width );
-		YGNodeStyleSetHeight( node, n.height );
-	}
+			YGNodeStyleSetWidth( node, n.width );
+			YGNodeStyleSetHeight( node, n.height );
+		}
 
-	if( !calculating )
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setPosition( Point n ) {
 	if( type != ElementType::Window ) {
-		if( node ) {
+		if( !calculating ) {
+			if( node ) {
 
-			std::string obj = objectName;
+				std::string obj = objectName;
 
-			YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
-			YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
-		}
-		if( !calculating )
+				YGNodeStyleSetPosition( node, YGEdgeLeft, n.x );
+				YGNodeStyleSetPosition( node, YGEdgeTop, n.y );
+			}
+
 			dirty_layout = true;
+		}
 	}
 }
 
 void Layoutable::setMargin( float n, Direction d ) {
 	if( type != ElementType::Window ) {
-		if( node ) {
+		if( !calculating ) {
+			if( node ) {
 
-			if( flags( d & Direction::Left ) ) {
-				YGNodeStyleSetMargin( node, YGEdgeLeft, n );
+				if( flags( d & Direction::Left ) ) {
+					YGNodeStyleSetMargin( node, YGEdgeLeft, n );
+				}
+
+				if( flags( d & Direction::Top ) ) {
+					YGNodeStyleSetMargin( node, YGEdgeTop, n );
+				}
+
+				if( flags( d & Direction::Right ) ) {
+					YGNodeStyleSetMargin( node, YGEdgeRight, n );
+				}
+
+				if( flags( d & Direction::Bottom ) ) {
+					YGNodeStyleSetMargin( node, YGEdgeBottom, n );
+				}
+
 			}
-
-			if( flags( d & Direction::Top ) ) {
-				YGNodeStyleSetMargin( node, YGEdgeTop, n );
-			}
-
-			if( flags( d & Direction::Right ) ) {
-				YGNodeStyleSetMargin( node, YGEdgeRight, n );
-			}
-
-			if( flags( d & Direction::Bottom ) ) {
-				YGNodeStyleSetMargin( node, YGEdgeBottom, n );
-			}
-
-		}
-		if( !calculating )
 			dirty_layout = true;
+		}
 	}
 }
 
 void Layoutable::setBorder( float n, Direction d ) {
-	if( node ) {
+	if( !calculating ) {
 
-		if( flags( d & Direction::Left ) ) {
-			YGNodeStyleSetBorder( node, YGEdgeLeft, n );
+		if( node ) {
+
+			if( flags( d & Direction::Left ) ) {
+				YGNodeStyleSetBorder( node, YGEdgeLeft, n );
+			}
+
+			if( flags( d & Direction::Top ) ) {
+				YGNodeStyleSetBorder( node, YGEdgeTop, n );
+			}
+
+			if( flags( d & Direction::Right ) ) {
+				YGNodeStyleSetBorder( node, YGEdgeRight, n );
+			}
+
+			if( flags( d & Direction::Bottom ) ) {
+				YGNodeStyleSetBorder( node, YGEdgeBottom, n );
+			}
+
 		}
-
-		if( flags( d & Direction::Top ) ) {
-			YGNodeStyleSetBorder( node, YGEdgeTop, n );
-		}
-
-		if( flags( d & Direction::Right ) ) {
-			YGNodeStyleSetBorder( node, YGEdgeRight, n );
-		}
-
-		if( flags( d & Direction::Bottom ) ) {
-			YGNodeStyleSetBorder( node, YGEdgeBottom, n );
-		}
-
-	}
-	if( !calculating )
 		dirty_layout = true;
+	}
 }
 
 void Layoutable::setPadding( float n, Direction d ) {
-	if( node ) {
+	if( !calculating ) {
+		if( node ) {
 
-		if( flags( d & Direction::Left ) ) {
-			YGNodeStyleSetPadding( node, YGEdgeLeft, n );
+			if( flags( d & Direction::Left ) ) {
+				YGNodeStyleSetPadding( node, YGEdgeLeft, n );
+			}
+
+			if( flags( d & Direction::Top ) ) {
+				YGNodeStyleSetPadding( node, YGEdgeTop, n );
+			}
+
+			if( flags( d & Direction::Right ) ) {
+				YGNodeStyleSetPadding( node, YGEdgeRight, n );
+			}
+
+			if( flags( d & Direction::Bottom ) ) {
+				YGNodeStyleSetPadding( node, YGEdgeBottom, n );
+			}
+
 		}
-
-		if( flags( d & Direction::Top ) ) {
-			YGNodeStyleSetPadding( node, YGEdgeTop, n );
-		}
-
-		if( flags( d & Direction::Right ) ) {
-			YGNodeStyleSetPadding( node, YGEdgeRight, n );
-		}
-
-		if( flags( d & Direction::Bottom ) ) {
-			YGNodeStyleSetPadding( node, YGEdgeBottom, n );
-		}
-
-	}
-	if( !calculating )
 		dirty_layout = true;
+	}
 }
