@@ -37,8 +37,8 @@ Widget::Widget( Widget* parent ) : Layoutable( parent ),
 	                  } );
 	size.changed( [&](Size s) { resized = Rect( position, s ); } );
 
-	borderColor = Color( 0, 200, 0, 200 );
-	backgroundColor = Color( 255, 0, 0, 255 );
+	borderColor = Color( 232, 23, 94, 200 );
+	backgroundColor = Color( 72, 72, 72, 255 );
 	foregroundColor = Color( 0, 0, 0 );
 }
 

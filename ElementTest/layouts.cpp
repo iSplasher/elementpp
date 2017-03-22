@@ -26,38 +26,6 @@ SCENARIO("Layouts", "[Layout]") {
 	if( !app )
 		app = new Application();
 
-	//auto root = priv::YGNodeNew();
-	//auto child1 = priv::YGNodeNew();
-	//auto child2 = priv::YGNodeNew();
-	//YGNodeStyleSetPadding( root, priv::YGEdgeAll, 10 );
-	//priv::YGNodeInsertChild( root, child1, 0 );
-	//priv::YGNodeInsertChild( root, child2, 1 );
-	////priv::YGNodeStyleSetAlignItems( root, priv::YGAlignStretch );
-	//priv::YGNodeStyleSetFlexDirection( root, priv::YGFlexDirectionRow );
-	//priv::YGNodeStyleSetFlexGrow( root, 1 );
-	//priv::YGNodeStyleSetFlexGrow( child1, 1 );
-	//priv::YGNodeStyleSetFlexGrow( child2, 1 );
-	////priv::YGNodeStyleSetWidth(root, 300);
-	////priv::YGNodeStyleSetHeight(root, 300);
-	//priv::YGNodeStyleSetWidth( child1, 50 );
-	//priv::YGNodeStyleSetHeight( child1, 50 );
-	//priv::YGNodeCalculateLayout( root, 300, 300, priv::YGDirectionLTR );
-
-	//priv::YGNodeStyleGetHeight( root );
-	//priv::YGNodeStyleGetWidth( root );
-	//priv::YGNodeStyleGetHeight( child1 );
-	//priv::YGNodeStyleGetWidth( child1 );
-	//priv::YGNodeLayoutGetHeight( root );
-	//priv::YGNodeLayoutGetWidth( root );
-	//priv::YGNodeLayoutGetHeight( child1 );
-	//priv::YGNodeLayoutGetWidth( child1 );
-	//priv::YGNodeLayoutGetHeight( child2 );
-	//priv::YGNodeLayoutGetWidth( child2 );
-	//priv::YGNodeLayoutGetTop( child1 );
-	//priv::YGNodeLayoutGetLeft( child1 );
-	//priv::YGNodeLayoutGetTop( child2 );
-	//priv::YGNodeLayoutGetLeft( child2 );
-
 	auto window = app->create< Window >();
 	window->position = Point(700, 450);
 	window->size = Size(600, 400);
@@ -77,9 +45,10 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget1->rightDoublePress.changed([](Point p) { std::cout << "Doubel Right Click: Widget 1: " << p << std::endl; });
 	//widget1->doublePress.changed([](MouseEvent m) { std::cout << "Double Clicked: Widget 1: " << m.position << std::endl; });
 	auto widget1 = app->create< Widget >(window);
+	widget1->objectName = "Widget1";
 	setDefault(widget1);
 	widget1->isResizeable = true;
-	auto widget2 = app->create< Widget >();
+	auto widget2 = app->create< Widget >(window);
 	setDefault(widget2);
 	widget2->objectName = "Widget2";
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
@@ -90,7 +59,7 @@ SCENARIO("Layouts", "[Layout]") {
 
 	auto widget11 = app->create< Widget >( widget1 );
 	setDefault(widget11);
-	widget11->grow = 2;
+	//widget11->grow = 1;
 	//widget11->isResizeable = true;
 	//widget11->resized.changed( [](Rect r) { std::cout << "Widget 3: " << r << std::endl; } );
 	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
@@ -98,8 +67,10 @@ SCENARIO("Layouts", "[Layout]") {
 	//widget11->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 3: " << m.position << std::endl; } );
 	auto widget12 = app->create< Widget >();
 	setDefault(widget12);
+	widget12->objectName = "Widget12";
 	widget12->parent = widget1;
 	widget12->isResizeable = true;
+	//widget12->positionType = Position::Absolute;
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
 	//widget12->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 4: " << m.position << std::endl; } );

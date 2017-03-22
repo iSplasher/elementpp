@@ -291,14 +291,6 @@ void Layoutable::invalidate() {
 	// apply new calculations
 	invalidated();
 
-	// inform all underlying items
-	for( auto i : nodemap ) {
-		i.second->calculating = true;
-		i.second->invalidated();
-		i.second->calculating = false;
-		i.second->dirty_layout = false;
-	}
-
 }
 
 void Layoutable::update() {
@@ -333,11 +325,6 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
-		std::cout << "\n";
-		YGNodePrint(node, YGPrintOptionsLayout);
-		std::cout << "\n";
-		YGNodePrint(node, YGPrintOptionsStyle);
-		std::cout << "\n";
 		float nan1, nan2;
 		if( type != ElementType::Window ) {
 			std::string obj = objectName;
@@ -385,6 +372,14 @@ void Layoutable::invalidated() {
 		shrink = std::isnan(nan1) ? 0 : nan1;
 		nan1 = YGNodeStyleGetFlexBasis(node).value;
 		basis = std::isnan(nan1) ? 0 : nan1;
+	}
+
+	// inform all underlying items
+	for (auto i : nodemap) {
+		i.second->calculating = true;
+		i.second->invalidated();
+		i.second->calculating = false;
+		i.second->dirty_layout = false;
 	}
 }
 

@@ -172,7 +172,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	painter = std::make_unique< Painter >( this );
 	current_pos = position = win_rect.pos();
 	size = win_rect.size();
-	backgroundColor = Color( 250, 250, 250, 200 );
+	backgroundColor = Color( 54, 54, 54, 200 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
 	marginLeft = marginTop = marginRight = marginBottom = 0;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
