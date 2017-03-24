@@ -162,8 +162,8 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 		_inited = true;
 	}
 
-	pixelRatio.changed([](float p) { setPixelRatio(p); });
-	pixelRatio = getPixelRatio(r_window);
+	pixelRatio.changed( [](float p) { setPixelRatio( p ); } );
+	pixelRatio = getPixelRatio( r_window );
 	hresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::HResize, r_window );
 	vresize_cursor = std::make_unique< PRIV_NAMESPACE::_Cursor >( Cursor::VResize, r_window );
 	objectName = "Window";
@@ -204,7 +204,7 @@ void Window::update() {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glEnable( GL_CULL_FACE );
 
-	pixelRatio = getPixelRatio(r_window);
+	pixelRatio = getPixelRatio( r_window );
 
 	painter->begin( pixelRatio );
 	Widget::update();
@@ -251,8 +251,8 @@ void Window::applyWidgetResizeCursor( Widget* w, Direction dir ) {
 }
 
 bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
-	if( flags( buttons & MouseButton::Left ) && w->parent_window->grabbed_widget == w) {
-		p = w->mapFromWindow(p);
+	if( flags( buttons & MouseButton::Left ) && w->parent_window->grabbed_widget == w ) {
+		p = w->mapFromWindow( p );
 
 		auto new_rect = w->geometry.get();
 
@@ -280,9 +280,15 @@ bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 		}
 
 		//std::cout << "Current Pos: " << new_rect << " Delta Pos: " << delta_pos <<  std::endl;
-
-		w->position = new_rect.pos(); // important this is assigned to first. Size triggeres resize event which fetches position.
-		w->size = new_rect.size();
+		if( w->type == ElementType::Window || w->positionType == Position::Absolute ) {
+			w->position = new_rect.pos(); // important this is assigned to first. Size triggeres resize event which fetches position.
+		}
+		if( w->type == ElementType::Window ) {
+			w->size = new_rect.size();
+		}
+		else {
+			w->maxSize = new_rect.size();
+		}
 
 	}
 	return true;
@@ -366,7 +372,7 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 		else if( w->isResizeable ) {
 			auto dir = inResizeRangeHelper( w, p );
 			if( dir != Direction::None ) {
-				applyWidgetResizeCursor(w, dir);
+				applyWidgetResizeCursor( w, dir );
 			}
 			else
 				applyWidgetCursor( w );
@@ -523,7 +529,7 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 			w->parent_window->grabbed_widget = nullptr;
 
 		if( !w->parent_window->grabbed_widget && btn_press ) {
-			w->resize_dir = inResizeRangeHelper(w, p);
+			w->resize_dir = inResizeRangeHelper( w, p );
 			if( w->isResizeable && w->resize_dir != Direction::None ) {
 				w->parent_window->grabbed_widget = w;
 				if( flags( buttons & MouseButton::Left ) )

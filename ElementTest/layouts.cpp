@@ -51,10 +51,10 @@ SCENARIO("Layouts", "[Layout]") {
 	auto widget1 = app->create< Widget >(window);
 	widget1->objectName = "Widget1";
 	setDefault(widget1);
-	widget1->isResizeable = true;
 	auto widget2 = app->create< Widget >(window);
 	setDefault(widget2);
 	widget2->objectName = "Widget2";
+	widget2->isResizeable = true;
 	//widget2->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 2: " << m.position << std::endl; } );
 	//widget2->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 2: " << m.position << std::endl; } );
 	//widget2->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 2: " << m.position << std::endl; } );
@@ -63,8 +63,7 @@ SCENARIO("Layouts", "[Layout]") {
 
 	auto widget11 = app->create< Widget >( widget1 );
 	setDefault(widget11);
-	//widget11->grow = 1;
-	//widget11->isResizeable = true;
+	widget11->isResizeable = true;
 	//widget11->resized.changed( [](Rect r) { std::cout << "Widget 3: " << r << std::endl; } );
 	//widget11->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 3: " << m.position << std::endl; } );
 	//widget11->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 3: " << m.position << std::endl; } );
@@ -74,9 +73,10 @@ SCENARIO("Layouts", "[Layout]") {
 	widget12->objectName = "Widget12";
 	widget12->parent = widget1;
 	widget12->isResizeable = true;
-	//widget12->positionType = Position::Absolute;
+	widget12->size = Size(50, 200);
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
+	//widget12->pressed.changed([&](MouseEvent m) { widget12->size = Size(widget12->size) + 10; });
 	//widget12->release.changed( [](MouseEvent m) { std::cout << "Released: Widget 4: " << m.position << std::endl; } );
 	window->update();
 

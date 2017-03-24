@@ -218,6 +218,7 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
 	// set default values
 
 	grow = 1;
+	shrink = 1;
 }
 
 Layoutable::~Layoutable() {
@@ -273,14 +274,19 @@ void Layoutable::take( Layoutable* item ) {
 }
 
 void Layoutable::invalidate() {
+	if (parent.get() && type != ElementType::Window ) {
+		static_cast<Layoutable*>(parent.get())->invalidate();
+		return;
+	}
+
 	auto is_window = type == ElementType::Window;
-	if( parent.get() || is_window ) { // if this layout is managing a widget, use the widget's properties
+	if( !parent.get() || is_window ) { // if this layout is managing a widget, use the widget's properties
 		Size s;
 		if( is_window ) {
 			s = this->size;
 		}
 		else {
-			s = static_cast< Layoutable* >( parent.get() )->size;
+			s = size;
 		}
 		YGNodeCalculateLayout( node, s.width, s.height, YGDirectionLTR );
 	}
@@ -325,12 +331,12 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
-		//std::string obj = objectName;
-		//std::cout << "\n";
-		//YGNodePrint(node, YGPrintOptionsLayout);
-		//std::cout << "\n";
-		//YGNodePrint(node, YGPrintOptionsStyle);
-		//std::cout << "\n";
+		std::string obj = objectName;
+		std::cout << "\n";
+		YGNodePrint(node, YGPrintOptionsLayout);
+		std::cout << "\n";
+		YGNodePrint(node, YGPrintOptionsStyle);
+		std::cout << "\n";
 
 		float nan1, nan2;
 		if( type != ElementType::Window ) {
@@ -422,6 +428,8 @@ void Layoutable::setBasis( float n ) {
 void Layoutable::setMaxSize( Size n ) {
 	if( !calculating ) {
 		if( node ) {
+			YGNodeStyleSetWidthAuto(node); // need to reset size to surpass Style Size
+			YGNodeStyleSetHeightAuto(node);
 			YGNodeStyleSetMaxWidth( node, n.width );
 			YGNodeStyleSetMaxHeight( node, n.height );
 		}
