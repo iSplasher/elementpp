@@ -3,7 +3,6 @@
 #include "element/core/primitive.h"
 
 #include <GL/glew.h> // required for nanovg
-#include <GLFW/glfw3.h>
 
 #include "deps/nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION

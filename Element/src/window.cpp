@@ -1,149 +1,133 @@
 #include "element/window.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#ifdef OS_WINDOWS
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
-#endif
+#include <SDL2/SDL.h>
 
 #include "element/core/painter.h" // necessary to include AFTER glew
 
 USING_NAMESPACE
 
+USING_NAMESPACE_PRIV
+
 // helper functions
 
-static float getPixelRatio( GLFWwindow* window ) {
-#if defined(OS_WINDOWS)
-	HWND hWnd = glfwGetWin32Window( window );
-	HMONITOR monitor = MonitorFromWindow( hWnd, MONITOR_DEFAULTTONEAREST );
-	/* The following function only exists on Windows 8.1+, but we don't want to make that a dependency */
-	static HRESULT (WINAPI *GetDpiForMonitor_)( HMONITOR, UINT, UINT*, UINT* ) = nullptr;
-	static bool GetDpiForMonitor_tried = false;
-
-	if( !GetDpiForMonitor_tried ) {
-		auto shcore = LoadLibrary( TEXT("shcore") );
-		if( shcore ) {
-			GetDpiForMonitor_ = reinterpret_cast< decltype(GetDpiForMonitor_) >( GetProcAddress( shcore, "GetDpiForMonitor" ) );
-			FreeLibrary( shcore );
-		}
-
-		GetDpiForMonitor_tried = true;
+static float getPixelRatio( SDL_Window* window ) {
+	float dpi = 1;
+	auto idx = SDL_GetWindowDisplayIndex(window);
+	if (idx > -1) {
+		if (SDL_GetDisplayDPI(idx, &dpi, nullptr, nullptr))
+			SDL_Log("Failed to query for DPI: %s\n", SDL_GetError());
+	} else {
+		SDL_Log("Failed to query for DPI: %s\n", SDL_GetError());
 	}
-
-	if( GetDpiForMonitor_ ) {
-		uint32_t dpiX, dpiY;
-		if( GetDpiForMonitor_( monitor, 0 /* effective DPI */, &dpiX, &dpiY ) == S_OK )
-			return std::round( dpiX / 96.0 );
-	}
-	return 1.f;
-#elif defined(OS_LINUX)
-	(void)window;
-
-	/* Try to read the pixel ratio from GTK */
-	FILE *fp = popen("gsettings get org.gnome.desktop.interface scaling-factor", "r");
-	if (!fp)
-		return 1;
-
-	int ratio = 1;
-	if (fscanf(fp, "uint32 %i", &ratio) != 1)
-		return 1;
-
-	if (pclose(fp) != 0)
-		return 1;
-
-	return ratio >= 1 ? ratio : 1;
-#else
-
-	int fb_width;
-	int fb_height;
-	SizeI s;
-
-	glfwGetFramebufferSize(window, &fb_width, &fb_height);
-	glfwGetWindowSize(window, &s.width, &s.height);
-	return static_cast< float >(fb_width) / static_cast< float >(s.width);
-#endif
+	return dpi;
 }
 
-static Window* getWindow( GLFWwindow* r_window ) {
-	return static_cast< Window* >( glfwGetWindowUserPointer( r_window ) );
+static Window* getWindow(SDL_Window* r_window ) {
+	return static_cast< Window* >( SDL_GetWindowData( r_window, _winpointer.c_str() ) );
 }
 
-static MouseButton getMouseButtons( GLFWwindow* r_window ) {
-	MouseButton buttons = MouseButton::None;
-
-	auto left = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_LEFT );
-	auto right = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_RIGHT );
-	auto middle = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_MIDDLE );
-
-	if( left == GLFW_PRESS ) {
-		buttons |= MouseButton::Left;
-	}
-
-	if( right == GLFW_PRESS ) {
-		buttons |= MouseButton::Right;
-	}
-
-	if( middle == GLFW_PRESS ) {
-		buttons |= MouseButton::Middle;
-	}
-
-	if( left == GLFW_PRESS && left == right == middle ) {
-		buttons = MouseButton::Any;
-	}
-
-	return buttons;
+Direction PRIV_NAMESPACE::windowHitTestHelper(Window* window, Point point) {
+	return Window::inResizeRangeHelper(window, point);
 }
 
-static KeyModifier getKeyModifiers( GLFWwindow* r_window ) {
-	KeyModifier modifiers = KeyModifier::None;
-
-	auto shift = glfwGetKey( r_window, GLFW_MOD_SHIFT );
-	auto control = glfwGetKey( r_window, GLFW_MOD_CONTROL );
-	auto alt = glfwGetKey( r_window, GLFW_MOD_ALT );
-	auto meta = glfwGetKey( r_window, GLFW_MOD_SUPER );
-
-	if( shift == GLFW_PRESS ) {
-		modifiers |= KeyModifier::Shift;
+static SDL_HitTestResult windowHitTest(SDL_Window* r_window, const SDL_Point* point, void* data) {
+	auto window = getWindow(r_window);
+	switch(windowHitTestHelper(window, Point(point->x, point->y))) {
+		case Direction::Any: break;
+		case Direction::Left:
+			return SDL_HITTEST_RESIZE_LEFT;
+		case Direction::Top: 
+			return SDL_HITTEST_RESIZE_TOP;
+		case Direction::Right: 
+			return SDL_HITTEST_RESIZE_RIGHT;
+		case Direction::Bottom: 
+			return SDL_HITTEST_RESIZE_BOTTOM;
+		case Direction::Default: 
+			return SDL_HITTEST_DRAGGABLE;
+		default: 
+			return SDL_HITTEST_RESIZE_BOTTOMLEFT;
 	}
-
-	if( control == GLFW_PRESS ) {
-		modifiers |= KeyModifier::Control;
-	}
-
-	if( alt == GLFW_PRESS ) {
-		modifiers |= KeyModifier::Alt;
-	}
-
-	if( meta == GLFW_PRESS ) {
-		modifiers |= KeyModifier::Meta;
-	}
-
-	return modifiers;
 }
+
+
+//static MouseButton getMouseButtons( GLFWwindow* r_window ) {
+//	MouseButton buttons = MouseButton::None;
+//
+//	auto left = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_LEFT );
+//	auto right = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_RIGHT );
+//	auto middle = glfwGetMouseButton( r_window, GLFW_MOUSE_BUTTON_MIDDLE );
+//
+//	if( left == GLFW_PRESS ) {
+//		buttons |= MouseButton::Left;
+//	}
+//
+//	if( right == GLFW_PRESS ) {
+//		buttons |= MouseButton::Right;
+//	}
+//
+//	if( middle == GLFW_PRESS ) {
+//		buttons |= MouseButton::Middle;
+//	}
+//
+//	if( left == GLFW_PRESS && left == right == middle ) {
+//		buttons = MouseButton::Any;
+//	}
+//
+//	return buttons;
+//}
+
+//static KeyModifier getKeyModifiers( GLFWwindow* r_window ) {
+//	KeyModifier modifiers = KeyModifier::None;
+//
+//	auto shift = glfwGetKey( r_window, GLFW_MOD_SHIFT );
+//	auto control = glfwGetKey( r_window, GLFW_MOD_CONTROL );
+//	auto alt = glfwGetKey( r_window, GLFW_MOD_ALT );
+//	auto meta = glfwGetKey( r_window, GLFW_MOD_SUPER );
+//
+//	if( shift == GLFW_PRESS ) {
+//		modifiers |= KeyModifier::Shift;
+//	}
+//
+//	if( control == GLFW_PRESS ) {
+//		modifiers |= KeyModifier::Control;
+//	}
+//
+//	if( alt == GLFW_PRESS ) {
+//		modifiers |= KeyModifier::Alt;
+//	}
+//
+//	if( meta == GLFW_PRESS ) {
+//		modifiers |= KeyModifier::Meta;
+//	}
+//
+//	return modifiers;
+//}
 
 Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
-#ifndef OS_WINDOWS
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
-	glfwWindowHint( GLFW_DEPTH_BITS, 16 );
-	glfwWindowHint( GLFW_ALPHA_BITS, 8 );
-	glfwWindowHint( GLFW_TRANSPARENT, true );
-	glfwWindowHint( GLFW_DECORATED, false );
-	glfwWindowHint( GLFW_SAMPLES, 12 );
-	r_window = glfwCreateWindow( win_rect.width, win_rect.height, "Element++", nullptr, nullptr );
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 12);
+
+	r_window = SDL_CreateWindow(
+		"Element++",
+		win_rect.pos() == 0 ? SDL_WINDOWPOS_CENTERED : win_rect.pos().x,
+		win_rect.pos() == 0 ? SDL_WINDOWPOS_CENTERED : win_rect.pos().y,
+		win_rect.width, win_rect.height,
+		SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);
 
 	if( !r_window ) {
-		throw std::runtime_error( "Could not create window" );
+		SDL_Log("Failed to create window: %s\n", SDL_GetError());
+		return;
 	}
 
-	glfwSetWindowUserPointer( r_window, this );
-	glfwSetWindowPosCallback( r_window, windowMovedCb );
-	glfwSetCursorPosCallback( r_window, mouseMovedCb );
-	glfwSetMouseButtonCallback( r_window, mousePressCb );
+	context = SDL_GL_CreateContext(r_window);
+
+	SDL_SetWindowData( r_window, _winpointer.c_str(), this );
+	SDL_SetWindowHitTest(r_window, windowHitTest, nullptr);
 
 	setType( ElementType::Window );
 	parent_window = this;
@@ -154,7 +138,7 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 		glewExperimental = GL_TRUE;
 		auto glew_result = glewInit();
 		if( glew_result != GLEW_OK ) {
-			throw std::runtime_error( "Failed to init glew" );
+			SDL_Log("Failed to initialize glew");
 		}
 		// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 		glGetError();
@@ -172,16 +156,18 @@ Window::Window( Rect win_rect, Window* parent ) : Widget( parent ) {
 	painter = std::make_unique< Painter >( this );
 	current_pos = position = win_rect.pos();
 	size = win_rect.size();
-	backgroundColor = Color( 54, 54, 54, 200 );
+	backgroundColor = Color( 54, 54, 54 );
 	borderLeft = borderTop = borderRight = borderBottom = 0;
 	marginLeft = marginTop = marginRight = marginBottom = 0;
 	paddingLeft = paddingTop = paddingRight = paddingBottom = 0;
-	glfwSetWindowPos( r_window, win_rect.x, win_rect.y );
 }
 
 Window::~Window() {
 	if( r_window ) {
-		glfwDestroyWindow( r_window );
+		SDL_DestroyWindow( r_window );
+	}
+	if(context) {
+		SDL_GL_DeleteContext(context);
 	}
 }
 
@@ -195,8 +181,7 @@ void Window::update() {
 
 	int fb_width;
 	int fb_height;
-
-	glfwGetFramebufferSize( r_window, &fb_width, &fb_height );
+	SDL_GL_GetDrawableSize(r_window, &fb_width, &fb_height);
 	glViewport( 0, 0, fb_width, fb_height );
 	glClearColor( 0, 0, 0, 0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -210,23 +195,23 @@ void Window::update() {
 	Widget::update();
 	painter->end();
 	if( r_window ) {
-		glfwSwapBuffers( r_window );
+		SDL_GL_SwapWindow( r_window );
 	}
 }
 
 void Window::setActive() const {
-	glfwMakeContextCurrent( r_window );
+	SDL_GL_MakeCurrent( r_window, context );
 }
 
 void Window::updateGeometry() {
 	if( current_pos != position ) {
 		current_pos = position;
-		glfwSetWindowPos( r_window, std::floor( current_pos.x ), std::floor( current_pos.y ) );
+		SDL_SetWindowPosition( r_window, std::floor( current_pos.x ), std::floor( current_pos.y ) );
 	}
 
 	if( current_size != size ) {
 		current_size = size;
-		glfwSetWindowSize( r_window, std::floor( current_size.width ), std::floor( current_size.height ) );
+		SDL_SetWindowSize( r_window, std::floor( current_size.width ), std::floor( current_size.height ) );
 	}
 
 }
@@ -313,39 +298,39 @@ Direction Window::inResizeRangeHelper( Widget* w, Point p ) {
 	return dir;
 }
 
-void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
-	auto win = getWindow( r_window );
-	if( !win->blockEvents ) {
-		//win->resized = Rect( win->position, Size( width, height ) );
-	}
-}
-
-void Window::windowMovedCb( _privRWindow* r_window, int xpos, int ypos ) {
-	auto win = getWindow( r_window );
-	if( !win->blockEvents ) {
-		win->windowMovedHelper( Point( xpos, ypos ) );
-	}
-}
-
-void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
-	Point p = Point( xpos, ypos );
-	// It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
-#ifdef OS_WINDOWS
-	auto hwnd = glfwGetWin32Window( r_window );
-	POINT pos;
-	pos.x = p.x;
-	pos.y = p.y;
-	ClientToScreen( hwnd, &pos );
-	p.x = pos.x;
-	p.y = pos.y;
-#else
-	static_assert(false, "Coordinates in screen space has not yet been implemented on this platform")
-#endif
-	auto buttons = getMouseButtons( r_window );
-	auto win = getWindow( r_window );
-	p = win->mapFromScreen( p );
-	mouseMovedHelper( win, p, buttons );
-}
+//void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
+//	auto win = getWindow( r_window );
+//	if( !win->blockEvents ) {
+//		//win->resized = Rect( win->position, Size( width, height ) );
+//	}
+//}
+//
+//void Window::windowMovedCb( _privRWindow* r_window, int xpos, int ypos ) {
+//	auto win = getWindow( r_window );
+//	if( !win->blockEvents ) {
+//		win->windowMovedHelper( Point( xpos, ypos ) );
+//	}
+//}
+//
+//void Window::mouseMovedCb( _privRWindow* r_window, double xpos, double ypos ) {
+//	Point p = Point( xpos, ypos );
+//	// It's necessary to get the point in screen space to avoid jittering when moving an undecorated window.
+//#ifdef OS_WINDOWS
+//	auto hwnd = glfwGetWin32Window( r_window );
+//	POINT pos;
+//	pos.x = p.x;
+//	pos.y = p.y;
+//	ClientToScreen( hwnd, &pos );
+//	p.x = pos.x;
+//	p.y = pos.y;
+//#else
+//	static_assert(false, "Coordinates in screen space has not yet been implemented on this platform")
+//#endif
+//	auto buttons = getMouseButtons( r_window );
+//	auto win = getWindow( r_window );
+//	p = win->mapFromScreen( p );
+//	mouseMovedHelper( win, p, buttons );
+//}
 
 void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 	if( w->blockEvents )
@@ -383,81 +368,81 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 
 }
 
-void Window::mousePressCb( _privRWindow* r_window, int button, int action, int mods ) {
-	auto btn_press = action == GLFW_PRESS ? true : false;
-	auto m_button = MouseButton::None;
-	auto modifiers = KeyModifier::None;
-
-	switch( button ) {
-		case GLFW_MOUSE_BUTTON_LEFT:
-			m_button = MouseButton::Left;
-			break;
-		case GLFW_MOUSE_BUTTON_RIGHT:
-			m_button = MouseButton::Right;
-			break;
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			m_button = MouseButton::Middle;
-			break;
-		default:
-			return;
-	}
-
-	if( mods & GLFW_MOD_SHIFT ) {
-		modifiers |= KeyModifier::Shift;
-	}
-
-	if( mods & GLFW_MOD_CONTROL ) {
-		modifiers |= KeyModifier::Control;
-	}
-
-	if( mods & GLFW_MOD_ALT ) {
-		modifiers |= KeyModifier::Alt;
-	}
-
-	if( mods & GLFW_MOD_SUPER ) {
-		modifiers |= KeyModifier::Meta;
-	}
-
-	PointD m_pos_d;
-	glfwGetCursorPos( r_window, &m_pos_d.x, &m_pos_d.y );
-
-	auto wind = getWindow( r_window );
-	auto m_pos = Point( m_pos_d );
-
-	auto now = std::chrono::steady_clock::now();
-	auto click_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_pressed ).count();
-	auto release_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_released ).count();
-
-	auto click = false, d_click = false, d_press = false;
-	if( wind->button_press_rect.contains( m_pos ) ) { // only if cursor is still within rect
-
-		// if release, check if time since last press is within click interval
-		if( !btn_press ) {
-
-			if( click_delta > 20 && click_delta < App->clickInterval && flags( m_button & wind->last_pressed_buttons ) )
-				click = true;
-
-			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
-				d_click = true;
-		}
-		else {
-			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
-				d_press = true;
-		}
-	}
-
-	wind->last_pressed_buttons = m_button;
-	if( btn_press ) {
-		wind->button_press_rect = Rect( m_pos - 1.5f, 3.0f, 3.0f );
-		wind->last_pressed = now;
-	}
-	else {
-		wind->last_released = now;
-	}
-
-	mousePressedHelper( wind, btn_press, m_button, modifiers, m_pos, click, d_click, d_press );
-
-}
+//void Window::mousePressCb( _privRWindow* r_window, int button, int action, int mods ) {
+//	auto btn_press = action == GLFW_PRESS ? true : false;
+//	auto m_button = MouseButton::None;
+//	auto modifiers = KeyModifier::None;
+//
+//	switch( button ) {
+//		case GLFW_MOUSE_BUTTON_LEFT:
+//			m_button = MouseButton::Left;
+//			break;
+//		case GLFW_MOUSE_BUTTON_RIGHT:
+//			m_button = MouseButton::Right;
+//			break;
+//		case GLFW_MOUSE_BUTTON_MIDDLE:
+//			m_button = MouseButton::Middle;
+//			break;
+//		default:
+//			return;
+//	}
+//
+//	if( mods & GLFW_MOD_SHIFT ) {
+//		modifiers |= KeyModifier::Shift;
+//	}
+//
+//	if( mods & GLFW_MOD_CONTROL ) {
+//		modifiers |= KeyModifier::Control;
+//	}
+//
+//	if( mods & GLFW_MOD_ALT ) {
+//		modifiers |= KeyModifier::Alt;
+//	}
+//
+//	if( mods & GLFW_MOD_SUPER ) {
+//		modifiers |= KeyModifier::Meta;
+//	}
+//
+//	PointD m_pos_d;
+//	glfwGetCursorPos( r_window, &m_pos_d.x, &m_pos_d.y );
+//
+//	auto wind = getWindow( r_window );
+//	auto m_pos = Point( m_pos_d );
+//
+//	auto now = std::chrono::steady_clock::now();
+//	auto click_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_pressed ).count();
+//	auto release_delta = std::chrono::duration_cast< std::chrono::milliseconds >( now - wind->last_released ).count();
+//
+//	auto click = false, d_click = false, d_press = false;
+//	if( wind->button_press_rect.contains( m_pos ) ) { // only if cursor is still within rect
+//
+//		// if release, check if time since last press is within click interval
+//		if( !btn_press ) {
+//
+//			if( click_delta > 20 && click_delta < App->clickInterval && flags( m_button & wind->last_pressed_buttons ) )
+//				click = true;
+//
+//			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
+//				d_click = true;
+//		}
+//		else {
+//			if( release_delta > 20 && release_delta < App->doubleClickInterval && flags( m_button & wind->last_pressed_buttons ) )
+//				d_press = true;
+//		}
+//	}
+//
+//	wind->last_pressed_buttons = m_button;
+//	if( btn_press ) {
+//		wind->button_press_rect = Rect( m_pos - 1.5f, 3.0f, 3.0f );
+//		wind->last_pressed = now;
+//	}
+//	else {
+//		wind->last_released = now;
+//	}
+//
+//	mousePressedHelper( wind, btn_press, m_button, modifiers, m_pos, click, d_click, d_press );
+//
+//}
 
 void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons, KeyModifier modifiers, Point p, bool click, bool d_click, bool d_press ) {
 	if( w->blockEvents )
@@ -550,12 +535,12 @@ void priv::_Cursor::apply( Cursor c ) {
 		_destroy();
 		_newCursor( c );
 	}
-	if( r_window ) {
-		if( cursor )
-			glfwSetCursor( r_window, cursor );
-		else
-			glfwSetCursor( r_window, nullptr );
-	}
+	//if( r_window ) {
+	//	if( cursor )
+	//		glfwSetCursor( r_window, cursor );
+	//	else
+	//		glfwSetCursor( r_window, nullptr );
+	//}
 }
 
 void priv::_Cursor::apply() {
@@ -571,22 +556,16 @@ void priv::_Cursor::_newCursor( Cursor c ) {
 				cursor = nullptr;
 				break;
 			case Cursor::Arrow:
-				cursor = glfwCreateStandardCursor( GLFW_ARROW_CURSOR );
 				break;
 			case Cursor::IBeam:
-				cursor = glfwCreateStandardCursor( GLFW_IBEAM_CURSOR );
 				break;
 			case Cursor::Cross:
-				cursor = glfwCreateStandardCursor( GLFW_CROSSHAIR_CURSOR );
 				break;
 			case Cursor::Hand:
-				cursor = glfwCreateStandardCursor( GLFW_HAND_CURSOR );
 				break;
 			case Cursor::HResize:
-				cursor = glfwCreateStandardCursor( GLFW_HRESIZE_CURSOR );
 				break;
 			case Cursor::VResize:
-				cursor = glfwCreateStandardCursor( GLFW_VRESIZE_CURSOR );
 				break;
 			default:
 				// implementation idea:
@@ -603,8 +582,8 @@ void priv::_Cursor::_newCursor( Cursor c ) {
 }
 
 void priv::_Cursor::_destroy() {
-	if( cursor )
-		glfwDestroyCursor( cursor );
+	/*if( cursor )
+		glfwDestroyCursor( cursor );*/
 	cursor = nullptr;
 }
 

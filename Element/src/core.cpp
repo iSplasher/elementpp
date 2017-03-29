@@ -2,7 +2,7 @@
 #include "element/window.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 
 USING_NAMESPACE
 
@@ -69,11 +69,6 @@ void Element::setParent( Element* new_parent ) {
 
 static void errorCallback( int err, const char* descr ) { std::cout << descr; }
 
-static void closeWindowCallback( GLFWwindow* r_window ) {
-	// TODO: delete Window object
-	glfwDestroyWindow( r_window );
-}
-
 Application::Application() :
 	Element(),
 	elementCount( this, std::mem_fn( &Application::getElementCount ) ),
@@ -85,9 +80,7 @@ Application::Application() :
 
 	assert(self == nullptr);
 	self = this;
-
-	glfwSetErrorCallback( errorCallback );
-	if( !glfwInit() ) { throw std::runtime_error( "Failed to initialize glfw" ); }
+	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO)) { SDL_Log("Failed to initialize SDL: %s\n", SDL_GetError()); return; }
 
 	glEnable( GL_MULTISAMPLE );
 	objectName = "Application";
@@ -95,13 +88,16 @@ Application::Application() :
 }
 
 Application::~Application() {
-	glfwTerminate();
 	isRunning = false;
+	SDL_Quit();
 }
 
 ExitCode Application::exec() {
 	isRunning = true;
-	glfwSwapInterval( 0 );
+	if (SDL_GL_SetSwapInterval(1)) {
+		SDL_Log("SwapIntervalError: %s\n", SDL_GetError());
+		SDL_GL_SetSwapInterval(0);
+	}
 	do {}
 	while( processEv() );
 	return ExitCode::Quit;
@@ -117,8 +113,9 @@ bool Application::processEv() const {
 			static_cast< Layoutable* >( core )->update();
 		}
 	}
-	glfwWaitEvents();
-
+	if (!SDL_WaitEvent( nullptr )) {
+		SDL_Log("Event error: %s", SDL_GetError());
+	}
 	return should_quit ? false : true;
 }
 

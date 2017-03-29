@@ -5,10 +5,14 @@
 
 #include <chrono>
 
-using _privRWindow = struct GLFWwindow;
+using _privRWindow = struct SDL_Window;
 using _privCursor = struct GLFWcursor;
 
 NAMESPACE_BEGIN
+
+PRIV_NAMESPACE_BEGIN
+static Direction windowHitTestHelper(Window* window, Point point);
+NAMESPACE_END
 
 class ELEMENT_API Window : public Widget {
 public:
@@ -57,13 +61,18 @@ private:
 
 	UniquePainter painter;
 	_privRWindow *r_window; // render window
+	void* context = nullptr;
 
 	friend class Painter;
 	friend class Widget;
 	friend class Application;
+	friend static Direction PRIV_NAMESPACE::windowHitTestHelper(Window* window, Point point);
 };
 
 PRIV_NAMESPACE_BEGIN
+
+static const std::string _winpointer = "window";
+
 class _Cursor {
 	void _newCursor(Cursor c);
 	void _destroy();

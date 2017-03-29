@@ -28,7 +28,6 @@ SCENARIO("Layouts", "[Layout]") {
 		app = new Application();
 
 	auto window = app->create< Window >();
-	window->position = Point(700, 450);
 	window->size = Size(600, 400);
 
 	window->update();
@@ -73,7 +72,8 @@ SCENARIO("Layouts", "[Layout]") {
 	widget12->objectName = "Widget12";
 	widget12->parent = widget1;
 	widget12->isResizeable = true;
-	widget12->size = Size(50, 200);
+	widget12->positionType = Position::Absolute;
+	widget12->size = Size(200, 200);
 	//widget12->mouseMoved.changed( [](MouseEvent m) { std::cout << "Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed( [](MouseEvent m) { std::cout << "Pressed: Widget 4: " << m.position << std::endl; } );
 	//widget12->pressed.changed([&](MouseEvent m) { widget12->size = Size(widget12->size) + 10; });
