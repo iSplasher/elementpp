@@ -35,7 +35,6 @@ private:
 	static void applyWidgetCursor(Widget* w);
 	static void applyWidgetResizeCursor(Widget* w, Direction dir);
 	static bool resizeHelper(Widget* w, Point p, MouseButton buttons );
-	static Direction inResizeRangeHelper(Widget* w, Point p);
 	static void windowResizedCb(_privRWindow* r_window, int width, int height);
 	static void windowMovedCb(_privRWindow* r_window, int xpos, int ypos);
 	static void mouseMovedCb(_privRWindow* r_window, double xpos, double ypos);

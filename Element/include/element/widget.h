@@ -236,6 +236,9 @@ public:
 	*/
 	Rect mapToScreen( Rect p ) { return Rect( mapToScreen( p.pos() ), p.size() ); }
 
+protected:
+	
+	Direction hitTest(Point p);
 
 private:
 
@@ -251,6 +254,7 @@ private:
 
 	void setParent( Element* ) override;
 	static void handleMove(MouseEvent m_ev); // handle movement
+	Direction inResizeRangeHelper(Point p);
 	void windowMovedHelper(Point);
 
 	friend class Painter;

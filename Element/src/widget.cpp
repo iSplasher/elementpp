@@ -93,6 +93,37 @@ Point Widget::mapToScreen( Point p ) {
 	return p;
 }
 
+Direction Widget::hitTest( Point p ) {
+	// skip if point is outside
+	auto g = geometry.get();
+	if (type == ElementType::Window) {
+		g.x = 0;
+		g.y = 0;
+	}
+	if (!g.contains(p)) {
+		return Direction::None;
+	}
+	// skip if widget is hidden
+	if (!visible.get()) {
+		return Direction::None;
+	}
+
+	auto d = inResizeRangeHelper(p);
+	if (d == Direction::None) {
+		for (auto x : children()) {
+			auto w = static_cast<Widget*>(x);
+			auto d_c = w->hitTest(p);
+			if (d_c != Direction::None) {
+				return d_c;
+			}
+		}
+	}
+
+	if (isDraggable)
+		return Direction::Default;
+	return d;
+}
+
 void Widget::setParent( Element* e ) {
 	if( !e ) {
 		if( parent.get() )
@@ -121,6 +152,27 @@ void Widget::handleMove( MouseEvent m_ev ) {
 			w->position = curr_m - w->last_mouse_pos;
 		}
 	}
+}
+
+Direction Widget::inResizeRangeHelper( Point p ) {
+	Direction dir = Direction::None;
+	if (!isResizeable)
+		return dir;
+	auto r = geometry.get();
+	if (type == ElementType::Window) {
+		r = Point();
+	}
+	auto resize_range = 6.0f;
+	if ((p.x - r.x) < resize_range)
+		dir = Direction::Left;
+	else if ((r.x + r.width - p.x) < resize_range)
+		dir = Direction::Right;
+	else if ((p.y - r.y) < resize_range)
+		dir = Direction::Top;
+	else if ((r.y + r.height - p.y) < resize_range)
+		dir = Direction::Bottom;
+
+	return dir;
 }
 
 void Widget::windowMovedHelper( Point p ) {

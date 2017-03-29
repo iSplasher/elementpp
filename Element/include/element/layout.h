@@ -67,6 +67,8 @@ public:
 	Property<Position> positionType;
 	Property<Direction> direction;
 	Property<bool> wrap;
+	Property<bool> visible;
+
 
 	virtual void append(Layoutable* item);
 	virtual void append(std::initializer_list<Layoutable*> item);

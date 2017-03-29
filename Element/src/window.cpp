@@ -28,13 +28,12 @@ static Window* getWindow(SDL_Window* r_window ) {
 }
 
 Direction PRIV_NAMESPACE::windowHitTestHelper(Window* window, Point point) {
-	return Window::inResizeRangeHelper(window, point);
+	return window->hitTest(point);
 }
 
 static SDL_HitTestResult windowHitTest(SDL_Window* r_window, const SDL_Point* point, void* data) {
 	auto window = getWindow(r_window);
 	switch(windowHitTestHelper(window, Point(point->x, point->y))) {
-		case Direction::Any: break;
 		case Direction::Left:
 			return SDL_HITTEST_RESIZE_LEFT;
 		case Direction::Top: 
@@ -46,7 +45,7 @@ static SDL_HitTestResult windowHitTest(SDL_Window* r_window, const SDL_Point* po
 		case Direction::Default: 
 			return SDL_HITTEST_DRAGGABLE;
 		default: 
-			return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+			return SDL_HITTEST_NORMAL;
 	}
 }
 
@@ -279,24 +278,6 @@ bool Window::resizeHelper( Widget* w, Point p, MouseButton buttons ) {
 	return true;
 }
 
-Direction Window::inResizeRangeHelper( Widget* w, Point p ) {
-	auto r = w->geometry.get();
-	if( w->type == ElementType::Window ) {
-		r = Point();
-	}
-	Direction dir = Direction::None;
-	auto resize_range = 6.0f;
-	if( ( p.x - r.x ) < resize_range )
-		dir = Direction::Left;
-	else if( ( r.x + r.width - p.x ) < resize_range )
-		dir = Direction::Right;
-	else if( ( p.y - r.y ) < resize_range )
-		dir = Direction::Top;
-	else if( ( r.y + r.height - p.y ) < resize_range )
-		dir = Direction::Bottom;
-
-	return dir;
-}
 
 //void Window::windowResizedCb( _privRWindow* r_window, int width, int height ) {
 //	auto win = getWindow( r_window );
@@ -351,20 +332,20 @@ void Window::mouseMovedHelper( Widget* w, Point p, MouseButton buttons ) {
 		}
 	}
 
-	if( innermost ) {
-		if( w->parent_window->grabbed_widget ) // we are still resizing, don't stop
-			resizeHelper( w->parent_window->grabbed_widget, p, buttons );
-		else if( w->isResizeable ) {
-			auto dir = inResizeRangeHelper( w, p );
-			if( dir != Direction::None ) {
-				applyWidgetResizeCursor( w, dir );
-			}
-			else
-				applyWidgetCursor( w );
-		}
-		else
-			applyWidgetCursor( w );
-	}
+	//if( innermost ) {
+	//	if( w->parent_window->grabbed_widget ) // we are still resizing, don't stop
+	//		resizeHelper( w->parent_window->grabbed_widget, p, buttons );
+	//	else if( w->isResizeable ) {
+	//		auto dir = inResizeRangeHelper( w, p );
+	//		if( dir != Direction::None ) {
+	//			applyWidgetResizeCursor( w, dir );
+	//		}
+	//		else
+	//			applyWidgetCursor( w );
+	//	}
+	//	else
+	//		applyWidgetCursor( w );
+	//}
 
 }
 
@@ -509,19 +490,19 @@ void Window::mousePressedHelper( Widget* w, bool btn_press, MouseButton buttons,
 		}
 	}
 
-	if( innermost ) {
-		if( !btn_press )
-			w->parent_window->grabbed_widget = nullptr;
+	//if( innermost ) {
+	//	if( !btn_press )
+	//		w->parent_window->grabbed_widget = nullptr;
 
-		if( !w->parent_window->grabbed_widget && btn_press ) {
-			w->resize_dir = inResizeRangeHelper( w, p );
-			if( w->isResizeable && w->resize_dir != Direction::None ) {
-				w->parent_window->grabbed_widget = w;
-				if( flags( buttons & MouseButton::Left ) )
-					w->resize_pos = w->mapFromWindow( p );
-			}
-		}
-	}
+	//	if( !w->parent_window->grabbed_widget && btn_press ) {
+	//		w->resize_dir = inResizeRangeHelper( w, p );
+	//		if( w->isResizeable && w->resize_dir != Direction::None ) {
+	//			w->parent_window->grabbed_widget = w;
+	//			if( flags( buttons & MouseButton::Left ) )
+	//				w->resize_pos = w->mapFromWindow( p );
+	//		}
+	//	}
+	//}
 
 }
 

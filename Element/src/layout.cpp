@@ -31,7 +31,8 @@ Layoutable::Layoutable( Layoutable* parent ) : Element( parent ),
                                                basis( 0 ),
                                                positionType( Position::Default ),
                                                direction( Direction::Default ),
-                                               wrap( false ) {
+                                               wrap( false ),
+											visible(true){
 
 	if( !layout_config ) {
 		layout_config = YGConfigNew();
@@ -331,12 +332,12 @@ void Layoutable::updateChildren() {
 
 void Layoutable::invalidated() {
 	if( node ) {
-		std::string obj = objectName;
-		std::cout << "\n";
-		YGNodePrint(node, YGPrintOptionsLayout);
-		std::cout << "\n";
-		YGNodePrint(node, YGPrintOptionsStyle);
-		std::cout << "\n";
+		//std::string obj = objectName;
+		//std::cout << "\n";
+		//YGNodePrint(node, YGPrintOptionsLayout);
+		//std::cout << "\n";
+		//YGNodePrint(node, YGPrintOptionsStyle);
+		//std::cout << "\n";
 
 		float nan1, nan2;
 		if( type != ElementType::Window ) {
