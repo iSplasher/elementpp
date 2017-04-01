@@ -359,7 +359,7 @@ struct ELEMENT_API RectT {
 	/// </summary>
 	template< typename O >
 	bool contains( const PointT< O >& p ) const {
-		return p.x > x && p.x < x + width && p.y > y && p.y < y + height;
+		return p.x >= x && p.x <= x + width && p.y >= y && p.y <= y + height;
 	}
 
 	/// <summary>
@@ -367,7 +367,7 @@ struct ELEMENT_API RectT {
 	/// </summary>
 	template< typename O >
 	bool contains( const SizeT< O >& s ) const {
-		return s.width > 0 && s.width < width && s.height > 0 && s.height < height;
+		return s.width >= 0 && s.width <= width && s.height >= 0 && s.height <= height;
 	}
 
 	/// <summary>

@@ -14,9 +14,6 @@ NAMESPACE_BEGIN
 class Widget;
 class Layoutable;
 
-
-
-
 class ELEMENT_API Layoutable : public Element {
 public:
 
@@ -105,8 +102,6 @@ private:
 	void setPadding(float, Direction);
 
 	// data members
-
-	float old_grow = 1; // used by setSize to set fixed size
 
 	bool dirty_layout = false; // layout has to recalculate
 	bool calculating = false; // layout is calculating

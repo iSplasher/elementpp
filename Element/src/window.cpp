@@ -33,20 +33,28 @@ Direction PRIV_NAMESPACE::windowHitTestHelper(Window* window, Point point) {
 
 static SDL_HitTestResult windowHitTest(SDL_Window* r_window, const SDL_Point* point, void* data) {
 	auto window = getWindow(r_window);
-	switch(windowHitTestHelper(window, Point(point->x, point->y))) {
-		case Direction::Left:
+	auto d = windowHitTestHelper(window, Point(point->x, point->y));
+
+	if (flags(d & Direction::Top) && flags(d & Direction::Left))
+		return SDL_HITTEST_RESIZE_TOPLEFT;
+	if (flags(d & Direction::Top) && flags(d & Direction::Right))
+		return SDL_HITTEST_RESIZE_TOPRIGHT;
+	if (flags(d & Direction::Bottom) && flags(d & Direction::Left))
+		return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+	if (flags(d & Direction::Bottom) && flags(d & Direction::Right))
+		return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+	if (flags(d & Direction::Left))
 			return SDL_HITTEST_RESIZE_LEFT;
-		case Direction::Top: 
+	if (flags(d & Direction::Top))
 			return SDL_HITTEST_RESIZE_TOP;
-		case Direction::Right: 
+	if (flags(d & Direction::Right))
 			return SDL_HITTEST_RESIZE_RIGHT;
-		case Direction::Bottom: 
+	if (flags(d & Direction::Bottom))
 			return SDL_HITTEST_RESIZE_BOTTOM;
-		case Direction::Default: 
+	if (flags(d & Direction::Default))
 			return SDL_HITTEST_DRAGGABLE;
-		default: 
-			return SDL_HITTEST_NORMAL;
-	}
+
+	return SDL_HITTEST_NORMAL;
 }
 
 

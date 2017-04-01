@@ -116,11 +116,11 @@ Direction Widget::hitTest( Point p ) {
 			if (d_c != Direction::None) {
 				return d_c;
 			}
+			if (isDraggable)
+				return Direction::Default;
 		}
 	}
 
-	if (isDraggable)
-		return Direction::Default;
 	return d;
 }
 
@@ -163,7 +163,15 @@ Direction Widget::inResizeRangeHelper( Point p ) {
 		r = Point();
 	}
 	auto resize_range = 6.0f;
-	if ((p.x - r.x) < resize_range)
+	if ((p.x - r.x) < resize_range && (p.y - r.y) < resize_range)
+		dir = Direction::Top | Direction::Left;
+	else if ((p.x - r.x) < resize_range && (r.y + r.height - p.y) < resize_range)
+		dir = Direction::Bottom | Direction::Left;
+	else if ((r.x + r.width - p.x) < resize_range && (p.y - r.y) < resize_range)
+		dir = Direction::Top | Direction::Right;
+	else if ((r.x + r.width - p.x) < resize_range && (r.y + r.height - p.y) < resize_range)
+		dir = Direction::Bottom | Direction::Right;
+	else if ((p.x - r.x) < resize_range)
 		dir = Direction::Left;
 	else if ((r.x + r.width - p.x) < resize_range)
 		dir = Direction::Right;
