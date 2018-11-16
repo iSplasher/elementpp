@@ -43,18 +43,19 @@ enum class Pen::Join {
 	Bevel = NVG_BEVEL
 };
 
+
 Pen::Pen( Painter& painter, Color color ) {
-	painter.setPen(*this);
-	setJoin(Join::Bevel);
-	setCap(Cap::Round);
-	setColor(color);
-	setWidth(1);
+	painter.setPen( *this );
+	setJoin( Join::Bevel );
+	setCap( Cap::Round );
+	setColor( color );
+	setWidth( 1 );
 }
 
 Pen::~Pen() {
-	if (painter)
+	if( painter )
 		painter->resetPen();
-	
+
 }
 
 void Pen::setColor( Color color ) {
@@ -90,12 +91,12 @@ void Pen::apply() const {
 }
 
 Brush::Brush( Painter& painter, Color color ) {
-	painter.setBrush(*this);
-	setColor(Color(0, 0, 0));
+	painter.setBrush( *this );
+	setColor( Color( 0, 0, 0 ) );
 }
 
 Brush::~Brush() {
-	if (painter)
+	if( painter )
 		painter->resetBrush();
 }
 
@@ -113,7 +114,8 @@ void Brush::apply() const {
 }
 
 Painter::Painter( Window* window ) :
-	def_pen(std::make_unique<Pen>( *this )), def_brush( std::make_unique<Brush>( *this ) ){
+	def_pen( std::make_unique< Pen >( *this ) ),
+	def_brush( std::make_unique< Brush >( *this ) ) {
 	w = window;
 	if( !w->this_paint ) {
 		auto n_flags = NVG_STENCIL_STROKES | NVG_ANTIALIAS;;
@@ -187,12 +189,12 @@ const Painter& Painter::reset() {
 }
 
 const Painter& Painter::resetPen() {
-	setPen(*def_pen);
+	setPen( *def_pen );
 	return *this;
 }
 
 const Painter& Painter::resetBrush() {
-	setBrush(*def_brush);
+	setBrush( *def_brush );
 	return *this;
 }
 
@@ -210,12 +212,12 @@ const Painter& Painter::setBrush( Brush& brush ) {
 
 const Painter& Painter::clip( Rect rect ) const {
 	translate( rect );
-	nvgScissor(context, rect.x, rect.y, rect.width, rect.height);
+	nvgScissor( context, rect.x, rect.y, rect.width, rect.height );
 	return *this;
 }
 
 const Painter& Painter::resetClip() const {
-	nvgResetScissor(context);
+	nvgResetScissor( context );
 	return *this;
 }
 
@@ -277,9 +279,9 @@ void Painter::paintWidget( Widget* w ) {
 	p.setWidth( 0 );
 	Size size = w->size;
 	b.setColor( w->borderColor );
-	drawRoundedRect( Rect( 0, 0, size.width, size.height ) , w->borderRadiusTopLeft, w->borderRadiusTopRight, w->borderRadiusBottomRight, w->borderRadiusBottomLeft); // border
+	drawRoundedRect( Rect( 0, 0, size.width, size.height ), w->borderRadiusTopLeft, w->borderRadiusTopRight, w->borderRadiusBottomRight, w->borderRadiusBottomLeft ); // border
 	b.setColor( w->backgroundColor );
-	auto content_geometry = Rect( w->borderLeft, w->borderTop, size.width - (w->borderRight * 2), size.height - (w->borderBottom * 2) );
+	auto content_geometry = Rect( w->borderLeft, w->borderTop, size.width - ( w->borderRight * 2 ), size.height - ( w->borderBottom * 2 ) );
 	drawRect( Rect( content_geometry ) ); // contents
 	p.setWidth( 1 );
 }
