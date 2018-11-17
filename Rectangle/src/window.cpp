@@ -15,14 +15,6 @@ ui::Window::Window(const Props &props) : Component(props) {
 ui::Window::Window(Window&& other) noexcept : Component(std::move(other)),
 window(std::move(other.window)) {}
 
-ui::Window& ui::Window::operator=(const Window& other) {
-    if (this == &other)
-        return *this;
-    Component::operator =(other);
-    window = other.window;
-    return *this;
-}
-
 ui::Window& ui::Window::operator=(Window&& other) noexcept {
     if (this == &other)
         return *this;
@@ -31,7 +23,8 @@ ui::Window& ui::Window::operator=(Window&& other) noexcept {
     return *this;
 }
 
-void ui::Window::render() {
+ComponentInstPtr ui::Window::render() const {
 
-    Component::render();
+    return Component::render();
+
 }

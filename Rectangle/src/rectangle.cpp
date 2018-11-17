@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
         {
             kw("size", {500, 500}),
             kw("show", true)
-        }
-        //el<comp>()
+        },
+        el<comp>()
         ));
 }
 

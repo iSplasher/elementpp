@@ -16,17 +16,13 @@ namespace ui
 
         Window(const Props &props);
 
-        Window(const Window& other) = default;
-
         Window(Window&& other) noexcept;
-
-        Window& operator=(const Window& other);
 
         Window& operator=(Window&& other) noexcept;
 
         virtual ~Window() = default;
 
-        void render() override;
+        ComponentInstPtr render() const override;
 
     private:
 
