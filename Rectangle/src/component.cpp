@@ -4,7 +4,7 @@ USING_LIB_NAMESPACE
 USING_PRIVATE_LIB_NAMESPACE
 
 
-ComponentInstPtr ComponentBase::render() const {
+ComponentInstPtr ComponentWrapper::render() const {
     if (type == component) {
         return render_cmp ? render_cmp->render() : nullptr;
     }

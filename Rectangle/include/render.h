@@ -14,15 +14,17 @@ std::shared_ptr< LIB_PRIVATE_NAMESPACE::ComponentInstance > el_instances_impl(
     ComponentInstPtrList objs,
     std::shared_ptr<const IProps> props = nullptr) {
 
-    std::shared_ptr<Component> obj;
+    Component* obj;
 
     if (props) {
-        obj = std::make_shared<T>(props);
+        obj = new T(props);
     } else {
-        obj = std::make_shared<T>();
+        obj = new T();
     }
 
-    return std::make_shared<LIB_PRIVATE_NAMESPACE::ComponentInstance>(obj, objs);
+    std::shared_ptr<ComponentWrapper> obj_wrapper = std::make_shared<ComponentWrapper>(props, obj);
+
+    return std::make_shared<LIB_PRIVATE_NAMESPACE::ComponentInstance>(obj_wrapper, objs);
 }
 
 template<typename T>
@@ -31,9 +33,9 @@ std::shared_ptr< LIB_PRIVATE_NAMESPACE::ComponentInstance > el_instances_impl(
     PureFunc render_func,
     std::shared_ptr<const IProps> props = nullptr) {
 
-    std::shared_ptr<ComponentBase> obj = std::make_shared<T>(props, render_func);
+    std::shared_ptr<ComponentWrapper> obj_wrapper = std::make_shared<ComponentWrapper>(props, render_func);
 
-    return std::make_shared<LIB_PRIVATE_NAMESPACE::ComponentInstance>(obj, objs);
+    return std::make_shared<LIB_PRIVATE_NAMESPACE::ComponentInstance>(obj_wrapper, objs);
 }
 
 LIB_NAMESPACE_END
@@ -62,7 +64,7 @@ auto el(const ArgsT&... args) {
 template<auto T, typename ...ArgsT>
 auto el(const ArgsT&... args) {
     auto p = std::make_shared<IProps>();
-    return LIB_PRIVATE_NAMESPACE::el_instances_impl<ComponentBase>({ static_cast<ComponentInstPtr>(args) ... }, T, p);
+    return LIB_PRIVATE_NAMESPACE::el_instances_impl<ComponentWrapper>({ static_cast<ComponentInstPtr>(args) ... }, T, p);
 }
 
 
